@@ -190,7 +190,7 @@ else
                     APPTMP="/data/local/tmp/"
                     APPNAME="nethunter.apk"
                     mount -o rw,remount /system
-                    mkdir -p $APPDST/backup
+                    mkdir -p ${APPDST}backup
                     curl -o ${APPTMP}${APPNAME} ${APPSRC}
                     if [ $? == "0" ]; then
                             # Check if we downloaded a valid apk
@@ -205,17 +205,17 @@ else
                                     echo "Error: File does not seem to be a valid Android app."
                                     exit 1
                             fi
-                            if [ -f $APPDST/nethunter.apk ]; then
-                                    mv -f $APPDST/nethunter.apk $APPDST/backup
+                            if [ -f ${APPDST}${APPNAME} ]; then
+                                    mv -f ${APPDST}${APPNAME} ${APPDST}backup
                             fi
-                            mv -f /data/local/tmp/nethunter.apk $APPDST
+                            mv -f ${APPTMP}${APPNAME} ${APPDST}
                             echo "NetHunter app updated successfully."
                     else
-                            echo "Error: Downloading $APPSRC failed."
+                            echo "Error: Downloading ${APPSRC} failed."
                     fi
                     mount -o ro,remount /system
             else
-                    echo "Error: Could not find /system/priv-app/NetHunter."
+                    echo "Error: Could not find ${APPDST}."
                     echo "NetHunter App does not seem to be installed as a system app."
                     echo "Try updating the nethunter app like any other sideloaded user app instead."
             fi
