@@ -176,6 +176,50 @@ else
 	if [ "$1" == "update" ]; then
 		LANG=C PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin $busybox chroot $mnt sudo /usr/bin/start-update.sh
 	fi
+	
+	#UPDATEAPP - Updates the nethunter-app if installed as system/priv-app
+
+    if [ "$1" == "updateapp" ]; then
+            if [ -d "/system/priv-app/NetHunter" ]; then
+                    if [ -z "$2" ]; then
+                            APPSRC="https://images.offensive-security.com/latest.apk"
+                    else
+                            APPSRC="$2"
+                    fi
+                    APPDST="/system/priv-app/NetHunter/"
+                    APPTMP="/data/local/tmp/"
+                    APPNAME="nethunter.apk"
+                    mount -o rw,remount /system
+                    mkdir -p $APPDST/backup
+                    curl -o ${APPTMP}${APPNAME} ${APPSRC}
+                    if [ $? == "0" ]; then
+                            # Check if we downloaded a valid apk
+                            if [[ $(file ${APPTMP}${APPNAME}|grep 'Zip archive') ]]; then
+                                    if [[ $(grep 'AndroidManifest.xml' ${APPTMP}${APPNAME}) ]]; then
+                                        echo "${APPSRC} appears to be a valid Android app. Installing now."
+                                    else
+                                        echo "Error: File does not seem to be a valid Android app."
+                                        exit 1
+                                    fi
+                            else
+                                    echo "Error: File does not seem to be a valid Android app."
+                                    exit 1
+                            fi
+                            if [ -f $APPDST/nethunter.apk ]; then
+                                    mv -f $APPDST/nethunter.apk $APPDST/backup
+                            fi
+                            mv -f /data/local/tmp/nethunter.apk $APPDST
+                            echo "NetHunter app updated successfully."
+                    else
+                            echo "Error: Downloading $APPSRC failed."
+                    fi
+                    mount -o ro,remount /system
+            else
+                    echo "Error: Could not find /system/priv-app/NetHunter."
+                    echo "NetHunter App does not seem to be installed as a system app."
+                    echo "Try updating the nethunter app like any other sideloaded user app instead."
+            fi
+    fi
 
 	#Disable WLAN1
 
