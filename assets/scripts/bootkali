@@ -182,7 +182,7 @@ else
     if [ "$1" == "updateapp" ]; then
             if [ -d "/system/priv-app/NetHunter" ]; then
                     if [ -z "$2" ]; then
-                            APPSRC="https://images.offensive-security.com/latest.apk"
+                            APPSRC="https://images.offensive-security.com/nethunter/nethunter-latest.apk"
                     else
                             APPSRC="$2"
                     fi
@@ -209,17 +209,104 @@ else
                                     mv -f ${APPDST}${APPNAME} ${APPDST}backup
                             fi
                             mv -f ${APPTMP}${APPNAME} ${APPDST}
-                            echo "NetHunter app updated successfully."
+                            echo "${APPNAME} updated successfully."
                     else
                             echo "Error: Downloading ${APPSRC} failed."
                     fi
                     mount -o ro,remount /system
             else
                     echo "Error: Could not find ${APPDST}."
-                    echo "NetHunter App does not seem to be installed as a system app."
-                    echo "Try updating the nethunter app like any other sideloaded user app instead."
+                    echo "${APPNAME} does not seem to be installed as a system app."
+                    echo "Try updating ${APPNAME} app like any other sideloaded user app instead."
             fi
     fi
+
+    if [ "$1" == "updateterm" ]; then
+                if [ -d "/system/priv-app/NetHunter-Terminal" ]; then
+                        if [ -z "$2" ]; then
+                                APPSRC="https://images.offensive-security.com/nethunter/Term-nh-latest.apk"
+                        else
+                                APPSRC="$2"
+                        fi
+                        APPDST="/system/priv-app/NetHunter-Terminal/"
+                        APPTMP="/data/local/tmp/"
+                        APPNAME="Term-nh.apk"
+                        mount -o rw,remount /system
+                        mkdir -p ${APPDST}backup
+                        curl -o ${APPTMP}${APPNAME} ${APPSRC}
+                        if [ $? == "0" ]; then
+                                # Check if we downloaded a valid apk
+                                if [[ $(file ${APPTMP}${APPNAME}|grep 'Zip archive') ]]; then
+                                        if [[ $(grep 'AndroidManifest.xml' ${APPTMP}${APPNAME}) ]]; then
+                                            echo "${APPSRC} appears to be a valid Android app. Installing now."
+                                        else
+                                            echo "Error: File does not seem to be a valid Android app."
+                                            exit 1
+                                        fi
+                                else
+                                        echo "Error: File does not seem to be a valid Android app."
+                                        exit 1
+                                fi
+                                if [ -f ${APPDST}${APPNAME} ]; then
+                                        mv -f ${APPDST}${APPNAME} ${APPDST}backup
+                                fi
+                                mv -f ${APPTMP}${APPNAME} ${APPDST}
+                                unzip -qo ${APPDST}${APPNAME} "lib/*" -d ${APPDST}
+                                mv ${APPDST}lib/armeabi-v7a ${APPDST}lib/arm
+                                mv ${APPDST}lib/arm64-v8a ${APPDST}lib/arm64
+                                echo "${APPNAME} updated successfully."
+                        else
+                                echo "Error: Downloading ${APPSRC} failed."
+                        fi
+                        mount -o ro,remount /system
+                else
+                        echo "Error: Could not find ${APPDST}."
+                        echo "${APPNAME} does not seem to be installed as a system app."
+                        echo "Try updating ${APPNAME} app like any other sideloaded user app instead."
+                fi
+        fi
+
+        if [ "$1" == "updatevnc" ]; then
+                        if [ -d "/system/priv-app/NetHunter-VNC" ]; then
+                                if [ -z "$2" ]; then
+                                        APPSRC="https://images.offensive-security.com/nethunter/VNC-nh-latest.apk"
+                                else
+                                        APPSRC="$2"
+                                fi
+                                APPDST="/system/priv-app/NetHunter-VNC/"
+                                APPTMP="/data/local/tmp/"
+                                APPNAME="VNC-nh.apk"
+                                mount -o rw,remount /system
+                                mkdir -p ${APPDST}backup
+                                curl -o ${APPTMP}${APPNAME} ${APPSRC}
+                                if [ $? == "0" ]; then
+                                        # Check if we downloaded a valid apk
+                                        if [[ $(file ${APPTMP}${APPNAME}|grep 'Zip archive') ]]; then
+                                                if [[ $(grep 'AndroidManifest.xml' ${APPTMP}${APPNAME}) ]]; then
+                                                    echo "${APPSRC} appears to be a valid Android app. Installing now."
+                                                else
+                                                    echo "Error: File does not seem to be a valid Android app."
+                                                    exit 1
+                                                fi
+                                        else
+                                                echo "Error: File does not seem to be a valid Android app."
+                                                exit 1
+                                        fi
+                                        if [ -f ${APPDST}${APPNAME} ]; then
+                                                mv -f ${APPDST}${APPNAME} ${APPDST}backup
+                                        fi
+                                        mv -f ${APPTMP}${APPNAME} ${APPDST}
+                                        echo "${APPNAME} updated successfully."
+                                else
+                                        echo "Error: Downloading ${APPSRC} failed."
+                                fi
+                                mount -o ro,remount /system
+                        else
+                                echo "Error: Could not find ${APPDST}."
+                                echo "${APPNAME} does not seem to be installed as a system app."
+                                echo "Try updating ${APPNAME} app like any other sideloaded user app instead."
+                        fi
+                fi
 
 	#Disable WLAN1
 
