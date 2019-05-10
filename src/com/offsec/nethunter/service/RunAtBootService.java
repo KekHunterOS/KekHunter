@@ -131,13 +131,13 @@ public class RunAtBootService extends JobIntentService {
 
         if (userinit(runBootServices)) {
 //            Toast.makeText(getBaseContext(), "Boot end: ALL OK", Toast.LENGTH_SHORT).show();
-            doNotification("Boot ended. All fine. Action performed: " + doing_action + " OK");
+            doNotification("Boot completed.\nEveryting is fine.\nAction performed: " + doing_action + " OK");
         } else {
             if (!runBootServices) {
 //                Toast.makeText(getBaseContext(), "Not runing boot scripts. OK", Toast.LENGTH_SHORT).show();
-                doNotification("Boot ended. All fine. Action performed: " + doing_action + " OK");
+                doNotification("Boot completed.\nEverything is fine.\nAction performed: " + doing_action + " OK");
             } else {
-                doNotification("Boot ended. No busybox found!");
+                doNotification("Boot completed.\nNo busybox found!");
             }
         }
         // put change MAC addresses here.

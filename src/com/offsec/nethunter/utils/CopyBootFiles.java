@@ -128,7 +128,27 @@ class CopyBootFiles extends AsyncTask<String, String, String> {
               } else {
                   publishProgress("Chroot not Found, install it in Chroot Manager");
               }
+
+              // This is required to install the additional apks in Android Oreo and newer
+              // We can no longer install user apps through TWRP so we copy them across and install them here
+              // Get the list of *.apk files in /sdcard/nh_files/cache/apk and install them using "pm install"
+              publishProgress("Installing additional apps....");
+              String ApkCachePath= nh.APP_SD_FILES_PATH + "/cache/apk/";
+              ArrayList<String> filenames = FetchFiles(ApkCachePath);
+              int i, x;
+
+              for (String object: filenames) {
+                  if (object.contains(".apk")){
+                      String apk = ApkCachePath + object;
+                      publishProgress("Installing additional apps.\nThe device may be unresponsive for a few minutes\nInstalling " + object);
+                      ShellExecuter install = new ShellExecuter();
+                      install.RunAsRoot(new String[]{"mv " + apk + " /data/local/tmp/ && pm install /data/local/tmp/" + object + " && rm -f /data/local/tmp/" + object});
+
+                  }
+              }
+
               return "All files copied.";
+
           } else {
               cancel(true);
           }
@@ -267,5 +287,23 @@ class CopyBootFiles extends AsyncTask<String, String, String> {
         Log.d(COPY_ASSETS_TAG, "command output: ln -s " + nh.APP_SCRIPTS_PATH + "/" + filename + " /system/bin/" + filename);
 
         exe.RunAsRoot(new String[]{"ln -s " + nh.APP_SCRIPTS_PATH + "/" + filename + " /system/bin/" + filename});
+    }
+
+    // Get a list of files from a directory
+    private ArrayList<String> FetchFiles(String folder) {
+
+        ArrayList<String> filenames = new ArrayList<String>();
+        String path = folder;
+        File directory = new File(path);
+
+        if (directory.exists()) {
+            File[] files = directory.listFiles();
+
+            for (int i = 0; i < files.length; i++) {
+                String file_name = files[i].getName();
+                filenames.add(file_name);
+            }
+        }
+        return filenames;
     }
 }
