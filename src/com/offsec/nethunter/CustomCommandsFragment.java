@@ -1,12 +1,12 @@
 package com.offsec.nethunter;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,16 +14,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.SearchView;
 
 import com.offsec.nethunter.utils.BootKali;
 import com.offsec.nethunter.utils.NhPaths;
@@ -32,9 +32,10 @@ import com.offsec.nethunter.utils.ShellExecuter;
 import java.util.List;
 
 import androidx.appcompat.app.AlertDialog;
-//import androidx.appcompat.widget.SearchView;
 import android.widget.SearchView;
 import androidx.fragment.app.Fragment;
+
+//import androidx.appcompat.widget.SearchView;
 
 public class CustomCommandsFragment extends Fragment {
 
@@ -88,17 +89,12 @@ public class CustomCommandsFragment extends Fragment {
         custom_commands_runlevel = "90";
 
         View rootView = inflater.inflate(R.layout.custom_commands, container, false);
-        final Button addCommand = (Button) rootView.findViewById(R.id.addCommand);
+        final Button addCommand = rootView.findViewById(R.id.addCommand);
         setHasOptionsMenu(true);
-        final SearchView searchStr = (SearchView) rootView.findViewById(R.id.searchCommand);
+        final SearchView searchStr = rootView.findViewById(R.id.searchCommand);
         main(rootView);
         // set up listeners
-        addCommand.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showCommandDialog("ADD", null, 0);
-            }
-        });
+        addCommand.setOnClickListener(v -> showCommandDialog("ADD", null, 0));
 
         searchStr.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
@@ -125,10 +121,11 @@ public class CustomCommandsFragment extends Fragment {
         String _cmd = command.getCommand();
         //String _mode = command.getExec_Mode();
         String _sendTo = command.getSend_To_Shell();
+        nh = new NhPaths();
 
         String composedCommand;
         if (_sendTo.equals("KALI")) {
-            composedCommand = "su -c bootkali custom_cmd " + _cmd;
+            composedCommand = "su -c '"+nh.APP_SCRIPTS_PATH+"/bootkali custom_cmd " + _cmd + "'";
         } else {
             // SEND TO ANDROID
             // no sure, if we add su -c , we cant exec comands as a normal android user
@@ -136,8 +133,9 @@ public class CustomCommandsFragment extends Fragment {
         }
         String bootServiceFile = bootScriptPath + "/" + custom_commands_runlevel + "_" + command.getId() + "_custom_command";
         String fileContents = shebang + _label + "\n" + composedCommand;
+        Log.d("bootScript", fileContents);
         exe.RunAsRoot(new String[]{
-                "echo '" + fileContents + "' > " + bootServiceFile,
+                "cat > " + bootServiceFile + " <<s0133717hur75\n" + fileContents + "\ns0133717hur75\n",
                 "chmod 700 " + bootServiceFile
         });
 
@@ -191,8 +189,8 @@ public class CustomCommandsFragment extends Fragment {
 
     private void main(final View rootView) {
 
-        commandListView = (ListView) rootView.findViewById(R.id.commandList);
-        TextView customComandsInfo = (TextView) rootView.findViewById(R.id.customComandsInfo);
+        commandListView = rootView.findViewById(R.id.commandList);
+        TextView customComandsInfo = rootView.findViewById(R.id.customComandsInfo);
         commandList = database.getAllCommands();
         commandAdapter = new CmdLoader(mContext, commandList);
 
@@ -202,27 +200,21 @@ public class CustomCommandsFragment extends Fragment {
         }
 
         commandListView.setAdapter(commandAdapter);
-        commandListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                ((Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE)).vibrate(50);
+        commandListView.setOnItemLongClickListener((parent, view, position, id) -> {
+            ((Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE)).vibrate(50);
 
-                CustomCommand currenCommand = (CustomCommand) commandListView.getItemAtPosition(position);
-                showCommandDialog("EDIT", currenCommand, position);
+            CustomCommand currenCommand = (CustomCommand) commandListView.getItemAtPosition(position);
+            showCommandDialog("EDIT", currenCommand, position);
 
-                return false;
-            }
+            return false;
         });
 
     }
 
     private static void hideSoftKeyboard(final View caller) {
-        caller.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                InputMethodManager imm = (InputMethodManager) caller.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(caller.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-            }
+        caller.postDelayed(() -> {
+            InputMethodManager imm = (InputMethodManager) caller.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(caller.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         }, 100);
     }
 
@@ -235,25 +227,20 @@ public class CustomCommandsFragment extends Fragment {
         alertDialogBuilder.setView(promptsView);
         alertDialogBuilder.setCancelable(false);
         alertDialogBuilder.setNegativeButton("Cancel",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                        hideSoftKeyboard(getView());
-                    }
+                (dialog, id) -> {
+                    dialog.cancel();
+                    hideSoftKeyboard(getView());
                 });
 
-        final Spinner command_exec_mode = (Spinner) promptsView.findViewById(R.id.spinnerExecMode);
-        final CheckBox run_at_boot = (CheckBox) promptsView.findViewById(R.id.custom_comands_runAtBoot);
+        final Spinner command_exec_mode = promptsView.findViewById(R.id.spinnerExecMode);
+        final CheckBox run_at_boot = promptsView.findViewById(R.id.custom_comands_runAtBoot);
 
-        run_at_boot.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    command_exec_mode.setSelection(0);
-                    command_exec_mode.setEnabled(false);
-                } else {
-                    command_exec_mode.setEnabled(true);
-                }
+        run_at_boot.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                command_exec_mode.setSelection(0);
+                command_exec_mode.setEnabled(false);
+            } else {
+                command_exec_mode.setEnabled(true);
             }
         });
         switch (action) {
@@ -268,39 +255,37 @@ public class CustomCommandsFragment extends Fragment {
 
     private void saveNewCommand(AlertDialog.Builder alertDialogBuilder, View promptsView) {
 
-        final EditText userInputBtnLabel = (EditText) promptsView.findViewById(R.id.editText_launcher_btn_label);
-        final EditText userInputCommand = (EditText) promptsView.findViewById(R.id.editText_launcher_command);
-        final Spinner command_exec_mode = (Spinner) promptsView.findViewById(R.id.spinnerExecMode);
-        final Spinner command_run_in_shell = (Spinner) promptsView.findViewById(R.id.spinnerRun_in_shell);
-        final CheckBox run_at_boot = (CheckBox) promptsView.findViewById(R.id.custom_comands_runAtBoot);
+        final EditText userInputBtnLabel = promptsView.findViewById(R.id.editText_launcher_btn_label);
+        final EditText userInputCommand = promptsView.findViewById(R.id.editText_launcher_command);
+        final Spinner command_exec_mode = promptsView.findViewById(R.id.spinnerExecMode);
+        final Spinner command_run_in_shell = promptsView.findViewById(R.id.spinnerRun_in_shell);
+        final CheckBox run_at_boot = promptsView.findViewById(R.id.custom_comands_runAtBoot);
         alertDialogBuilder
                 .setPositiveButton("OK",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                if (userInputBtnLabel.getText().length() > 0 &&
-                                        userInputCommand.getText().length() > 0) {
-                                    Integer _run_at_boot = 0;
-                                    if (run_at_boot.isChecked()) {
-                                        _run_at_boot = 1;
+                        (dialog, id) -> {
+                            if (userInputBtnLabel.getText().length() > 0 &&
+                                    userInputCommand.getText().length() > 0) {
+                                Integer _run_at_boot = 0;
+                                if (run_at_boot.isChecked()) {
+                                    _run_at_boot = 1;
 
-                                    }
-                                    CustomCommand _insertedCommand = database.addCommand(userInputBtnLabel.getText().toString(),
-                                            userInputCommand.getText().toString(),
-                                            command_exec_mode.getSelectedItem().toString(),
-                                            command_run_in_shell.getSelectedItem().toString(), _run_at_boot);
-                                    nh.showMessage("Command created.");
-
-                                    if (_run_at_boot == 1) {
-                                        addToBoot(_insertedCommand);
-                                    }
-                                    // add to top of the list
-                                    commandList.add(0, _insertedCommand);
-                                    commandAdapter.notifyDataSetChanged();
-                                } else {
-                                    nh.showMessage(getString(R.string.toast_input_error_launcher));
                                 }
-                                hideSoftKeyboard(getView());
+                                CustomCommand _insertedCommand = database.addCommand(userInputBtnLabel.getText().toString(),
+                                        userInputCommand.getText().toString(),
+                                        command_exec_mode.getSelectedItem().toString(),
+                                        command_run_in_shell.getSelectedItem().toString(), _run_at_boot);
+                                nh.showMessage("Command created.");
+
+                                if (_run_at_boot == 1) {
+                                    addToBoot(_insertedCommand);
+                                }
+                                // add to top of the list
+                                commandList.add(0, _insertedCommand);
+                                commandAdapter.notifyDataSetChanged();
+                            } else {
+                                nh.showMessage(getString(R.string.toast_input_error_launcher));
                             }
+                            hideSoftKeyboard(getView());
                         });
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
@@ -308,11 +293,11 @@ public class CustomCommandsFragment extends Fragment {
 
     private void editCommand(AlertDialog.Builder alertDialogBuilder, View promptsView, CustomCommand commandInfo, final int position) {
 
-        final EditText userInputCommandLabel = (EditText) promptsView.findViewById(R.id.editText_launcher_btn_label);
-        final EditText userInputCommand = (EditText) promptsView.findViewById(R.id.editText_launcher_command);
-        final Spinner command_exec_mode = (Spinner) promptsView.findViewById(R.id.spinnerExecMode);
-        final Spinner command_run_in_shell = (Spinner) promptsView.findViewById(R.id.spinnerRun_in_shell);
-        final CheckBox run_at_boot = (CheckBox) promptsView.findViewById(R.id.custom_comands_runAtBoot);
+        final EditText userInputCommandLabel = promptsView.findViewById(R.id.editText_launcher_btn_label);
+        final EditText userInputCommand = promptsView.findViewById(R.id.editText_launcher_command);
+        final Spinner command_exec_mode = promptsView.findViewById(R.id.spinnerExecMode);
+        final Spinner command_run_in_shell = promptsView.findViewById(R.id.spinnerRun_in_shell);
+        final CheckBox run_at_boot = promptsView.findViewById(R.id.custom_comands_runAtBoot);
         // command Info
         final long _id = commandInfo.getId();
         String _label = commandInfo.getCommand_label();
@@ -343,47 +328,43 @@ public class CustomCommandsFragment extends Fragment {
         }
         alertDialogBuilder
                 .setPositiveButton("Update",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
+                        (dialog, id) -> {
 
-                                if (userInputCommandLabel.getText().length() > 0 &&
-                                        userInputCommand.getText().length() > 0) {
-                                    Integer _run_at_boot = 0;
-                                    if (run_at_boot.isChecked()) {
-                                        _run_at_boot = 1;
-                                    }
-                                    CustomCommand _updatedCommand = new CustomCommand(_id,
-                                            userInputCommandLabel.getText().toString(),
-                                            userInputCommand.getText().toString(),
-                                            command_exec_mode.getSelectedItem().toString(),
-                                            command_run_in_shell.getSelectedItem().toString(), _run_at_boot);
-
-                                    database.updateCommand(_updatedCommand);
-                                    if (_run_at_boot == 1) {
-                                        addToBoot(_updatedCommand);
-                                    } else {
-                                        removeFromBoot(_updatedCommand.getId());
-                                    }
-                                    nh.showMessage("Command Updated");
-                                    commandList.set(position, _updatedCommand);
-                                    commandAdapter.notifyDataSetChanged();
-
-                                } else {
-                                    nh.showMessage(getString(R.string.toast_input_error_launcher));
+                            if (userInputCommandLabel.getText().length() > 0 &&
+                                    userInputCommand.getText().length() > 0) {
+                                Integer _run_at_boot = 0;
+                                if (run_at_boot.isChecked()) {
+                                    _run_at_boot = 1;
                                 }
-                                hideSoftKeyboard(getView());
+                                CustomCommand _updatedCommand = new CustomCommand(_id,
+                                        userInputCommandLabel.getText().toString(),
+                                        userInputCommand.getText().toString(),
+                                        command_exec_mode.getSelectedItem().toString(),
+                                        command_run_in_shell.getSelectedItem().toString(), _run_at_boot);
+
+                                database.updateCommand(_updatedCommand);
+                                if (_run_at_boot == 1) {
+                                    addToBoot(_updatedCommand);
+                                } else {
+                                    removeFromBoot(_updatedCommand.getId());
+                                }
+                                nh.showMessage("Command Updated");
+                                commandList.set(position, _updatedCommand);
+                                commandAdapter.notifyDataSetChanged();
+
+                            } else {
+                                nh.showMessage(getString(R.string.toast_input_error_launcher));
                             }
+                            hideSoftKeyboard(getView());
                         })
                 .setNeutralButton("Delete",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                database.deleteCommand(_id);
-                                removeFromBoot(_id);
-                                commandList.remove(position);
-                                commandAdapter.notifyDataSetChanged();
-                                hideSoftKeyboard(getView());
-                                nh.showMessage("Command Deleted");
-                            }
+                        (dialog, id) -> {
+                            database.deleteCommand(_id);
+                            removeFromBoot(_id);
+                            commandList.remove(position);
+                            commandAdapter.notifyDataSetChanged();
+                            hideSoftKeyboard(getView());
+                            nh.showMessage("Command Deleted");
                         });
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
@@ -394,6 +375,8 @@ public class CustomCommandsFragment extends Fragment {
         database.addCommand("Wlan1 Monitor Mode", nh.makeTermTitle("Wlan1 Monitor UP") + "sudo ifconfig wlan1 down && sudo iwconfig wlan1 mode monitor && sudo ifconfig wlan1 up && echo \"wlan1 Monitor mode enabled\" && sleep 3 && exit", "INTERACTIVE", "KALI", 0);
         database.addCommand("Launch Wifite", nh.makeTermTitle("Wifite") + "wifite", "INTERACTIVE", "KALI", 0);
         database.addCommand("Dump Mifare", nh.makeTermTitle("DumpMifare") + "dumpmifare.sh", "INTERACTIVE", "KALI", 0);
+        database.addCommand("Backup Kali Chroot", nh.makeTermTitle("Backup_Kali_Chroot") + "su --mount-master -c 'chroot_backup /data/local/nhsystem/kali-armhf /sdcard/kalifs-backup.tar.gz'",
+                "INTERACTIVE", "ANDROID", 0);
     }
 }
 
@@ -444,12 +427,12 @@ class CmdLoader extends BaseAdapter {
             // set up the ViewHolder
             vH = new ViewHolderItem();
             // get the reference of switch and the text view
-            vH.cwTitle = (TextView) convertView.findViewById(R.id.command_tag);
+            vH.cwTitle = convertView.findViewById(R.id.command_tag);
             // vH.cwSwich = (Switch) convertView.findViewById(R.id.switch1);
-            vH.execmode = (TextView) convertView.findViewById(R.id.execmode);
-            vH.sendtocmd = (TextView) convertView.findViewById(R.id.sendtocmd);
-            vH.runatboot = (TextView) convertView.findViewById(R.id.custom_comands_runAtBoot_text);
-            vH.cwButton = (Button) convertView.findViewById(R.id.runCommand);
+            vH.execmode = convertView.findViewById(R.id.execmode);
+            vH.sendtocmd = convertView.findViewById(R.id.sendtocmd);
+            vH.runatboot = convertView.findViewById(R.id.custom_comands_runAtBoot_text);
+            vH.cwButton = convertView.findViewById(R.id.runCommand);
             convertView.setTag(vH);
             //System.out.println ("created row");
         } else {
@@ -477,12 +460,7 @@ class CmdLoader extends BaseAdapter {
         vH.execmode.setText(_mode);
         vH.sendtocmd.setText(_sendTo);
         vH.runatboot.setText(_runAtBoot_txt);
-        vH.cwButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                doCustomCommand(commandInfo);
-            }
-        });
+        vH.cwButton.setOnClickListener(v -> doCustomCommand(commandInfo));
         return convertView;
 
     }
