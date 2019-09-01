@@ -51,7 +51,7 @@ public class DuckHunterFragment extends Fragment implements ActionBar.TabListene
     private static SharedPreferences sharedpreferences;
 
     // Language vars
-    private final static CharSequence[] languages = {"American English", "French", "German", "Spanish", "Swedish", "Italian", "British English", "Russian", "Danish", "Norwegian", "Portugese", "Belgian", "Canadian Multilingual", "Canadian"};
+    private final static CharSequence[] languages = {"American English", "French", "German", "Spanish", "Swedish", "Italian", "British English", "Russian", "Danish", "Norwegian", "Portugese", "Belgian", "Canadian Multilingual", "Canadian", "Hungarian"};
     private static String lang = "us"; // Set US as default language
     private static Boolean shouldConvert = true;
     private static final String ARG_SECTION_NUMBER = "section_number";
@@ -151,6 +151,9 @@ public class DuckHunterFragment extends Fragment implements ActionBar.TabListene
                 break;
             case 13:
                 lang = "ca";
+                break;
+            case 14:
+                lang = "hu";
                 break;
             default:
                 lang = "us";

@@ -41,7 +41,7 @@ public class HidFragment extends Fragment {
     private SharedPreferences sharedpreferences;
     private static NhPaths nh;
     private final CharSequence[] platforms = {"No UAC Bypass", "Windows 7", "Windows 8", "Windows 10"};
-    private final CharSequence[] languages = {"American English", "Belgian", "British English", "Danish", "French", "German", "Italian", "Norwegian", "Portugese", "Russian", "Spanish", "Swedish", "Canadian Multilingual", "Canadian"};
+    private final CharSequence[] languages = {"American English", "Belgian", "British English", "Danish", "French", "German", "Italian", "Norwegian", "Portugese", "Russian", "Spanish", "Swedish", "Canadian Multilingual", "Canadian", "Hungarian"};
     private String configFilePath;
 
     private static final String ARG_SECTION_NUMBER = "section_number";
@@ -168,6 +168,9 @@ public class HidFragment extends Fragment {
                 break;
             case 13:
                 lang = "ca";
+                break;
+            case 14:
+                lang = "hu";
                 break;
             default:
                 lang = "us";

@@ -381,10 +381,6 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                                     .addToBackStack(null)
                                     .commit();
                             break;
-
-                        case R.id.checkforupdate_item:
-                            checkUpdate();
-                            break;
                     }
                     restoreActionBar();
                     return true;
