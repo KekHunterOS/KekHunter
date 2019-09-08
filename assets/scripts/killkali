@@ -50,12 +50,15 @@ $busybox umount $mnt/proc && echo "unmounted proc"
 $busybox umount $mnt/sys && echo "unmounted sys"
 $busybox umount $mnt/system && echo "unmounted system"
 $busybox umount $mnt/sdcard && echo "unmounted sdcard"
-if [ -d "$mnt/external_sd" ]; then
- $busybox umount $mnt/external_sd && echo "unmounted external_sd"
- else
- echo "No external_sd path found"
- log "No external_sd path found"
- exit
+
+EXTSD="/external_sd"
+
+if grep -qs "$EXTSD" /proc/mounts;
+then
+	$busybox umount $mnt/external_sd && echo "external_sd was found and unmounted .."
+else
+	echo "external_sd path not mounted, leaving it"
+exit
 fi
 
 export PATH=$PRESERVED_PATH
