@@ -144,9 +144,7 @@ ChrootManagerFragment extends Fragment {
         updateButton.setVisibility(View.GONE);
         sharedpreferences = getActivity().getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
 
-        // extracte files location
-
-
+        // extract files location
         installLogFile = nh.SD_PATH + "/nh_install_" + new SimpleDateFormat("yyyyMMdd_hhmmss'.log'", Locale.US).format(new Date());
         return rootView;
     }
@@ -191,7 +189,6 @@ ChrootManagerFragment extends Fragment {
                 }
 
             }).start();
-
 
         }
     }
@@ -444,7 +441,6 @@ ChrootManagerFragment extends Fragment {
         }
     }
 
-
     /* Checks if external storage is available for read and write */
     private boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
@@ -467,7 +463,6 @@ ChrootManagerFragment extends Fragment {
             }
         }
     }
-
 
     private boolean startZipDownload(String _URI) {
         deleteFile(zipFilePath);
@@ -533,7 +528,6 @@ ChrootManagerFragment extends Fragment {
                 }
 
             }).start();
-
 
         }
 
@@ -611,8 +605,6 @@ ChrootManagerFragment extends Fragment {
 
 
     /* --------------------------------------- asynctasks -------------------- */
-
-
     public class UnziptarTask extends AsyncTask<Void, String, Boolean> {
 
         // https://developer.android.com/training/scheduling/wakelock.html
@@ -759,8 +751,8 @@ ChrootManagerFragment extends Fragment {
                     JSONObject jsonObject;
                     try {
                         jsonObject = new JSONObject(jsonstring);
-                        SHA512_FULL = "1c981b91b188488aec143a94d79aa2e7d81fd01badea99ff9b5a4c21ed588b485f8cadcf2edcb0ff26f3c6def3ca27beb8d60f8712c3dadf8d0ed41198dcb8c7";
-                        SHA512_MINIMAL = "805f5e4dccb8468f53f670346771880b011e1819bd251b6be2f3a8c2e275c87d96ca91ff8916872abfbc68e17c60886ecae0b2be0de6f7ebe7e84945c7de5ccb";
+                        SHA512_FULL = "a184e019821e72ea9d3db0b9eaa0ef58eb071302be88057571dc9b07bde34b333c53a984d9325411274f2f2c67245df4e9948d8947659b2b898a11b04899442d";
+                        SHA512_MINIMAL = "322a18334a4f848a53513fc1f9f5a62fb587e6051d2f729b60f963af279bfc3cf3f5ae55af67a1a2a438838f0a26064ea80d90234ad829a674b00fab4727bfd8";
                         if (isFull) {
                             // asign the value so the integryty check works ^^
                             SHA512 = SHA512_FULL;
