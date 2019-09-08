@@ -5,8 +5,8 @@ if [ -x /system/xbin/busybox_nh ]; then
 elif [ -x /sbin/busybox_nh ]; then
 	busybox=/sbin/busybox_nh
 elif [ -x /data/adb/modules_update/busybox-ndk/xbin/busybox ]; then
-elif [ -x /system/xbin/busybox ]; then
 	busybox=/data/adb/modules_update/busybox-ndk/xbin/busybox
+elif [ -x /system/xbin/busybox ]; then
 	busybox=/system/xbin/busybox
 elif [ -x /data/local/bin/busybox ]; then
 	busybox=/data/local/bin/busybox
