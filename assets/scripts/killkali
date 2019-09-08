@@ -4,7 +4,9 @@ if [ -x /system/xbin/busybox_nh ]; then
 	busybox=/system/xbin/busybox_nh
 elif [ -x /sbin/busybox_nh ]; then
 	busybox=/sbin/busybox_nh
+elif [ -x /data/adb/modules_update/busybox-ndk/xbin/busybox ]; then
 elif [ -x /system/xbin/busybox ]; then
+	busybox=/data/adb/modules_update/busybox-ndk/xbin/busybox
 	busybox=/system/xbin/busybox
 elif [ -x /data/local/bin/busybox ]; then
 	busybox=/data/local/bin/busybox
@@ -48,6 +50,12 @@ $busybox umount $mnt/proc && echo "unmounted proc"
 $busybox umount $mnt/sys && echo "unmounted sys"
 $busybox umount $mnt/system && echo "unmounted system"
 $busybox umount $mnt/sdcard && echo "unmounted sdcard"
-$busybox umount $mnt/external_sd && echo "unmounted external_sd"
+if [ -d "$mnt/external_sd" ]; then
+ $busybox umount $mnt/external_sd && echo "unmounted external_sd"
+ else
+ echo "No external_sd path found"
+ log "No external_sd path found"
+ exit
+fi
 
 export PATH=$PRESERVED_PATH
