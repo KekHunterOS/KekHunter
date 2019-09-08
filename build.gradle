@@ -29,6 +29,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-location:15.0.1'
     implementation 'joda-time:joda-time:2.10'
     implementation 'com.google.guava:guava:24.1-jre'
+    implementation 'org.jetbrains:annotations:15.0'
 }
 
 android {

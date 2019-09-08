@@ -6,14 +6,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 
-import com.offsec.nethunter.utils.NhPaths;
-import com.offsec.nethunter.utils.ShellExecuter;
-
-import java.util.Locale;
-
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NavUtils;
+
+// TODO: FIX IMPORTS!
+//import com.offsec.nethunter.utils.NhPaths;
+//import com.offsec.nethunter.utils.ShellExecuter;
+
+import java.util.Locale;
+import java.util.Objects;
+
+import static android.R.id;
 
 public class EditSourceActivity extends AppCompatActivity {
 
@@ -26,7 +30,7 @@ public class EditSourceActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         nh = new NhPaths();
         Bundle b = getIntent().getExtras();
-        configFilePath = b.getString("path");
+        configFilePath = Objects.requireNonNull(b).getString("path");
         setContentView(R.layout.source);
         if (Build.VERSION.SDK_INT >= 21) {
             // detail for android 5 devices
@@ -46,7 +50,7 @@ public class EditSourceActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
+        if (item.getItemId() == id.home) {
             NavUtils.navigateUpFromSameTask(this);
             return true;
         }
