@@ -17,9 +17,8 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-//TODO: THESE IMPORTS ARE IMPORTANT
-//import com.offsec.nethunter.utils.NhPaths;
-//import com.offsec.nethunter.utils.ShellExecuter;
+import com.offsec.nethunter.utils.NhPaths;
+import com.offsec.nethunter.utils.ShellExecuter;
 
 import java.io.BufferedReader;
 //import java.io.IOException;

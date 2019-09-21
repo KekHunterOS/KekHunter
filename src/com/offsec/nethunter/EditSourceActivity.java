@@ -10,9 +10,8 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NavUtils;
 
-// TODO: FIX IMPORTS!
-//import com.offsec.nethunter.utils.NhPaths;
-//import com.offsec.nethunter.utils.ShellExecuter;
+import com.offsec.nethunter.utils.NhPaths;
+import com.offsec.nethunter.utils.ShellExecuter;
 
 import java.util.Locale;
 import java.util.Objects;
@@ -22,8 +21,8 @@ import static android.R.id;
 public class EditSourceActivity extends AppCompatActivity {
 
     private String configFilePath = "";
-    private NhPaths nh;
-    private final ShellExecuter exe = new ShellExecuter();
+    public NhPaths nh;
+    public final ShellExecuter exe = new ShellExecuter();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +73,7 @@ public class EditSourceActivity extends AppCompatActivity {
     public void updateSource(View view) {
         EditText source = findViewById(R.id.source);
         String newSource = source.getText().toString();
-        Boolean isSaved = exe.SaveFileContents(newSource, configFilePath);
+        boolean isSaved = exe.SaveFileContents(newSource, configFilePath);
         if (isSaved) {
             nh.showMessage("Source updated");
         } else {

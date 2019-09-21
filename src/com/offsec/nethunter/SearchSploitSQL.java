@@ -55,14 +55,15 @@ class SearchSploitSQL extends SQLiteOpenHelper {
     }
 
     Boolean doDbFeed() {
-        String _cmd = "su -c bootkali\n" + "csv2sqlite.py /usr/share/exploitdb/files_exploits.csv SearchSploit " + 
-        SearchSploit.TABLE + "\n" +
-                "sqlite3 SearchSploit 'UPDATE " +
-	SearchSploit.TABLE + " SET " +
-	SearchSploit.PORT + " = 0 WHERE " +
-	SearchSploit.PORT + " IS NULL;'\n" +
-	"mv SearchSploit /sdcard/nh_files/SearchSploit\n";
+        // Generate the csv to kali /root first as temp (so we can read it)
+        String _cmd1 = "su -c 'bootkali custom_cmd /usr/bin/python /sdcard/nh_files/modules/csv2sqlite.py /usr/share/exploitdb/files_exploits.csv /root/SearchSploit " + SearchSploit.TABLE + "'";
+        exe.RunAsRootOutput(_cmd1);
+        // Then move it to app db folder
+        String _cmd2 = "mv /data/local/nhsystem/kali-armhf/root/SearchSploit /sdcard/nh_files/";
+        exe.RunAsRootOutput(_cmd2);
+        return true;
     }
+
 
     long getCount() {
         String sql = "SELECT COUNT(*) FROM " + SearchSploit.TABLE;

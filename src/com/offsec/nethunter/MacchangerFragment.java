@@ -24,9 +24,8 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-// TODO: SAME ISSUE HERE, MISSING IMPORTS GIVES US TROUBLE (CODE RED)
-//import com.offsec.nethunter.utils.NhPaths;
-//import com.offsec.nethunter.utils.ShellExecuter;
+import com.offsec.nethunter.utils.NhPaths;
+import com.offsec.nethunter.utils.ShellExecuter;
 
 import java.util.ArrayList;
 import java.util.List;
