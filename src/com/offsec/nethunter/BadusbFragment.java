@@ -1,6 +1,7 @@
 package com.offsec.nethunter;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import com.offsec.nethunter.utils.ShellExecuter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 public class BadusbFragment extends Fragment {
@@ -27,7 +29,7 @@ public class BadusbFragment extends Fragment {
     private static final String ARG_SECTION_NUMBER = "section_number";
     private NhPaths nh;
     private final ShellExecuter exe = new ShellExecuter();
-
+    private Context context;
     public BadusbFragment() {
 
     }
@@ -38,6 +40,12 @@ public class BadusbFragment extends Fragment {
         args.putInt(ARG_SECTION_NUMBER, sectionNumber);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.context = getContext();
     }
 
     @Override
@@ -117,9 +125,9 @@ public class BadusbFragment extends Fragment {
         sourceFile = sourceFile.replaceAll("(?m)^INTERFACE=(.*)$", "INTERFACE=" + ifc.getText().toString());
         Boolean r = exe.SaveFileContents(sourceFile, sourcePath);// 1st arg contents, 2nd arg filepath
         if (r) {
-            nh.showMessage("Options updated!");
+            nh.showMessage(context,"Options updated!");
         } else {
-            nh.showMessage("Options not updated!");
+            nh.showMessage(context,"Options not updated!");
         }
     }
 
@@ -132,7 +140,7 @@ public class BadusbFragment extends Fragment {
             command[0] = nh.APP_SCRIPTS_PATH + "/start-badusb-kitkat &> " + nh.APP_SD_FILES_PATH + "/badusb.log &";
         }
         exe.RunAsRoot(command);
-        nh.showMessage("BadUSB attack started! Check /sdcard/nh_files/badusb.log");
+        nh.showMessage(context,"BadUSB attack started! Check /sdcard/nh_files/badusb.log");
     }
 
     private void stop() {
@@ -144,6 +152,6 @@ public class BadusbFragment extends Fragment {
             command[0] = nh.APP_SCRIPTS_PATH + "/stop-badusb-kitkat";
         }
         exe.RunAsRoot(command);
-        nh.showMessage("BadUSB attack stopped!");
+        nh.showMessage(context,"BadUSB attack stopped!");
     }
 }

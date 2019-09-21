@@ -47,7 +47,7 @@ class CustomCommandsSQL extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS");
+        db.execSQL("DROP TABLE IF EXISTS " + CustomCommand.TABLE);
         this.onCreate(db);
     }
 

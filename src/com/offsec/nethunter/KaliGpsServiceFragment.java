@@ -27,6 +27,7 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
     private static final String ARG_SECTION_NUMBER = "section_number";
     private KaliGPSUpdates.Provider gpsProvider = null;
     private TextView gpsTextView;
+    private Context context;
 
     public KaliGpsServiceFragment() {
     }
@@ -41,11 +42,9 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.gps, container, false);
-
-
+        context = getContext();
         nh = new NhPaths();
-
+        final View rootView = inflater.inflate(R.layout.gps, container, false);
         addClickListener(R.id.start_kismet, v -> {
 
             if (gpsProvider != null) {
@@ -111,7 +110,7 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
             intent.putExtra("com.offsec.nhterm.iInitialCommand", "/usr/bin/start-kismet");
             startActivity(intent);
         } catch (Exception e) {
-            Toast.makeText(getActivity().getApplicationContext(), getString(R.string.toast_install_terminal), Toast.LENGTH_SHORT).show();
+            nh.showMessage(context, getString(R.string.toast_install_terminal));
         }
     }
 }

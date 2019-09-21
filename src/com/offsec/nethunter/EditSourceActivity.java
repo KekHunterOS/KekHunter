@@ -1,5 +1,6 @@
 package com.offsec.nethunter;
 
+import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -19,11 +20,13 @@ public class EditSourceActivity extends AppCompatActivity {
 
     private String configFilePath = "";
     private NhPaths nh;
+    private Activity activity;
     private final ShellExecuter exe = new ShellExecuter();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        activity = this;
         nh = new NhPaths();
         Bundle b = getIntent().getExtras();
         configFilePath = b.getString("path");
@@ -41,7 +44,7 @@ public class EditSourceActivity extends AppCompatActivity {
         if (ab != null) {
             ab.setDisplayHomeAsUpEnabled(true);
         }
-        nh.showMessage("File Loaded");
+        nh.showMessage(activity, "File Loaded");
     }
 
     @Override
@@ -72,9 +75,9 @@ public class EditSourceActivity extends AppCompatActivity {
         String newSource = source.getText().toString();
         Boolean isSaved = exe.SaveFileContents(newSource, configFilePath);
         if (isSaved) {
-            nh.showMessage("Source updated");
+            nh.showMessage(activity,"Source updated");
         } else {
-            nh.showMessage("Source not updated");
+            nh.showMessage(activity,"Source not updated");
         }
     }
 }

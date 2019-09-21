@@ -10,61 +10,30 @@ import com.offsec.nethunter.R;
 
 import androidx.appcompat.app.AlertDialog;
 
+import java.io.File;
 
 
-public class CheckForRoot  extends AsyncTask<String, Boolean, String> {
+public abstract class CheckForRoot {
 
-    private final String TAG = "CHECK_FOR_ROOT";
-    private final Context ctx;
-    private final ShellExecuter exe;
+    public static String BUSYBOX;
+    private static final String MAGISK_BUSYBOX = "/sbin/.magisk/busybox/busybox";
 
-    private ProgressDialog pd;
-    private Boolean isRootAvailable;
-    public CheckForRoot(Context _ctx){
-        Log.d(TAG, "CONTRUCTING");
-        this.ctx = _ctx;
-
-        exe = new ShellExecuter();
-        isRootAvailable = false;
-
+    public static boolean isRoot() {
+        ShellExecuter exe = new ShellExecuter();
+        return !exe.Executer("su -c 'id'").isEmpty();
     }
 
-    @Override
-    protected String doInBackground(String... data) {
-            isRootAvailable = exe.isRootAvailable();
-            publishProgress(isRootAvailable);
-            return "CHECK FOR ROOT DONE: " + isRootAvailable;
-    }
-    @Override
-    protected void onProgressUpdate(Boolean... progress) {
-        if(progress[0]){
-            cancel(true);
-            CopyBootFiles mytask = new CopyBootFiles(ctx);
-            mytask.execute();
-
-        } else {
-            AlertDialog.Builder adb = new AlertDialog.Builder(ctx);
-            adb.setTitle(R.string.rootdialogtitle)
-                    .setMessage(R.string.rootdialogmessage)
-                    .setPositiveButton(R.string.rootdialogposbutton, (dialog, which) -> {
-                        dialog.cancel();
-                        cancel(true);
-                        CheckForRoot mytask = new CheckForRoot(ctx);
-                        mytask.execute();
-                    })
-                    .setNegativeButton(R.string.rootdialognegbutton, (dialog, which) -> {
-                        cancel(true);
-                        ((Activity) ctx).finish();
-                    });
-            AlertDialog ad = adb.create();
-            ad.setCancelable(false);
-            ad.show();
+    public static boolean isBusyboxInstalled() {
+        ShellExecuter exe = new ShellExecuter();
+        BUSYBOX = exe.RunAsRootOutput("which busybox | head -n1");
+        if (BUSYBOX.isEmpty()) {
+            if (new File(MAGISK_BUSYBOX).canExecute()){
+                BUSYBOX = MAGISK_BUSYBOX;
+                return true;
+            }
+            return false;
         }
+        return true;
     }
-    @Override
-    protected void onPostExecute(String result) {
-        Log.d(TAG, result);
-    }
-
-
 }
+

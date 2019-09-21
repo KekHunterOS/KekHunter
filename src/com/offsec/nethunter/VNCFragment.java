@@ -1,5 +1,6 @@
 package com.offsec.nethunter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -26,8 +27,9 @@ public class VNCFragment extends Fragment {
     private String xwidth;
     private String xheight;
     private String localhostonly = "";
-
-    NhPaths nh;
+    private Context context;
+    private Activity activity;
+    private NhPaths nh;
     private static final String ARG_SECTION_NUMBER = "section_number";
 
     public VNCFragment() {
@@ -43,14 +45,14 @@ public class VNCFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
+        context = getContext();
+        activity = getActivity();
         final View rootView = inflater.inflate(R.layout.vnc_setup, container, false);
-        SharedPreferences sharedpreferences = getActivity().getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-        Context mContext = getActivity().getApplicationContext();
+        SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
 
         // Get screen size to pass to VNC
         DisplayMetrics displaymetrics = new DisplayMetrics();
-        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+        activity.getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
         final int screen_height = displaymetrics.heightPixels;
         final int screen_width = displaymetrics.widthPixels;
 
@@ -69,7 +71,7 @@ public class VNCFragment extends Fragment {
 
         String[] resolutions = new String[]{"Native", "256 Colors", "64 Colors"};
         Spinner resolution_spinner = rootView.findViewById(R.id.resolution_spinner);
-        resolution_spinner.setAdapter(new ArrayAdapter<>(getContext(),
+        resolution_spinner.setAdapter(new ArrayAdapter<>(activity,
                 android.R.layout.simple_list_item_1, resolutions));
 
         // Checkbox for localhost only
@@ -120,7 +122,7 @@ public class VNCFragment extends Fragment {
             String _USER = ((EditText) getView().findViewById(R.id.vnc_USER)).getText().toString();
             int _RESOLUTION = ((Spinner) getView().findViewById(R.id.resolution_spinner)).getSelectedItemPosition();
             if (!_R_IP.equals("") && !_R_PORT.equals("") && !_NICK.equals("")) {
-                Intent intent = getActivity().getApplicationContext().getPackageManager().getLaunchIntentForPackage("com.offsec.nhvnc");
+                Intent intent = context.getPackageManager().getLaunchIntentForPackage("com.offsec.nhvnc");
                 intent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
                 intent.putExtra("com.offsec.nhvnc.EXTRA_CONN_DATA", true);
                 intent.putExtra("R_IP", _R_IP);
@@ -135,7 +137,7 @@ public class VNCFragment extends Fragment {
 
         } catch (Exception e) {
             Log.d("errorLaunching", e.toString());
-            Toast.makeText(getActivity().getApplicationContext(), "NetHunter VNC not found!", Toast.LENGTH_SHORT).show();
+            nh.showMessage(context, "NetHunter VNC not found!");
         }
     }
 
@@ -147,7 +149,7 @@ public class VNCFragment extends Fragment {
             intent.putExtra("com.offsec.nhterm.iInitialCommand", command);
             startActivity(intent);
         } catch (Exception e) {
-            Toast.makeText(getActivity().getApplicationContext(), getString(R.string.toast_install_terminal), Toast.LENGTH_SHORT).show();
+            nh.showMessage(context, getString(R.string.toast_install_terminal));
 
         }
     }

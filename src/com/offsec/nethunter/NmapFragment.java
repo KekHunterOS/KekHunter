@@ -50,8 +50,8 @@ public class NmapFragment extends Fragment {
 
     private EditText searchBar;
     private EditText portsBar;
-
-    NhPaths nh;
+    private Context context;
+    private NhPaths nh;
 
     public NmapFragment() {
     }
@@ -66,14 +66,13 @@ public class NmapFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        context = getContext();
+        nh = new NhPaths();
         final View rootView = inflater.inflate(R.layout.nmap, container, false);
-
         // Default advanced options as invisible
         final LinearLayout AdvLayout = rootView.findViewById(R.id.nmap_adv_layout);
         AdvLayout.setVisibility(View.GONE);
-
-        SharedPreferences sharedpreferences = getActivity().getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-        Context mContext = getActivity().getApplicationContext();
+        SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
 
         // Switch to activate open/close of advanced options
         Switch advswitch = rootView.findViewById(R.id.nmap_adv_switch);
@@ -95,7 +94,7 @@ public class NmapFragment extends Fragment {
 
         // NMAP Interface Spinner
         Spinner typeSpinner = rootView.findViewById(R.id.nmap_int_spinner);
-        ArrayAdapter<CharSequence> typeAdapter = ArrayAdapter.createFromResource(getActivity(),
+        ArrayAdapter<CharSequence> typeAdapter = ArrayAdapter.createFromResource(context,
                 R.array.nmap_interface_array, android.R.layout.simple_spinner_item);
         typeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         typeSpinner.setAdapter(typeAdapter);
@@ -139,7 +138,7 @@ public class NmapFragment extends Fragment {
 
         // NMAP Technique Spinner
         Spinner techSpinner = rootView.findViewById(R.id.nmap_scan_tech_spinner);
-        ArrayAdapter<CharSequence> techAdapter = ArrayAdapter.createFromResource(getActivity(),
+        ArrayAdapter<CharSequence> techAdapter = ArrayAdapter.createFromResource(context,
                 R.array.nmap_scantechnique_array, android.R.layout.simple_spinner_item);
         typeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         techSpinner.setAdapter(techAdapter);
@@ -206,7 +205,7 @@ public class NmapFragment extends Fragment {
 
         // NMAP Timing Spinner
         Spinner timeSpinner = rootView.findViewById(R.id.nmap_timing_spinner);
-        ArrayAdapter<CharSequence> timeAdapter = ArrayAdapter.createFromResource(getActivity(),
+        ArrayAdapter<CharSequence> timeAdapter = ArrayAdapter.createFromResource(context,
                 R.array.nmap_timing_array, android.R.layout.simple_spinner_item);
         timeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         timeSpinner.setAdapter(timeAdapter);
@@ -438,7 +437,7 @@ public class NmapFragment extends Fragment {
             intent.putExtra("com.offsec.nhterm.iInitialCommand", command);
             startActivity(intent);
         } catch (Exception e) {
-            Toast.makeText(getActivity().getApplicationContext(), getString(R.string.toast_install_terminal), Toast.LENGTH_SHORT).show();
+            nh.showMessage(context, getString(R.string.toast_install_terminal));
         }
     }
 }

@@ -1,11 +1,11 @@
 package com.offsec.nethunter.utils;
 
+import android.content.Context;
 import android.os.Environment;
 import android.view.Gravity;
 import android.widget.Toast;
 
 import java.io.File;
-import static com.offsec.nethunter.AppNavHomeActivity.getAppContext;
 
 
 /**********************************************
@@ -107,21 +107,6 @@ public class NhPaths {
         nh.CHROOT_PATH = NH_SYSTEM_PATH + ARCH_FOLDER;
         // old CHROOT
         nh.OLD_CHROOT_PATH = "/data/local/kali-armhf";
-
-    }
-
-    public void showMessage(String message) {
-        int duration = Toast.LENGTH_SHORT;
-        Toast toast = Toast.makeText(getAppContext(), message, duration);
-        toast.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, 0);
-        toast.show();
-    }
-
-    public void showMessage_long(String message) {
-        int duration = Toast.LENGTH_LONG;
-        Toast toast = Toast.makeText(getAppContext(), message, duration);
-        toast.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, 0);
-        toast.show();
     }
 
     public String whichBusybox() {
@@ -142,7 +127,20 @@ public class NhPaths {
         }
         return "";
     }
+
     public String makeTermTitle(String title) {
         return "echo -ne \"\\033]0;" + title + "\\007\" && clear;";
+    }
+
+    public void showMessage(Context context, String msg) {
+        Toast toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, 0);
+        toast.show();
+    }
+
+    public void showMessage_long(Context context, String msg) {
+        Toast toast = Toast.makeText(context, msg, Toast.LENGTH_LONG);
+        toast.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, 0);
+        toast.show();
     }
 }

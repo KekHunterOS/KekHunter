@@ -1,5 +1,6 @@
 package com.offsec.nethunter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -31,9 +32,12 @@ import com.offsec.nethunter.utils.ShellExecuter;
 
 import java.util.List;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import android.widget.SearchView;
 import androidx.fragment.app.Fragment;
+
+import javax.annotation.Nullable;
 
 //import androidx.appcompat.widget.SearchView;
 
@@ -43,7 +47,6 @@ public class CustomCommandsFragment extends Fragment {
     private static final String ARG_SECTION_NUMBER = "section_number";
     private static final String TAG = "CustomCommandsFragment";
     private CustomCommandsSQL database;
-    private Context mContext;
     private ListView commandListView;
     private CmdLoader commandAdapter;
     private List<CustomCommand> commandList;
@@ -52,7 +55,8 @@ public class CustomCommandsFragment extends Fragment {
     private String custom_commands_runlevel;
     private final ShellExecuter exe = new ShellExecuter();
     private NhPaths nh;
-
+    private Context context;
+    private Activity activity;
     public CustomCommandsFragment() {
 
     }
@@ -71,12 +75,12 @@ public class CustomCommandsFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        SharedPreferences sharedpreferences = getActivity().getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-        //this runs BEFORE the ui is available
-        mContext = getActivity().getApplicationContext();
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {//this runs BEFORE the ui is available
+        context = getContext();
+        activity = getActivity();
         nh = new NhPaths();
-        database = new CustomCommandsSQL(mContext);
+        SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+        database = new CustomCommandsSQL(context);
         if (!sharedpreferences.contains("initial_commands")) {
             SharedPreferences.Editor editor = sharedpreferences.edit();
             editor.putString("initial_commands", "added");
@@ -192,7 +196,7 @@ public class CustomCommandsFragment extends Fragment {
         commandListView = rootView.findViewById(R.id.commandList);
         TextView customComandsInfo = rootView.findViewById(R.id.customComandsInfo);
         commandList = database.getAllCommands();
-        commandAdapter = new CmdLoader(mContext, commandList);
+        commandAdapter = new CmdLoader(context, commandList);
 
 
         if (commandAdapter.getCount() == 0) {
@@ -201,7 +205,7 @@ public class CustomCommandsFragment extends Fragment {
 
         commandListView.setAdapter(commandAdapter);
         commandListView.setOnItemLongClickListener((parent, view, position, id) -> {
-            ((Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE)).vibrate(50);
+            ((Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE)).vibrate(50);
 
             CustomCommand currenCommand = (CustomCommand) commandListView.getItemAtPosition(position);
             showCommandDialog("EDIT", currenCommand, position);
@@ -220,10 +224,10 @@ public class CustomCommandsFragment extends Fragment {
 
     private void showCommandDialog(String action, CustomCommand commandInfo, int position) {
         // common setup
-        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View promptsView = inflater.inflate(R.layout.custon_commands_dialog, null);
 
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity);
         alertDialogBuilder.setView(promptsView);
         alertDialogBuilder.setCancelable(false);
         alertDialogBuilder.setNegativeButton("Cancel",
@@ -274,7 +278,7 @@ public class CustomCommandsFragment extends Fragment {
                                         userInputCommand.getText().toString(),
                                         command_exec_mode.getSelectedItem().toString(),
                                         command_run_in_shell.getSelectedItem().toString(), _run_at_boot);
-                                nh.showMessage("Command created.");
+                                nh.showMessage(context,"Command created.");
 
                                 if (_run_at_boot == 1) {
                                     addToBoot(_insertedCommand);
@@ -283,7 +287,7 @@ public class CustomCommandsFragment extends Fragment {
                                 commandList.add(0, _insertedCommand);
                                 commandAdapter.notifyDataSetChanged();
                             } else {
-                                nh.showMessage(getString(R.string.toast_input_error_launcher));
+                                nh.showMessage(context, getString(R.string.toast_input_error_launcher));
                             }
                             hideSoftKeyboard(getView());
                         });
@@ -348,12 +352,12 @@ public class CustomCommandsFragment extends Fragment {
                                 } else {
                                     removeFromBoot(_updatedCommand.getId());
                                 }
-                                nh.showMessage("Command Updated");
+                                nh.showMessage(context, "Command Updated");
                                 commandList.set(position, _updatedCommand);
                                 commandAdapter.notifyDataSetChanged();
 
                             } else {
-                                nh.showMessage(getString(R.string.toast_input_error_launcher));
+                                nh.showMessage(context, getString(R.string.toast_input_error_launcher));
                             }
                             hideSoftKeyboard(getView());
                         })
@@ -364,7 +368,7 @@ public class CustomCommandsFragment extends Fragment {
                             commandList.remove(position);
                             commandAdapter.notifyDataSetChanged();
                             hideSoftKeyboard(getView());
-                            nh.showMessage("Command Deleted");
+                            nh.showMessage(context, "Command Deleted");
                         });
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();

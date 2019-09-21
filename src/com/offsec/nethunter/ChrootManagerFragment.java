@@ -121,6 +121,7 @@ ChrootManagerFragment extends Fragment {
     private SharedPreferences sharedpreferences;
     private AlertDialog ad;
     private NhPaths nh;
+    private Context context;
 
     public static ChrootManagerFragment newInstance(int sectionNumber) {
         ChrootManagerFragment fragment = new ChrootManagerFragment();
@@ -416,7 +417,7 @@ ChrootManagerFragment extends Fragment {
             }
             statusLog("Metapackages selected: " + packages);
         } catch (Exception e) {
-            nh.showMessage(getString(R.string.toast_install_terminal));
+            nh.showMessage(context, getString(R.string.toast_install_terminal));
             statusLog("Error: Terminal app not found, cant continue. Install a terminal.");
             checkForExistingChroot();
         }
@@ -610,7 +611,7 @@ ChrootManagerFragment extends Fragment {
         // https://developer.android.com/training/scheduling/wakelock.html
         final PowerManager powerManager = (PowerManager) getActivity().getSystemService(POWER_SERVICE);
         final PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                "ChrootWakelockTag");
+                "com.offsec.nethunter:ChrootWakelockTag");
 
         Boolean isStarted = false;
 
