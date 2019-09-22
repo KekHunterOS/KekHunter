@@ -5,7 +5,7 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.4.0'
+        classpath 'com.android.tools.build:gradle:3.5.0'
     }
 }
 
@@ -48,8 +48,8 @@ android {
     defaultConfig {
         minSdkVersion 17
         targetSdkVersion 28
-        versionCode 2019030500
-        versionName "2019.3"
+        versionCode 2019040002
+        versionName "2019.4-RC2"
     }
 
     sourceSets {
