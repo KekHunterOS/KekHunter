@@ -17,7 +17,7 @@ project.properties
 proguard/
 # Log Files
 *.log
-
+!assets/scripts/*
 
 *.pydevproject
 .project

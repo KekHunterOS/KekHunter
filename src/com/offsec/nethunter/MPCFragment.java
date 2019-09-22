@@ -20,6 +20,7 @@ import com.offsec.nethunter.utils.NhPaths;
 
 import java.util.Locale;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 public class MPCFragment extends Fragment {
@@ -29,8 +30,8 @@ public class MPCFragment extends Fragment {
     private String payloadVar;
     private String callbackVar;
     private String stagerVar;
-
-    NhPaths nh;
+    private Context context;
+    private NhPaths nh;
     private static final String ARG_SECTION_NUMBER = "section_number";
 
     public MPCFragment() {
@@ -45,16 +46,20 @@ public class MPCFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        context = getContext();
+        nh = new NhPaths();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         final View rootView = inflater.inflate(R.layout.payload_maker, container, false);
-        SharedPreferences sharedpreferences = getActivity().getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-        Context mContext = getActivity().getApplicationContext();
-
+        SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
 
         // Payload Type Spinner
         Spinner typeSpinner = rootView.findViewById(R.id.mpc_type_spinner);
-        ArrayAdapter<CharSequence> typeAdapter = ArrayAdapter.createFromResource(getActivity(),
+        ArrayAdapter<CharSequence> typeAdapter = ArrayAdapter.createFromResource(context,
                 R.array.mpc_type_array, R.layout.payload_maker_item);
         //typeAdapter.setDropDownViewResource(R.layout.payload_maker_item);
         typeSpinner.setAdapter(typeAdapter);
@@ -117,7 +122,7 @@ public class MPCFragment extends Fragment {
 
         // Payload Spinner
         Spinner payloadSpinner = rootView.findViewById(R.id.mpc_payload_spinner);
-        ArrayAdapter<CharSequence> payloadAdapter = ArrayAdapter.createFromResource(getActivity(),
+        ArrayAdapter<CharSequence> payloadAdapter = ArrayAdapter.createFromResource(context,
                 R.array.mpc_payload_array, R.layout.payload_maker_item);
         //typeAdapter.setDropDownViewResource(R.layout.payload_maker_item);
         payloadSpinner.setAdapter(payloadAdapter);
@@ -143,7 +148,7 @@ public class MPCFragment extends Fragment {
 
         // Callback Spinner
         Spinner callbackSpinner = rootView.findViewById(R.id.mpc_callback_spinner);
-        ArrayAdapter<CharSequence> callbackAdapter = ArrayAdapter.createFromResource(getActivity(),
+        ArrayAdapter<CharSequence> callbackAdapter = ArrayAdapter.createFromResource(context,
                 R.array.mpc_callback_array, R.layout.payload_maker_item);
         //typeAdapter.setDropDownViewResource(R.layout.payload_maker_item);
         callbackSpinner.setAdapter(callbackAdapter);
@@ -169,7 +174,7 @@ public class MPCFragment extends Fragment {
 
         // Stager Spinner
         Spinner stageSpinner = rootView.findViewById(R.id.mpc_stage_spinner);
-        ArrayAdapter<CharSequence> stagerAdapter = ArrayAdapter.createFromResource(getActivity(),
+        ArrayAdapter<CharSequence> stagerAdapter = ArrayAdapter.createFromResource(context,
                 R.array.mpc_stage_array, R.layout.payload_maker_item);
         //typeAdapter.setDropDownViewResource(R.layout.payload_maker_item);
         stageSpinner.setAdapter(stagerAdapter);
@@ -195,7 +200,7 @@ public class MPCFragment extends Fragment {
 
         // Callback Type SPinner
         Spinner callbackTypeSpinner = rootView.findViewById(R.id.mpc_callbacktype_spinner);
-        ArrayAdapter<CharSequence> callbackTypeAdapter = ArrayAdapter.createFromResource(getActivity(),
+        ArrayAdapter<CharSequence> callbackTypeAdapter = ArrayAdapter.createFromResource(context,
                 R.array.mpc_callbacktype_array, R.layout.payload_maker_item);
         //typeAdapter.setDropDownViewResource(R.layout.payload_maker_item);
         callbackTypeSpinner.setAdapter(callbackTypeAdapter);
@@ -236,7 +241,7 @@ public class MPCFragment extends Fragment {
 
         // Get IP address for IP default IP field
         // http://stackoverflow.com/questions/6064510/how-to-get-ip-address-of-the-device
-        WifiManager wifiMan = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
+        WifiManager wifiMan = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         WifiInfo wifiInf = wifiMan.getConnectionInfo();
         int ipAddress = wifiInf.getIpAddress();
         String ip = String.format(Locale.getDefault(),"%d.%d.%d.%d", (ipAddress & 0xff), (ipAddress >> 8 & 0xff), (ipAddress >> 16 & 0xff), (ipAddress >> 24 & 0xff));
@@ -284,7 +289,7 @@ public class MPCFragment extends Fragment {
             intent.putExtra("com.offsec.nhterm.iInitialCommand", command);
             startActivity(intent);
         } catch (Exception e) {
-            Toast.makeText(getActivity().getApplicationContext(), getString(R.string.toast_install_terminal), Toast.LENGTH_SHORT).show();
+            nh.showMessage(context, getString(R.string.toast_install_terminal));
         }
     }
 

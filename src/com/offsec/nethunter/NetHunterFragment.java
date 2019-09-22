@@ -1,5 +1,6 @@
 package com.offsec.nethunter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -27,6 +28,7 @@ import java.net.URLConnection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 public class NetHunterFragment extends Fragment {
@@ -36,12 +38,12 @@ public class NetHunterFragment extends Fragment {
      * fragment.
      */
 
-    private static NhPaths nh;
     private static final String ARG_SECTION_NUMBER = "section_number";
     private static final String IP_REGEX = "\\b(?:\\d{1,3}\\.){3}\\d{1,3}\\b";
     private static final Pattern IP_REGEX_PATTERN = Pattern.compile(IP_REGEX);
-    Switch HIDSwitch;
-
+    private Context context;
+    private Activity activity;
+    private NhPaths nh;
     /**
      * Returns a new instance of this fragment for the given section
      * number.
@@ -61,8 +63,15 @@ public class NetHunterFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        context = getContext();
+        activity = getActivity();
+        nh = new NhPaths();
+    }
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.nethunter, container, false);
         TextView ip = rootView.findViewById(R.id.editText2);
         ip.setFocusable(false);
@@ -78,7 +87,7 @@ public class NetHunterFragment extends Fragment {
 
     private void getExternalIp() {
 
-        final TextView ip = getActivity().findViewById(R.id.editText2);
+        final TextView ip = activity.findViewById(R.id.editText2);
         ip.setText("Please wait...");
 
         new Thread(new Runnable() {
@@ -105,7 +114,7 @@ public class NetHunterFragment extends Fragment {
                 } else {
                     done = "Invalid IP!";
                 }
-                getActivity().runOnUiThread(() -> ip.setText(done));
+                activity.runOnUiThread(() -> ip.setText(done));
             }
         }).start();
         // CHECK FOR ROOT ACCESS
@@ -113,8 +122,6 @@ public class NetHunterFragment extends Fragment {
     }
 
     private void getInterfaces(final View rootView) {
-
-        nh = new NhPaths();
 
         final boolean installed = appInstalledOrNot("com.offsec.nhterm");
 
@@ -171,7 +178,7 @@ public class NetHunterFragment extends Fragment {
                 } else {
                     netIfaces.setVisibility(View.GONE);
                     netList.setVisibility(View.VISIBLE);
-                    ArrayAdapter<String> aaNET = new ArrayAdapter<>(getContext(), R.layout.nethunter_item, netArray);
+                    ArrayAdapter<String> aaNET = new ArrayAdapter<>(activity, R.layout.nethunter_item, netArray);
                     netList.setAdapter(aaNET);
                     fixListHeight(netList, aaNET);
                     netList.setOnItemLongClickListener((parent, view, position, id) -> {
@@ -190,7 +197,7 @@ public class NetHunterFragment extends Fragment {
                 } else {
                     hidIfaces.setVisibility(View.GONE);
                     hidList.setVisibility(View.VISIBLE);
-                    ArrayAdapter<String> aaHID = new ArrayAdapter<>(getContext(), R.layout.nethunter_item, hidArray);
+                    ArrayAdapter<String> aaHID = new ArrayAdapter<>(activity, R.layout.nethunter_item, hidArray);
                     hidList.setAdapter(aaHID);
                     fixListHeight(hidList, aaHID);
                     hidList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -211,7 +218,7 @@ public class NetHunterFragment extends Fragment {
                 } else {
                     busyboxIfaces.setVisibility(View.GONE);
                     busyboxList.setVisibility(View.VISIBLE);
-                    ArrayAdapter<String> aaBUSYBOX = new ArrayAdapter<>(getContext(), R.layout.nethunter_item, busyboxArray);
+                    ArrayAdapter<String> aaBUSYBOX = new ArrayAdapter<>(activity, R.layout.nethunter_item, busyboxArray);
                     busyboxList.setAdapter(aaBUSYBOX);
                     fixListHeight(busyboxList, aaBUSYBOX);
                     busyboxList.setOnItemLongClickListener((parent, view, position, id) -> {
@@ -243,7 +250,7 @@ public class NetHunterFragment extends Fragment {
                 } else {
                     kernelverIfaces.setVisibility(View.GONE);
                     kernelverList.setVisibility(View.VISIBLE);
-                    ArrayAdapter<String> aaKERNELVER = new ArrayAdapter<>(getContext(), R.layout.nethunter_item, kernelverArray);
+                    ArrayAdapter<String> aaKERNELVER = new ArrayAdapter<>(activity, R.layout.nethunter_item, kernelverArray);
                     kernelverList.setAdapter(aaKERNELVER);
                     kernelverList.setOnItemLongClickListener((parent, view, position, id) -> {
                         Log.d("CLICKED", kernelverList.getItemAtPosition(position).toString());
@@ -257,7 +264,7 @@ public class NetHunterFragment extends Fragment {
     }
 
     private boolean appInstalledOrNot(String uri) {
-        PackageManager pm = getActivity().getPackageManager();
+        PackageManager pm = activity.getPackageManager();
         boolean app_installed;
         try {
             pm.getPackageInfo(uri, PackageManager.GET_ACTIVITIES);
@@ -284,12 +291,12 @@ public class NetHunterFragment extends Fragment {
     // Now we can copy and address from networks!!!!!! Surprise! ;)
     private void doCopy(String text) {
         try {
-            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
             android.content.ClipData clip = android.content.ClipData.newPlainText("WordKeeper", text);
             clipboard.setPrimaryClip(clip);
-            Toast.makeText(getContext(), "Copied: " + text, Toast.LENGTH_SHORT).show();
+            nh.showMessage(context, "Copied: " + text);
         } catch (Exception e) {
-            Toast.makeText(getContext(), "Error copying: " + text, Toast.LENGTH_SHORT).show();
+           nh.showMessage(context, "Error copying: " + text);
         }
     }
     private String getDeviceName() {

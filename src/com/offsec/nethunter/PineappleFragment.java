@@ -13,16 +13,17 @@ import android.widget.EditText;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.ShellExecuter;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 public class PineappleFragment extends Fragment {
 
     private static final String TAG = "PineappleFragment";
 
-    private static NhPaths nh;
+    private NhPaths nh;
     private String start_type = "start ";
     private String proxy_type;
-
+    private Context context;
     private static final String ARG_SECTION_NUMBER = "section_number";
 
     public PineappleFragment() {
@@ -37,13 +38,17 @@ public class PineappleFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-        final View rootView = inflater.inflate(R.layout.pineapple, container, false);
-        SharedPreferences sharedpreferences = getActivity().getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-        Context mContext = getActivity().getApplicationContext();
-
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        context = getContext();
         nh = new NhPaths();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        final View rootView = inflater.inflate(R.layout.pineapple, container, false);
+        SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+
         Log.d(TAG, nh.APP_SCRIPTS_PATH);
 
         // Checkbox for No Upstream
@@ -76,7 +81,7 @@ public class PineappleFragment extends Fragment {
                 Log.d(TAG, command);
                 exe.RunAsRootOutput(command);
             }).start();
-            nh.showMessage("Starting eth0 connection");
+            nh.showMessage(context, "Starting eth0 connection");
         }, rootView);
 
         // Stop|Close Button
@@ -87,7 +92,7 @@ public class PineappleFragment extends Fragment {
                 Log.d(TAG, command);
                 exe.RunAsRootOutput(command);
             }).start();
-            nh.showMessage("Bringing down eth0 conneciton");
+            nh.showMessage(context, "Bringing down eth0 conneciton");
         }, rootView);
 
         return rootView;

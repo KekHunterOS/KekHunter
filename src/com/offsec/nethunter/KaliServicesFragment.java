@@ -21,6 +21,7 @@ import com.offsec.nethunter.utils.ShellExecuter;
 
 import java.io.File;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 public class KaliServicesFragment extends Fragment {
@@ -33,7 +34,7 @@ public class KaliServicesFragment extends Fragment {
     public static final String RUN_AT_BOOT = "RUN_AT_BOOT";
     private NhPaths nh;
     private SharedPreferences prefs;
-
+    private Context context;
     /**
      * Returns a new instance of this fragment for the given section
      * number.
@@ -47,8 +48,14 @@ public class KaliServicesFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        context = getContext();
+        nh = new NhPaths();
+    }
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.kali_services, container, false);
         setHasOptionsMenu(true);
         checkServices(rootView);
@@ -59,7 +66,7 @@ public class KaliServicesFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        prefs = getContext().getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+        prefs = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
         inflater.inflate(R.menu.kali_services, menu);
     }
 
@@ -84,12 +91,12 @@ public class KaliServicesFragment extends Fragment {
                     SharedPreferences.Editor ed = prefs.edit();
                     ed.putBoolean(RUN_AT_BOOT, false);
                     ed.apply();
-                    nh.showMessage("Boot Services DISABLED");
+                    nh.showMessage(context,"Boot Services DISABLED");
                 } else {
                     SharedPreferences.Editor ed = prefs.edit();
                     ed.putBoolean(RUN_AT_BOOT, true);
                     ed.apply();
-                    nh.showMessage("Boot Services ENABLED");
+                    nh.showMessage(context,"Boot Services ENABLED");
                 }
                 return true;
             default:
@@ -100,9 +107,6 @@ public class KaliServicesFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-
-        nh = new NhPaths();
-
         KaliServices = new String[][]{
 
                 // {name, check_cmd, start_cmd, stop_cmd, init_service_filename}
@@ -169,7 +173,7 @@ public class KaliServicesFragment extends Fragment {
 
                 final String serviceStates = exe.RunAsRootOutput(checkCmd);
                 final String finalCheckBootStates = checkBootStates;
-                servicesList.post(() -> servicesList.setAdapter(new KaliServicesLoader(getActivity().getApplicationContext(), serviceStates, finalCheckBootStates, KaliServices, bootScriptPath)));
+                servicesList.post(() -> servicesList.setAdapter(new KaliServicesLoader(context, serviceStates, finalCheckBootStates, KaliServices, bootScriptPath)));
 
             }
         }).start();
