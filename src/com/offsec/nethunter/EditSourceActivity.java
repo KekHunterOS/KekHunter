@@ -6,27 +6,30 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 
-import com.offsec.nethunter.utils.NhPaths;
-import com.offsec.nethunter.utils.ShellExecuter;
-
-import java.util.Locale;
-
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NavUtils;
 
+import com.offsec.nethunter.utils.NhPaths;
+import com.offsec.nethunter.utils.ShellExecuter;
+
+import java.util.Locale;
+import java.util.Objects;
+
+import static android.R.id;
+
 public class EditSourceActivity extends AppCompatActivity {
 
     private String configFilePath = "";
-    private NhPaths nh;
-    private final ShellExecuter exe = new ShellExecuter();
+    public NhPaths nh;
+    public final ShellExecuter exe = new ShellExecuter();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         nh = new NhPaths();
         Bundle b = getIntent().getExtras();
-        configFilePath = b.getString("path");
+        configFilePath = Objects.requireNonNull(b).getString("path");
         setContentView(R.layout.source);
         if (Build.VERSION.SDK_INT >= 21) {
             // detail for android 5 devices
@@ -46,7 +49,7 @@ public class EditSourceActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
+        if (item.getItemId() == id.home) {
             NavUtils.navigateUpFromSameTask(this);
             return true;
         }
@@ -70,7 +73,7 @@ public class EditSourceActivity extends AppCompatActivity {
     public void updateSource(View view) {
         EditText source = findViewById(R.id.source);
         String newSource = source.getText().toString();
-        Boolean isSaved = exe.SaveFileContents(newSource, configFilePath);
+        boolean isSaved = exe.SaveFileContents(newSource, configFilePath);
         if (isSaved) {
             nh.showMessage("Source updated");
         } else {
