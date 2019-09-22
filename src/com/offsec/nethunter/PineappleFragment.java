@@ -13,13 +13,14 @@ import android.widget.EditText;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.ShellExecuter;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 public class PineappleFragment extends Fragment {
 
     private static final String TAG = "PineappleFragment";
 
-    private static NhPaths nh;
+    private NhPaths nh;
     private String start_type = "start ";
     private String proxy_type;
     private Context context;
@@ -37,9 +38,14 @@ public class PineappleFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         context = getContext();
         nh = new NhPaths();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.pineapple, container, false);
         SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
 

@@ -27,12 +27,10 @@ public class BadusbFragment extends Fragment {
 
     private String sourcePath;
     private static final String ARG_SECTION_NUMBER = "section_number";
-    private NhPaths nh;
     private final ShellExecuter exe = new ShellExecuter();
     private Context context;
-    public BadusbFragment() {
-
-    }
+    private Activity activity;
+    private NhPaths nh;
 
     public static BadusbFragment newInstance(int sectionNumber) {
         BadusbFragment fragment = new BadusbFragment();
@@ -46,6 +44,14 @@ public class BadusbFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.context = getContext();
+        this.activity = getActivity();
+        nh = new NhPaths();
+        String configFilePath;
+        if (Build.VERSION.SDK_INT >= 21) {
+            sourcePath = nh.APP_SD_FILES_PATH + "/configs/startbadusb-lollipop.sh";
+        } else {
+            sourcePath = nh.APP_SD_FILES_PATH + "/configs/startbadusb-kitkat.sh";
+        }
     }
 
     @Override
@@ -60,18 +66,6 @@ public class BadusbFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        nh = new NhPaths();
-        String configFilePath;
-        if (Build.VERSION.SDK_INT >= 21) {
-            configFilePath = "/configs/startbadusb-lollipop.sh";
-        } else {
-            configFilePath = "/configs/startbadusb-kitkat.sh";
-        }
-        sourcePath = nh.APP_SD_FILES_PATH + configFilePath;
-    }
-
     public void onResume() {
         super.onResume();
         if (getView() != null) {
@@ -121,7 +115,7 @@ public class BadusbFragment extends Fragment {
 
     private void updateOptions() {
         String sourceFile = exe.ReadFile_SYNC(sourcePath);
-        EditText ifc = getActivity().findViewById(R.id.ifc);
+        EditText ifc = activity.findViewById(R.id.ifc);
         sourceFile = sourceFile.replaceAll("(?m)^INTERFACE=(.*)$", "INTERFACE=" + ifc.getText().toString());
         Boolean r = exe.SaveFileContents(sourceFile, sourcePath);// 1st arg contents, 2nd arg filepath
         if (r) {

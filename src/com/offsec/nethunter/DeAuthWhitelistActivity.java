@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.AttributeSet;
 import android.view.View;
 import android.widget.EditText;
 
@@ -18,7 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class DeAuthWhitelistActivity extends AppCompatActivity {
 
-    private NhPaths nh = new NhPaths();
+    private NhPaths nh;
     private Activity activity;
     private final ShellExecuter exe = new ShellExecuter();
 
@@ -26,6 +27,7 @@ public class DeAuthWhitelistActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activity = this;
+        nh = new NhPaths();
         setContentView(R.layout.deauth_whitelist);
         if (Build.VERSION.SDK_INT >= 21) {
             // detail for android 5 devices
@@ -42,7 +44,6 @@ public class DeAuthWhitelistActivity extends AppCompatActivity {
         }
         nh.showMessage(activity, "File Loaded");
     }
-
 
     public void updatewhitelist(View view) {
         EditText source = findViewById(R.id.deauth_modify);

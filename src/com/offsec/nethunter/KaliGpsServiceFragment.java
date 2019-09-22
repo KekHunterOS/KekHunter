@@ -21,13 +21,11 @@ import androidx.fragment.app.Fragment;
 public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.Receiver {
 
     private static final String TAG = "KaliGpsServiceFragment";
-
-    private static NhPaths nh;
-
     private static final String ARG_SECTION_NUMBER = "section_number";
     private KaliGPSUpdates.Provider gpsProvider = null;
     private TextView gpsTextView;
     private Context context;
+    private NhPaths nh;
 
     public KaliGpsServiceFragment() {
     }
@@ -41,9 +39,14 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         context = getContext();
         nh = new NhPaths();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.gps, container, false);
         addClickListener(R.id.start_kismet, v -> {
 

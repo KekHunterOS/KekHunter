@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -45,7 +46,7 @@ public class ManaFragment extends Fragment {
     private final CharSequence[] scripts = {"mana-nat-full", "mana-nat-simple", "mana-nat-bettercap", "mana-nat-simple-bdf", "hostapd-wpe", "hostapd-wpe-karma"};
     private static final String TAG = "ManaFragment";
     private static final String ARG_SECTION_NUMBER = "section_number";
-    private static NhPaths nh;
+    private NhPaths nh;
     private String configFilePath;
     private Context context;
     private Activity activity;
@@ -60,10 +61,15 @@ public class ManaFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         context = getContext();
         activity = getActivity();
         nh = new NhPaths();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.mana, container, false);
         TabsPagerAdapter tabsPagerAdapter = new TabsPagerAdapter(getChildFragmentManager());
 
@@ -74,7 +80,7 @@ public class ManaFragment extends Fragment {
             @Override
             public void onPageSelected(int position) {
                 //actionBar.setSelectedNavigationItem(position);
-                getActivity().invalidateOptionsMenu();
+                activity.invalidateOptionsMenu();
             }
         });
 
@@ -102,7 +108,7 @@ public class ManaFragment extends Fragment {
         } else {
             menu.findItem(R.id.source_button).setVisible(false);
         }
-        getActivity().invalidateOptionsMenu();
+        activity.invalidateOptionsMenu();
     }
 
     @Override
@@ -269,12 +275,20 @@ public class ManaFragment extends Fragment {
 
     public static class HostapdFragment extends Fragment {
 
-        private final String configFilePath = nh.APP_SD_FILES_PATH + "/configs/hostapd-karma.conf";
         private Context context;
+        private NhPaths nh;
+        private String configFilePath;
+        @Override
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            context = getContext();
+            nh = new NhPaths();
+            configFilePath = nh.APP_SD_FILES_PATH + "/configs/hostapd-karma.conf";
+        }
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            context = getContext();
             View rootView = inflater.inflate(R.layout.mana_hostapd, container, false);
             Button button = rootView.findViewById(R.id.updateButton);
             loadOptions(rootView);
@@ -314,8 +328,7 @@ public class ManaFragment extends Fragment {
         }
 
 
-        public void loadOptions(View rootView) {
-
+        private void loadOptions(View rootView) {
 
             final EditText ifc = rootView.findViewById(R.id.ifc);
             final EditText bssid = rootView.findViewById(R.id.bssid);
@@ -405,13 +418,22 @@ public class ManaFragment extends Fragment {
     }
 
     public static class HostapdFragmentWPE extends Fragment {
-        private final String configFilePath = nh.APP_SD_FILES_PATH + "/configs/hostapd-wpe.conf";
+
         private Context context;
+        private NhPaths nh;
+        private String configFilePath;
+
+        @Override
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            context = getContext();
+            nh = new NhPaths();
+            configFilePath = nh.APP_SD_FILES_PATH + "/configs/hostapd-wpe.conf";
+        }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            context = getContext();
             View rootView = inflater.inflate(R.layout.mana_hostapd_wpe, container, false);
 
             Button button = rootView.findViewById(R.id.wpe_updateButton);
@@ -460,7 +482,7 @@ public class ManaFragment extends Fragment {
         }
 
 
-        public void loadOptions(View rootView) {
+        private void loadOptions(View rootView) {
 
             final EditText ifc = rootView.findViewById(R.id.wpe_ifc);
             final EditText bssid = rootView.findViewById(R.id.wpe_bssid);
@@ -540,20 +562,27 @@ public class ManaFragment extends Fragment {
 
     public static class DhcpdFragment extends Fragment {
 
-        private final String configFilePath = nh.CHROOT_PATH + "/etc/dhcp/dhcpd.conf";
         final ShellExecuter exe = new ShellExecuter();
         private Context context;
+        private NhPaths nh;
+        private String configFilePath;
+
+        @Override
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            context = getContext();
+            nh = new NhPaths();
+            configFilePath = nh.CHROOT_PATH + "/etc/dhcp/dhcpd.conf";
+        }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            context = getContext();
             final View rootView = inflater.inflate(R.layout.source_short, container, false);
 
             String description = getResources().getString(R.string.mana_dhcpd);
             TextView desc = rootView.findViewById(R.id.description);
             desc.setText(description);
-
 
             EditText source = rootView.findViewById(R.id.source);
             exe.ReadFile_ASYNC(configFilePath, source);
@@ -572,19 +601,25 @@ public class ManaFragment extends Fragment {
 
     public static class DnsspoofFragment extends Fragment {
         private Context context;
+        private NhPaths nh;
         private String configFilePath;
         final ShellExecuter exe = new ShellExecuter();
 
         @Override
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            context = getContext();
+            nh = new NhPaths();
+            configFilePath = nh.CHROOT_PATH + "/etc/mana-toolkit/dnsspoof.conf";
+        }
+
+        @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            context = getContext();
             View rootView = inflater.inflate(R.layout.source_short, container, false);
             String description = getResources().getString(R.string.mana_dnsspoof);
             TextView desc = rootView.findViewById(R.id.description);
             desc.setText(description);
-
-            configFilePath = nh.CHROOT_PATH + "/etc/mana-toolkit/dnsspoof.conf";
 
             EditText source = rootView.findViewById(R.id.source);
             exe.ReadFile_ASYNC(configFilePath, source);
@@ -605,22 +640,28 @@ public class ManaFragment extends Fragment {
 
     public static class ManaNatFullFragment extends Fragment {
         private Context context;
+        private NhPaths nh;
         private String configFilePath;
 
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
             context = getContext();
-            View rootView = inflater.inflate(R.layout.source_short, container, false);
-            TextView desc = rootView.findViewById(R.id.description);
-
-            desc.setText(getResources().getString(R.string.mana_nat_full));
-
+            nh = new NhPaths();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 configFilePath = nh.CHROOT_PATH + "/usr/share/mana-toolkit/run-mana/start-nat-full-lollipop.sh";
             } else {
                 configFilePath = nh.CHROOT_PATH + "/usr/share/mana-toolkit/run-mana/start-nat-full-kitkat.sh";
             }
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.source_short, container, false);
+            TextView desc = rootView.findViewById(R.id.description);
+
+            desc.setText(getResources().getString(R.string.mana_nat_full));
 
             EditText source = rootView.findViewById(R.id.source);
             ShellExecuter exe = new ShellExecuter();
@@ -642,18 +683,25 @@ public class ManaFragment extends Fragment {
 
     public static class ManaNatSimpleFragment extends Fragment {
         private Context context;
+        private NhPaths nh;
         private String configFilePath;
 
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
             context = getContext();
-            View rootView = inflater.inflate(R.layout.source_short, container, false);
+            nh = new NhPaths();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 configFilePath = nh.CHROOT_PATH + "/usr/share/mana-toolkit/run-mana/start-nat-simple-lollipop.sh";
             } else {
                 configFilePath = nh.CHROOT_PATH + "/usr/share/mana-toolkit/run-mana/start-nat-simple-kitkat.sh";
             }
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.source_short, container, false);
 
             String description = getResources().getString(R.string.mana_nat_simple);
             TextView desc = rootView.findViewById(R.id.description);
@@ -681,15 +729,23 @@ public class ManaFragment extends Fragment {
 
     public static class ManaNatBettercapFragment extends Fragment {
         private Context context;
+        private NhPaths nh;
         private String configFilePath;
+
+        @Override
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            context = getContext();
+            nh = new NhPaths();
+            configFilePath = nh.CHROOT_PATH + "/usr/bin/start-nat-transproxy-lollipop.sh";
+        }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            context = getContext();
             View rootView = inflater.inflate(R.layout.source_short, container, false);
 
-            configFilePath = nh.CHROOT_PATH + "/usr/bin/start-nat-transproxy-lollipop.sh";
+
 
             String description = getResources().getString(R.string.mana_bettercap_description);
             TextView desc = rootView.findViewById(R.id.description);
@@ -716,19 +772,26 @@ public class ManaFragment extends Fragment {
 
     public static class BdfProxyConfigFragment extends Fragment {
         private Context context;
+        private NhPaths nh;
         private String configFilePath;
+
+        @Override
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            context = getContext();
+            nh = new NhPaths();
+            configFilePath = nh.APP_SD_FILES_PATH + "/configs/bdfproxy.cfg";
+        }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            context = getContext();
             View rootView = inflater.inflate(R.layout.source_short, container, false);
 
             String description = getResources().getString(R.string.bdfproxy_cfg);
             TextView desc = rootView.findViewById(R.id.description);
             desc.setText(description);
             // use the good one?
-            configFilePath = nh.APP_SD_FILES_PATH + "/configs/bdfproxy.cfg";
             Log.d("BDFPATH", configFilePath);
             EditText source = rootView.findViewById(R.id.source);
             ShellExecuter exe = new ShellExecuter();
@@ -751,23 +814,24 @@ public class ManaFragment extends Fragment {
 
     public static class ManaStartNatSimpleBdfFragment extends Fragment {
         private Context context;
+        private NhPaths nh;
         private String configFilePath;
 
         @Override
-        public void onActivityCreated(Bundle savedInstanceState) {
-
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            context = getContext();
+            nh = new NhPaths();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 configFilePath = nh.CHROOT_PATH + "/usr/share/mana-toolkit/run-mana/start-nat-simple-bdf-lollipop.sh";
             } else {
                 configFilePath = nh.CHROOT_PATH + "/usr/share/mana-toolkit/run-mana/start-nat-simple-bdf-kitkat.sh";
             }
-            super.onActivityCreated(savedInstanceState);
         }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            context = getContext();
             View rootView = inflater.inflate(R.layout.source_short, container, false);
 
             String description = getResources().getString(R.string.mana_nat_simple_bdf);

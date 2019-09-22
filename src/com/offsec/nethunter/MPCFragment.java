@@ -20,6 +20,7 @@ import com.offsec.nethunter.utils.NhPaths;
 
 import java.util.Locale;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 public class MPCFragment extends Fragment {
@@ -45,9 +46,14 @@ public class MPCFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         context = getContext();
         nh = new NhPaths();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.payload_maker, container, false);
         SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
 

@@ -33,11 +33,10 @@ import com.offsec.nethunter.utils.ShellExecuter;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import android.widget.SearchView;
 import androidx.fragment.app.Fragment;
-
-import javax.annotation.Nullable;
 
 //import androidx.appcompat.widget.SearchView;
 
@@ -75,10 +74,15 @@ public class CustomCommandsFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {//this runs BEFORE the ui is available
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         context = getContext();
         activity = getActivity();
         nh = new NhPaths();
+    }
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {//this runs BEFORE the ui is available
         SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
         database = new CustomCommandsSQL(context);
         if (!sharedpreferences.contains("initial_commands")) {
@@ -388,7 +392,7 @@ class CmdLoader extends BaseAdapter {
 
     private final List<CustomCommand> _commandList;
     private final Context _mContext;
-
+    private NhPaths nh;
     private final ShellExecuter exe = new ShellExecuter();
 
 
@@ -396,7 +400,7 @@ class CmdLoader extends BaseAdapter {
 
         _mContext = context;
         _commandList = commandList;
-
+        this.nh = new NhPaths();
     }
 
     static class ViewHolderItem {
@@ -493,15 +497,11 @@ class CmdLoader extends BaseAdapter {
         if (_mode.equals("BACKGROUND")) {
             if (_sendTo.equals("KALI")) {
                 new BootKali(_cmd).run_bg();
-                Toast.makeText(_mContext,
-                        "Kali cmd done.",
-                        Toast.LENGTH_SHORT).show();
+                nh.showMessage(_mContext, "Kali cmd done.");
             } else {
                 // dont run all the bg commands as root
                 exe.Executer(_cmd);
-                Toast.makeText(_mContext,
-                        "Android cmd done.",
-                        Toast.LENGTH_SHORT).show();
+                nh.showMessage(_mContext, "Android cmd done.");
             }
         } else try {
             // INTERACTIVE
@@ -527,9 +527,9 @@ class CmdLoader extends BaseAdapter {
         } catch (Exception e) {
             if (!checkTerminalExternalPermission("com.offsec.nhterm.permission.RUN_SCRIPT_NH") ||
                     !checkTerminalExternalPermission("com.offsec.nhterm.permission.RUN_SCRIPT")) {
-                Toast.makeText(_mContext, _mContext.getString(R.string.toast_error_permissions), Toast.LENGTH_SHORT).show();
+                nh.showMessage(_mContext, _mContext.getString(R.string.toast_error_permissions));
             } else {
-                Toast.makeText(_mContext, _mContext.getString(R.string.toast_install_terminal), Toast.LENGTH_SHORT).show();
+                nh.showMessage(_mContext, _mContext.getString(R.string.toast_install_terminal));
             }
         }
     }

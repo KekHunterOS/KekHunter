@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
@@ -40,11 +41,11 @@ public class MacchangerFragment extends Fragment {
 
 
     private SharedPreferences sharedpreferences;
-    private NhPaths nh;
     private static final String ARG_SECTION_NUMBER = "section_number";
     private ShellExecuter exe;
     private Context context;
     private Activity activity;
+    private NhPaths nh;
     public MacchangerFragment() {
 
     }
@@ -92,12 +93,17 @@ public class MacchangerFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         context = getContext();
         activity = getActivity();
         nh = new NhPaths();
         exe = new ShellExecuter();
         sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         View rootView = inflater.inflate(R.layout.macchanger, container, false);
         // get views

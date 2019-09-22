@@ -49,7 +49,6 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
         this.context = new WeakReference<>(context);
         this.activity = new WeakReference<>(activity);
         this.progressDialogRef = new WeakReference<>(progressDialog);
-
         this.nh = new NhPaths();
         this.sdCardDir = new File(nh.APP_SD_FILES_PATH);
         this.scriptsDir = new File(nh.APP_SCRIPTS_PATH);

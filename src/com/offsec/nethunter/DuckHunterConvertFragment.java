@@ -40,11 +40,12 @@ import java.util.List;
 
 public class DuckHunterConvertFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "DuckHunterConvert";
-    private NhPaths nh = new NhPaths();
+    private NhPaths nh;
     private String duckyInputFile;
     private String duckyOutputFile;
     private static final String loadFilePath = "/scripts/ducky/";
     private static final int PICKFILE_RESULT_CODE = 1;
+    private Context context;
     private Activity activity;
     private boolean isReceiverRegistered;
     private EditText editsource;
@@ -58,7 +59,9 @@ public class DuckHunterConvertFragment extends Fragment implements View.OnClickL
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.context = getContext();
         this.activity = getActivity();
+        nh = new NhPaths();
 
     }
 
@@ -153,9 +156,9 @@ public class DuckHunterConvertFragment extends Fragment implements View.OnClickL
                         }
                         br.close();
                         editsource.setText(text);
-                        Toast.makeText(getContext(), "Script loaded", Toast.LENGTH_SHORT).show();
+                        nh.showMessage(context, "Script loaded");
                     } catch (Exception e) {
-                        Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                        nh.showMessage(context, e.getMessage());
                     }
                     break;
                 }
@@ -210,7 +213,7 @@ public class DuckHunterConvertFragment extends Fragment implements View.OnClickL
             myOutWriter.close();
             fOut.close();
         } catch (Exception e) {
-            Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+            nh.showMessage(context, e.getMessage());
         }
     }
     public void onClick(View v) {
@@ -220,7 +223,7 @@ public class DuckHunterConvertFragment extends Fragment implements View.OnClickL
                     File scriptsDir = new File(nh.APP_SD_FILES_PATH, loadFilePath);
                     if (!scriptsDir.exists()) scriptsDir.mkdirs();
                 } catch (Exception e) {
-                    Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    nh.showMessage(context, e.getMessage());
                 }
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
                 Uri selectedUri = Uri.parse(nh.APP_SD_FILES_PATH + loadFilePath);
@@ -232,7 +235,7 @@ public class DuckHunterConvertFragment extends Fragment implements View.OnClickL
                     File scriptsDir = new File(nh.APP_SD_FILES_PATH, loadFilePath);
                     if (!scriptsDir.exists()) scriptsDir.mkdirs();
                 } catch (Exception e) {
-                    Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    nh.showMessage(context, e.getMessage());
                 }
                 AlertDialog.Builder alert = new AlertDialog.Builder(activity);
 
@@ -260,16 +263,16 @@ public class DuckHunterConvertFragment extends Fragment implements View.OnClickL
                                     myOutWriter.append(text);
                                     myOutWriter.close();
                                     fOut.close();
-                                    Toast.makeText(getContext(), "Script saved", Toast.LENGTH_SHORT).show();
+                                    nh.showMessage(context, "Script saved");
                                 }
                             } catch (Exception e) {
-                                Toast.makeText(getContext(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                                nh.showMessage(context, e.getMessage());
                             }
                         } else {
-                            Toast.makeText(getContext(), "File already exists", Toast.LENGTH_SHORT).show();
+                            nh.showMessage(context, "File already exists");
                         }
                     } else {
-                        Toast.makeText(getContext(), "Wrong name provided", Toast.LENGTH_SHORT).show();
+                        nh.showMessage(context, "Wrong name provided");
                     }
                 });
 
@@ -279,7 +282,7 @@ public class DuckHunterConvertFragment extends Fragment implements View.OnClickL
                 alert.show();
                 break;
             default:
-                Toast.makeText(getContext(), "Unknown click", Toast.LENGTH_SHORT).show();
+                nh.showMessage(context, "Unknown click");
                 break;
         }
     }

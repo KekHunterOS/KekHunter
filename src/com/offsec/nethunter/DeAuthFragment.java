@@ -19,6 +19,7 @@ import com.offsec.nethunter.utils.BootKali;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.ShellExecuter;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 /**
@@ -31,7 +32,7 @@ import androidx.fragment.app.FragmentActivity;
     public class DeAuthFragment  extends Fragment {
     private final ShellExecuter exe = new ShellExecuter();
     private Context context;
-    private NhPaths nh = new NhPaths();
+    private NhPaths nh;
     private static final String ARG_SECTION_NUMBER = "section_number";
 
     public static DeAuthFragment newInstance(int sectionNumber) {
@@ -42,10 +43,15 @@ import androidx.fragment.app.FragmentActivity;
         return fragment;
     }
 
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         context = getContext();
-        final View rootView = inflater.inflate(R.layout.deauth, container, false);
+        nh = new NhPaths();
+    }
 
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        final View rootView = inflater.inflate(R.layout.deauth, container, false);
         SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
         setHasOptionsMenu(true);
         final Button scan = rootView.findViewById(R.id.scan_networks);

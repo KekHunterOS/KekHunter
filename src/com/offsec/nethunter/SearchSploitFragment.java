@@ -33,6 +33,7 @@ import java.io.FileOutputStream;
 import java.nio.channels.FileChannel;
 import java.util.List;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
@@ -41,12 +42,8 @@ import androidx.fragment.app.Fragment;
 
 public class SearchSploitFragment extends Fragment {
 
-    private Context context;
-    private Activity activity;
     private static final String TAG = "SearchSploitFragment";
     private static final String ARG_SECTION_NUMBER = "section_number";
-
-
     private Boolean withFilters = true;
     private String sel_type;
     private String sel_platform;
@@ -58,6 +55,8 @@ public class SearchSploitFragment extends Fragment {
     private List<SearchSploit> full_exploitList;
     // Create and handle database
     private SearchSploitSQL database;
+    private Context context;
+    private Activity activity;
     private NhPaths nh;
 
     public static SearchSploitFragment newInstance(int sectionNumber) {
@@ -70,10 +69,15 @@ public class SearchSploitFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         context = getContext();
         activity = getActivity();
         nh = new NhPaths();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.searchsploit, container, false);
 
         setHasOptionsMenu(true);
@@ -123,9 +127,7 @@ public class SearchSploitFragment extends Fragment {
                 final Boolean isFeeded = database.doDbFeed();
                 searchSearchSploit.post(() -> {
                     if (isFeeded) {
-                        Toast.makeText(getActivity(),
-                                "DB FEED DONE",
-                                Toast.LENGTH_LONG).show();
+                        nh.showMessage_long(context, "DB FEED DONE");
                         try {
                             // Search List
                             //String sd = nh.SD_PATH;
@@ -153,9 +155,8 @@ public class SearchSploitFragment extends Fragment {
                         }
                         // main(rootView);
                     } else {
-                        Toast.makeText(getActivity(),
-                                "Unable to find Searchsploit files.csv database. Install exploitdb in chroot",
-                                Toast.LENGTH_LONG).show();
+                        nh.showMessage_long(context,
+                                "Unable to find Searchsploit files.csv database. Install exploitdb in chroot");
                     }
                 });
             }).start();
@@ -304,8 +305,6 @@ class ExploitLoader extends BaseAdapter {
 
     private final List<SearchSploit> _exploitList;
     private final Context _mContext;
-    static NhPaths nh;
-
 
     ExploitLoader(Context context, List<SearchSploit> exploitList) {
 

@@ -1,5 +1,6 @@
 package com.offsec.nethunter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -30,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
@@ -40,7 +42,6 @@ public class MITMfFragment extends Fragment {
 
     View.OnClickListener checkBoxListener;
     private TabsPagerAdapter tabsPagerAdapter;
-
     public interface CommandProvider {
         void getCommands(StringBuilder stringBuilder);
     }
@@ -60,13 +61,10 @@ public class MITMfFragment extends Fragment {
     String M_Responder_WRedir; // --wredir
 
 
-    private static NhPaths nh;
+    private NhPaths nh;
     private Context context;
+    private Activity activity;
     private static final String ARG_SECTION_NUMBER = "section_number";
-
-    public MITMfFragment() {
-    }
-
 
     public static MITMfFragment newInstance(int sectionNumber) {
         MITMfFragment fragment = new MITMfFragment();
@@ -77,10 +75,16 @@ public class MITMfFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        context = getContext();
+        activity = getActivity();
+        nh = new NhPaths();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         cleanCmd();
-        context = getContext();
-        nh = new NhPaths();
         View rootView = inflater.inflate(R.layout.mitmf, container, false);
         tabsPagerAdapter = new TabsPagerAdapter(getChildFragmentManager());
 
@@ -90,7 +94,7 @@ public class MITMfFragment extends Fragment {
         mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
-                getActivity().invalidateOptionsMenu();
+                activity.invalidateOptionsMenu();
             }
         });
         setHasOptionsMenu(true);
@@ -178,7 +182,7 @@ public class MITMfFragment extends Fragment {
             }
         }
 
-        public List<CommandProvider> getCommandProviders() {
+        private List<CommandProvider> getCommandProviders() {
             return commandProviders;
         }
 
@@ -219,11 +223,15 @@ public class MITMfFragment extends Fragment {
         MitmfGeneralBinding generalBinding;
         MITMFViewModel mViewModel;
 
+        @Override
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            context = getContext();
+        }
 
         @Override
         public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            context = getContext();
             generalBinding = MitmfGeneralBinding.inflate(inflater, container, false);
             mViewModel = new MITMFViewModel();
             generalBinding.setViewModel(mViewModel);
@@ -326,9 +334,14 @@ public class MITMfFragment extends Fragment {
         private Context context;
 
         @Override
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            context = getContext();
+        }
+
+        @Override
         public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            context = getContext();
             spoofBinding = MitmfSpoofBinding.inflate(inflater, container, false);
             viewModel = new MITMFViewModel();
             spoofBinding.setViewModel(viewModel);
@@ -447,13 +460,21 @@ public class MITMfFragment extends Fragment {
 
     public static class MITMfConfigFragment extends Fragment {
         private Context context;
-        private final String configFilePath = nh.CHROOT_PATH + "/etc/mitmf/mitmf.conf";
+        private NhPaths nh;
+        private String configFilePath;
         final ShellExecuter exe = new ShellExecuter();
+
+        @Override
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            context = getContext();
+            nh = new NhPaths();
+            configFilePath = nh.CHROOT_PATH + "/etc/mitmf/mitmf.conf";
+        }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            context = getContext();
             final View rootView = inflater.inflate(R.layout.source_short, container, false);
 
             String description = getResources().getString(R.string.mitmf_config);

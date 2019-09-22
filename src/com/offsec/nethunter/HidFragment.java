@@ -29,6 +29,7 @@ import java.io.OutputStreamWriter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -39,7 +40,7 @@ public class HidFragment extends Fragment {
 
     private ViewPager mViewPager;
     private SharedPreferences sharedpreferences;
-    private static NhPaths nh;
+    private NhPaths nh;
     private final CharSequence[] platforms = {"No UAC Bypass", "Windows 7", "Windows 8", "Windows 10"};
     private final CharSequence[] languages = {"American English", "Belgian", "British English", "Danish", "French", "German", "Italian", "Norwegian", "Portugese", "Russian", "Spanish", "Swedish", "Canadian Multilingual", "Canadian", "Hungarian"};
     private String configFilePath;
@@ -57,10 +58,15 @@ public class HidFragment extends Fragment {
     private boolean isHIDenable = false;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         context = getContext();
         activity = getActivity();
         nh = new NhPaths();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.hid, container, false);
         HidFragment.TabsPagerAdapter tabsPagerAdapter = new TabsPagerAdapter(getChildFragmentManager());
@@ -73,7 +79,7 @@ public class HidFragment extends Fragment {
         mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
-                getActivity().invalidateOptionsMenu();
+                activity.invalidateOptionsMenu();
             }
         });
         setHasOptionsMenu(true);
@@ -97,7 +103,7 @@ public class HidFragment extends Fragment {
         } else {
             menu.findItem(R.id.source_button).setVisible(false);
         }
-        getActivity().invalidateOptionsMenu();
+        activity.invalidateOptionsMenu();
     }
 
     @Override
@@ -314,13 +320,22 @@ public class HidFragment extends Fragment {
 
     public static class PowerSploitFragment extends HidFragment implements OnClickListener {
         private Context context;
-        private final String configFilePath = nh.CHROOT_PATH + "/var/www/html/powersploit-payload";
-        private final String configFileUrlPath = nh.CHROOT_PATH + "/var/www/html/powersploit-url";
+        private NhPaths nh;
+        private String configFilePath;
+        private String configFileUrlPath;
+
+        @Override
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            context = getContext();
+            nh = new NhPaths();
+            configFilePath = nh.CHROOT_PATH + "/var/www/html/powersploit-payload";
+            configFileUrlPath = nh.CHROOT_PATH + "/var/www/html/powersploit-url";
+        }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            context = getContext();
             View rootView = inflater.inflate(R.layout.hid_powersploit, container, false);
             Button b = rootView.findViewById(R.id.powersploitOptionsUpdate);
             b.setOnClickListener(this);
@@ -418,15 +433,24 @@ public class HidFragment extends Fragment {
     public static class WindowsCmdFragment extends HidFragment implements OnClickListener {
         private Context context;
         private Activity activity;
-        private final String configFilePath = nh.APP_SD_FILES_PATH + "/configs/hid-cmd.conf";
-        private final String loadFilePath = nh.APP_SD_FILES_PATH + "/scripts/hid/";
+        private NhPaths nh;
+        private String configFilePath;
+        private String loadFilePath;
         final ShellExecuter exe = new ShellExecuter();
+
+        @Override
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            context = getContext();
+            activity = getActivity();
+            nh = new NhPaths();
+            configFilePath = nh.APP_SD_FILES_PATH + "/configs/hid-cmd.conf";
+            loadFilePath = nh.APP_SD_FILES_PATH + "/scripts/hid/";
+        }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            context = getContext();
-            activity = getActivity();
             View rootView = inflater.inflate(R.layout.hid_windows_cmd, container, false);
             EditText source = rootView.findViewById(R.id.windowsCmdSource);
             exe.ReadFile_ASYNC(configFilePath, source);
@@ -541,13 +565,22 @@ public class HidFragment extends Fragment {
 
     public static class PowershellHttpFragment extends HidFragment implements OnClickListener {
         private Context context;
-        private final String configFilePath = nh.CHROOT_PATH + "/var/www/html/powershell-payload";
-        private final String configFileUrlPath = nh.CHROOT_PATH + "/var/www/html/powershell-url";
+        private NhPaths nh;
+        private String configFilePath;
+        private String configFileUrlPath;
+
+        @Override
+        public void onCreate(@Nullable Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            context = getContext();
+            nh = new NhPaths();
+            configFilePath = nh.CHROOT_PATH + "/var/www/html/powershell-payload";
+            configFileUrlPath = nh.CHROOT_PATH + "/var/www/html/powershell-url";
+        }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            context = getContext();
             View rootView = inflater.inflate(R.layout.hid_powershell_http, container, false);
             Button b = rootView.findViewById(R.id.powershellOptionsUpdate);
             b.setOnClickListener(this);

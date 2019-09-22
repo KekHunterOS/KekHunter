@@ -24,6 +24,7 @@ import com.offsec.nethunter.utils.NhPaths;
 
 import java.util.ArrayList;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 public class NmapFragment extends Fragment {
@@ -65,9 +66,14 @@ public class NmapFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         context = getContext();
         nh = new NhPaths();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.nmap, container, false);
         // Default advanced options as invisible
         final LinearLayout AdvLayout = rootView.findViewById(R.id.nmap_adv_layout);

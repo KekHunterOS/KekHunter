@@ -7,51 +7,24 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.text.method.LinkMovementMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Spinner;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.offsec.nethunter.AsyncTask.DuckHuntAsyncTask;
 import com.offsec.nethunter.utils.NhPaths;
-import com.offsec.nethunter.utils.ShellExecuter;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager.widget.ViewPager;
 
 public class DuckHunterFragment extends Fragment {
@@ -65,12 +38,13 @@ public class DuckHunterFragment extends Fragment {
     private static String[] keyboardLayoutString;
     private static final String ARG_SECTION_NUMBER = "section_number";
     private static final String TAG = "DuckHunterFragment";
-    private NhPaths nh = new NhPaths();
     private DuckHuntAsyncTask duckHuntAsyncTask;
+    private Context context;
     private Activity activity;
+    private NhPaths nh;
     private Menu menu;
-    private final String duckyInputFile = nh.APP_SD_FILES_PATH + "/modules/ducky_in.txt";
-    private final String duckyOutputFile = nh.APP_SD_FILES_PATH + "/modules/ducky_out.sh";
+    private String duckyInputFile ;
+    private String duckyOutputFile;
     private boolean isReceiverRegistered;
     private boolean shouldconvert = true;
     private DuckHuntBroadcastReceiver duckHuntBroadcastReceiver = new DuckHuntBroadcastReceiver();
@@ -86,7 +60,11 @@ public class DuckHunterFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.context = getContext();
         this.activity = getActivity();
+        nh = new NhPaths();
+        duckyInputFile = nh.APP_SD_FILES_PATH + "/modules/ducky_in.txt";
+        duckyOutputFile = nh.APP_SD_FILES_PATH + "/modules/ducky_out.sh";
         map.put("American English", "us");
         map.put("Turkish", "tr");
         map.put("Swedish", "sv");
@@ -133,7 +111,6 @@ public class DuckHunterFragment extends Fragment {
         return rootView;
     }
 
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         this.menu = menu;
@@ -149,13 +126,13 @@ public class DuckHunterFragment extends Fragment {
                 duckHuntAsyncTask.setListener(new DuckHuntAsyncTask.DuckHuntAsyncTaskListener(){
                     @Override
                     public void onAsyncTaskPrepare() {
-                        Toast.makeText(getContext(), "Launching Attack", Toast.LENGTH_SHORT).show();
+                        nh.showMessage(context, "Launching Attack");
                     }
 
                     @Override
                     public void onAsyncTaskFinished(Object result) {
                         if (!(boolean)result){
-                            Toast.makeText(getContext(), "HID interfaces are not enabled or something wrong with the permission of /dev/hidg*, make sure they are enabled and permissions are granted as 666", Toast.LENGTH_LONG).show();
+                            nh.showMessage_long(context, "HID interfaces are not enabled or something wrong with the permission of /dev/hidg*, make sure they are enabled and permissions are granted as 666");
                         }
                     }
                 });

@@ -21,6 +21,7 @@ import com.offsec.nethunter.utils.ShellExecuter;
 
 import java.io.File;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 public class KaliServicesFragment extends Fragment {
@@ -31,7 +32,7 @@ public class KaliServicesFragment extends Fragment {
     private String[][] KaliServices; //
     private static final String ARG_SECTION_NUMBER = "section_number";
     public static final String RUN_AT_BOOT = "RUN_AT_BOOT";
-    private NhPaths nh = new NhPaths();;
+    private NhPaths nh;
     private SharedPreferences prefs;
     private Context context;
     /**
@@ -47,8 +48,14 @@ public class KaliServicesFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         context = getContext();
+        nh = new NhPaths();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.kali_services, container, false);
         setHasOptionsMenu(true);
         checkServices(rootView);
