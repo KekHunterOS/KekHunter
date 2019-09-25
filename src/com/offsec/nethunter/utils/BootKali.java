@@ -51,7 +51,6 @@ import java.util.ArrayList;
  */
 public class BootKali {
     private final String TERM_CMD;
-    private final NhPaths nh = new NhPaths();
     private final String KALI_ENV;
     private final String KALI_COMMAND;
 
@@ -94,7 +93,7 @@ public class BootKali {
 
     //
     private String GEN_BOOTKALI() {
-        return "chroot" + SPACE + nh.CHROOT_PATH + SPACE;
+        return "chroot" + SPACE + NhPaths.CHROOT_PATH + SPACE;
     }
 
     private String GEN__KALI_CMD(String cmd) {

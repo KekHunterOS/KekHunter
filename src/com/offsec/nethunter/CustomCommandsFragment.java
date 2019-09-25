@@ -53,7 +53,6 @@ public class CustomCommandsFragment extends Fragment {
     private String shebang;
     private String custom_commands_runlevel;
     private final ShellExecuter exe = new ShellExecuter();
-    private NhPaths nh;
     private Context context;
     private Activity activity;
     public CustomCommandsFragment() {
@@ -78,12 +77,11 @@ public class CustomCommandsFragment extends Fragment {
         super.onCreate(savedInstanceState);
         context = getContext();
         activity = getActivity();
-        nh = new NhPaths();
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {//this runs BEFORE the ui is available
-        SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+        SharedPreferences sharedpreferences = context.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
         database = new CustomCommandsSQL(context);
         if (!sharedpreferences.contains("initial_commands")) {
             SharedPreferences.Editor editor = sharedpreferences.edit();
@@ -92,7 +90,7 @@ public class CustomCommandsFragment extends Fragment {
             setUpInitialCommands();
         }
 
-        bootScriptPath = nh.APP_INITD_PATH;
+        bootScriptPath = NhPaths.APP_INITD_PATH;
         shebang = "#!/system/bin/sh\n\n# Run at boot CustomCommand: ";
         custom_commands_runlevel = "90";
 
@@ -129,11 +127,10 @@ public class CustomCommandsFragment extends Fragment {
         String _cmd = command.getCommand();
         //String _mode = command.getExec_Mode();
         String _sendTo = command.getSend_To_Shell();
-        nh = new NhPaths();
 
         String composedCommand;
         if (_sendTo.equals("KALI")) {
-            composedCommand = "su -c '"+nh.APP_SCRIPTS_PATH+"/bootkali custom_cmd " + _cmd + "'";
+            composedCommand = "su -c '"+NhPaths.APP_SCRIPTS_PATH+"/bootkali custom_cmd " + _cmd + "'";
         } else {
             // SEND TO ANDROID
             // no sure, if we add su -c , we cant exec comands as a normal android user
@@ -282,7 +279,7 @@ public class CustomCommandsFragment extends Fragment {
                                         userInputCommand.getText().toString(),
                                         command_exec_mode.getSelectedItem().toString(),
                                         command_run_in_shell.getSelectedItem().toString(), _run_at_boot);
-                                nh.showMessage(context,"Command created.");
+                                NhPaths.showMessage(context,"Command created.");
 
                                 if (_run_at_boot == 1) {
                                     addToBoot(_insertedCommand);
@@ -291,7 +288,7 @@ public class CustomCommandsFragment extends Fragment {
                                 commandList.add(0, _insertedCommand);
                                 commandAdapter.notifyDataSetChanged();
                             } else {
-                                nh.showMessage(context, getString(R.string.toast_input_error_launcher));
+                                NhPaths.showMessage(context, getString(R.string.toast_input_error_launcher));
                             }
                             hideSoftKeyboard(getView());
                         });
@@ -356,12 +353,12 @@ public class CustomCommandsFragment extends Fragment {
                                 } else {
                                     removeFromBoot(_updatedCommand.getId());
                                 }
-                                nh.showMessage(context, "Command Updated");
+                                NhPaths.showMessage(context, "Command Updated");
                                 commandList.set(position, _updatedCommand);
                                 commandAdapter.notifyDataSetChanged();
 
                             } else {
-                                nh.showMessage(context, getString(R.string.toast_input_error_launcher));
+                                NhPaths.showMessage(context, getString(R.string.toast_input_error_launcher));
                             }
                             hideSoftKeyboard(getView());
                         })
@@ -372,18 +369,18 @@ public class CustomCommandsFragment extends Fragment {
                             commandList.remove(position);
                             commandAdapter.notifyDataSetChanged();
                             hideSoftKeyboard(getView());
-                            nh.showMessage(context, "Command Deleted");
+                            NhPaths.showMessage(context, "Command Deleted");
                         });
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
     }
 
     private void setUpInitialCommands() {
-        database.addCommand("Update Kali metapackages", nh.makeTermTitle("Updating Kali") + "apt-get update && apt-get upgrade", "INTERACTIVE", "KALI", 0);
-        database.addCommand("Wlan1 Monitor Mode", nh.makeTermTitle("Wlan1 Monitor UP") + "sudo ifconfig wlan1 down && sudo iwconfig wlan1 mode monitor && sudo ifconfig wlan1 up && echo \"wlan1 Monitor mode enabled\" && sleep 3 && exit", "INTERACTIVE", "KALI", 0);
-        database.addCommand("Launch Wifite", nh.makeTermTitle("Wifite") + "wifite", "INTERACTIVE", "KALI", 0);
-        database.addCommand("Dump Mifare", nh.makeTermTitle("DumpMifare") + "dumpmifare.sh", "INTERACTIVE", "KALI", 0);
-        database.addCommand("Backup Kali Chroot", nh.makeTermTitle("Backup_Kali_Chroot") + "su --mount-master -c 'chroot_backup /data/local/nhsystem/kali-armhf /sdcard/kalifs-backup.tar.gz'",
+        database.addCommand("Update Kali metapackages", NhPaths.makeTermTitle("Updating Kali") + "apt-get update && apt-get upgrade", "INTERACTIVE", "KALI", 0);
+        database.addCommand("Wlan1 Monitor Mode", NhPaths.makeTermTitle("Wlan1 Monitor UP") + "sudo ifconfig wlan1 down && sudo iwconfig wlan1 mode monitor && sudo ifconfig wlan1 up && echo \"wlan1 Monitor mode enabled\" && sleep 3 && exit", "INTERACTIVE", "KALI", 0);
+        database.addCommand("Launch Wifite", NhPaths.makeTermTitle("Wifite") + "wifite", "INTERACTIVE", "KALI", 0);
+        database.addCommand("Dump Mifare", NhPaths.makeTermTitle("DumpMifare") + "dumpmifare.sh", "INTERACTIVE", "KALI", 0);
+        database.addCommand("Backup Kali Chroot", NhPaths.makeTermTitle("Backup_Kali_Chroot") + "su --mount-master -c 'chroot_backup /data/local/nhsystem/kali-armhf /sdcard/kalifs-backup.tar.gz'",
                 "INTERACTIVE", "ANDROID", 0);
     }
 }
@@ -392,7 +389,6 @@ class CmdLoader extends BaseAdapter {
 
     private final List<CustomCommand> _commandList;
     private final Context _mContext;
-    private NhPaths nh;
     private final ShellExecuter exe = new ShellExecuter();
 
 
@@ -400,7 +396,6 @@ class CmdLoader extends BaseAdapter {
 
         _mContext = context;
         _commandList = commandList;
-        this.nh = new NhPaths();
     }
 
     static class ViewHolderItem {
@@ -497,11 +492,11 @@ class CmdLoader extends BaseAdapter {
         if (_mode.equals("BACKGROUND")) {
             if (_sendTo.equals("KALI")) {
                 new BootKali(_cmd).run_bg();
-                nh.showMessage(_mContext, "Kali cmd done.");
+                NhPaths.showMessage(_mContext, "Kali cmd done.");
             } else {
                 // dont run all the bg commands as root
                 exe.Executer(_cmd);
-                nh.showMessage(_mContext, "Android cmd done.");
+                NhPaths.showMessage(_mContext, "Android cmd done.");
             }
         } else try {
             // INTERACTIVE
@@ -527,9 +522,9 @@ class CmdLoader extends BaseAdapter {
         } catch (Exception e) {
             if (!checkTerminalExternalPermission("com.offsec.nhterm.permission.RUN_SCRIPT_NH") ||
                     !checkTerminalExternalPermission("com.offsec.nhterm.permission.RUN_SCRIPT")) {
-                nh.showMessage(_mContext, _mContext.getString(R.string.toast_error_permissions));
+                NhPaths.showMessage(_mContext, _mContext.getString(R.string.toast_error_permissions));
             } else {
-                nh.showMessage(_mContext, _mContext.getString(R.string.toast_install_terminal));
+                NhPaths.showMessage(_mContext, _mContext.getString(R.string.toast_install_terminal));
             }
         }
     }

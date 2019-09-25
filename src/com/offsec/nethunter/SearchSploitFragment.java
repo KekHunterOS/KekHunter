@@ -57,7 +57,6 @@ public class SearchSploitFragment extends Fragment {
     private SearchSploitSQL database;
     private Context context;
     private Activity activity;
-    private NhPaths nh;
 
     public static SearchSploitFragment newInstance(int sectionNumber) {
         SearchSploitFragment fragment = new SearchSploitFragment();
@@ -73,7 +72,6 @@ public class SearchSploitFragment extends Fragment {
         super.onCreate(savedInstanceState);
         context = getContext();
         activity = getActivity();
-        nh = new NhPaths();
     }
 
     @Override
@@ -118,7 +116,7 @@ public class SearchSploitFragment extends Fragment {
         final Button searchSearchSploit = rootView.findViewById(R.id.serchsploit_loadDB);
         searchSearchSploit.setVisibility(View.GONE);
         searchSearchSploit.setOnClickListener(v -> {
-            final ProgressDialog pd = new ProgressDialog(getActivity());
+            final ProgressDialog pd = new ProgressDialog(activity);
             pd.setTitle("Feeding Exploit DB");
             pd.setMessage("This can take a minute, wait...");
             pd.setCancelable(false);
@@ -127,12 +125,12 @@ public class SearchSploitFragment extends Fragment {
                 final Boolean isFeeded = database.doDbFeed();
                 searchSearchSploit.post(() -> {
                     if (isFeeded) {
-                        nh.showMessage_long(context, "DB FEED DONE");
+                        NhPaths.showMessage_long(context, "DB FEED DONE");
                         try {
                             // Search List
-                            //String sd = nh.SD_PATH;
+                            //String sd = NhPaths.SD_PATH;
                             String sd = "/sdcard";
-                            //String data = nh.APP_PATH;
+                            //String data = NhPaths.APP_PATH;
                             String data = "/data/data/com.offsec.nethunter/files/";
                             String DATABASE_NAME = "SearchSploit";
                             String currentDBPath = "../databases/" + DATABASE_NAME;
@@ -155,7 +153,7 @@ public class SearchSploitFragment extends Fragment {
                         }
                         // main(rootView);
                     } else {
-                        nh.showMessage_long(context,
+                        NhPaths.showMessage_long(context,
                                 "Unable to find Searchsploit files.csv database. Install exploitdb in chroot");
                     }
                 });

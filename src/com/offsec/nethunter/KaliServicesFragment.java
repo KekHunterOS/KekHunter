@@ -32,7 +32,6 @@ public class KaliServicesFragment extends Fragment {
     private String[][] KaliServices; //
     private static final String ARG_SECTION_NUMBER = "section_number";
     public static final String RUN_AT_BOOT = "RUN_AT_BOOT";
-    private NhPaths nh;
     private SharedPreferences prefs;
     private Context context;
     /**
@@ -51,7 +50,21 @@ public class KaliServicesFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = getContext();
-        nh = new NhPaths();
+        KaliServices = new String[][]{
+                // {name, check_cmd, start_cmd, stop_cmd, init_service_filename}
+                {"SSH", "sh " + NhPaths.APP_SCRIPTS_PATH + "/check-kalissh", "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali ssh start'", "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali ssh stop'", "70ssh"},
+                {"Dnsmasq", "sh " + NhPaths.APP_SCRIPTS_PATH + "/check-kalidnsmq", "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali dnsmasq start'", "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali dnsmasq stop'", "70dnsmasq"},
+                {"Hostapd", "sh " + NhPaths.APP_SCRIPTS_PATH + "/check-kalihostapd", "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali hostapd start'", "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali hostapd stop'", "70hostapd"},
+                {"OpenVPN", "sh " + NhPaths.APP_SCRIPTS_PATH + "/check-kalivpn", "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali openvpn start'", "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali openvpn stop'", "70openvpn"},
+                {"Apache", "sh " + NhPaths.APP_SCRIPTS_PATH + "/check-kaliapache", "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali apache start'", "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali apache stop'", "70apache"},
+                {"Metasploit", "sh " + NhPaths.APP_SCRIPTS_PATH + "/check-kalimetasploit", "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali msf start'", "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali msf stop'", "70msf"},
+                {"Fruity WiFi", "sh " + NhPaths.APP_SCRIPTS_PATH + "/check-fruity-wifi", "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali fruitywifi start'", "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali fruitywifi stop'", "70fruity"},
+                //{"DHCP", "sh " + NhPaths.APP_SCRIPTS_PATH + "/check-kalidhcp","su -c '" + cachedir + "/bootkali dhcp start'","su -c '" + cachedir + "/bootkali dhcp stop'", "70dhcp"},
+                {"BeEF Framework", "sh " + NhPaths.APP_SCRIPTS_PATH + "/check-kalibeef-xss", "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali beef-xss start'", "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali beef-xss stop'", "70beef"},
+                {"Y-cable Charging", "sh " + NhPaths.APP_SCRIPTS_PATH + "/check-ycable", "su -c 'bootkali ycable start'", "su -c 'bootkali ycable stop'", "70ycable"}
+                // the stop script isnt working well, doing a raw cmd instead to stop vnc
+                // {"VNC", "sh " + NhPaths.APP_SCRIPTS_PATH + "/check-kalivnc", "" + cachedir + "/bootkali\nvncserver", "" + cachedir + "/bootkali\nkill $(ps aux | grep 'Xtightvnc' | awk '{print $2}');CT=0;for x in $(ps aux | grep 'Xtightvnc' | awk '{print $2}'); do CT=$[$CT +1];tightvncserver -kill :$CT; done;rm /root/.vnc/*.log;rm -r /tmp/.X*", "70vnc"},
+        };
     }
 
     @Override
@@ -66,7 +79,7 @@ public class KaliServicesFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        prefs = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+        prefs = context.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
         inflater.inflate(R.menu.kali_services, menu);
     }
 
@@ -91,12 +104,12 @@ public class KaliServicesFragment extends Fragment {
                     SharedPreferences.Editor ed = prefs.edit();
                     ed.putBoolean(RUN_AT_BOOT, false);
                     ed.apply();
-                    nh.showMessage(context,"Boot Services DISABLED");
+                    NhPaths.showMessage(context,"Boot Services DISABLED");
                 } else {
                     SharedPreferences.Editor ed = prefs.edit();
                     ed.putBoolean(RUN_AT_BOOT, true);
                     ed.apply();
-                    nh.showMessage(context,"Boot Services ENABLED");
+                    NhPaths.showMessage(context,"Boot Services ENABLED");
                 }
                 return true;
             default:
@@ -104,52 +117,16 @@ public class KaliServicesFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        KaliServices = new String[][]{
-
-                // {name, check_cmd, start_cmd, stop_cmd, init_service_filename}
-
-                {"SSH", "sh " + nh.APP_SCRIPTS_PATH + "/check-kalissh", "su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali ssh start'", "su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali ssh stop'", "70ssh"},
-                {"Dnsmasq", "sh " + nh.APP_SCRIPTS_PATH + "/check-kalidnsmq", "su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali dnsmasq start'", "su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali dnsmasq stop'", "70dnsmasq"},
-                {"Hostapd", "sh " + nh.APP_SCRIPTS_PATH + "/check-kalihostapd", "su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali hostapd start'", "su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali hostapd stop'", "70hostapd"},
-                {"OpenVPN", "sh " + nh.APP_SCRIPTS_PATH + "/check-kalivpn", "su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali openvpn start'", "su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali openvpn stop'", "70openvpn"},
-                {"Apache", "sh " + nh.APP_SCRIPTS_PATH + "/check-kaliapache", "su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali apache start'", "su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali apache stop'", "70apache"},
-                {"Metasploit", "sh " + nh.APP_SCRIPTS_PATH + "/check-kalimetasploit", "su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali msf start'", "su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali msf stop'", "70msf"},
-                {"Fruity WiFi", "sh " + nh.APP_SCRIPTS_PATH + "/check-fruity-wifi", "su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali fruitywifi start'", "su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali fruitywifi stop'", "70fruity"},
-                //{"DHCP", "sh " + nh.APP_SCRIPTS_PATH + "/check-kalidhcp","su -c '" + cachedir + "/bootkali dhcp start'","su -c '" + cachedir + "/bootkali dhcp stop'", "70dhcp"},
-                {"BeEF Framework", "sh " + nh.APP_SCRIPTS_PATH + "/check-kalibeef-xss", "su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali beef-xss start'", "su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali beef-xss stop'", "70beef"},
-                {"Y-cable Charging", "sh " + nh.APP_SCRIPTS_PATH + "/check-ycable", "su -c 'bootkali ycable start'", "su -c 'bootkali ycable stop'", "70ycable"}
-                // the stop script isnt working well, doing a raw cmd instead to stop vnc
-                // {"VNC", "sh " + nh.APP_SCRIPTS_PATH + "/check-kalivnc", "" + cachedir + "/bootkali\nvncserver", "" + cachedir + "/bootkali\nkill $(ps aux | grep 'Xtightvnc' | awk '{print $2}');CT=0;for x in $(ps aux | grep 'Xtightvnc' | awk '{print $2}'); do CT=$[$CT +1];tightvncserver -kill :$CT; done;rm /root/.vnc/*.log;rm -r /tmp/.X*", "70vnc"},
-        };
-    }
-
-    public void onResume() {
-        super.onResume();
-    }
-
-    public void onPause() {
-        super.onPause();
-    }
-
-    public void onStop() {
-        super.onStop();
-    }
-
-
     private void checkServices(final View rootView) {
 
         new Thread(() -> {
 
-            nh = new NhPaths();
 
             ShellExecuter exe = new ShellExecuter();
             final ListView servicesList = rootView.findViewById(R.id.servicesList);
             String checkCmd = "";
             String checkBootStates = "";
-            final String bootScriptPath = nh.APP_INITD_PATH;
+            final String bootScriptPath = NhPaths.APP_INITD_PATH;
 
             if (KaliServices == null) {
                 Log.d("Services", "Null KaliServices");

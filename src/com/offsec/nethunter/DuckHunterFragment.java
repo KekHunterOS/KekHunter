@@ -41,7 +41,6 @@ public class DuckHunterFragment extends Fragment {
     private DuckHuntAsyncTask duckHuntAsyncTask;
     private Context context;
     private Activity activity;
-    private NhPaths nh;
     private Menu menu;
     private String duckyInputFile ;
     private String duckyOutputFile;
@@ -60,11 +59,10 @@ public class DuckHunterFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.context = getContext();
-        this.activity = getActivity();
-        nh = new NhPaths();
-        duckyInputFile = nh.APP_SD_FILES_PATH + "/modules/ducky_in.txt";
-        duckyOutputFile = nh.APP_SD_FILES_PATH + "/modules/ducky_out.sh";
+        context = getContext();
+        activity = getActivity();
+        duckyInputFile = NhPaths.APP_SD_FILES_PATH + "/modules/ducky_in.txt";
+        duckyOutputFile = NhPaths.APP_SD_FILES_PATH + "/modules/ducky_out.sh";
         map.put("American English", "us");
         map.put("Turkish", "tr");
         map.put("Swedish", "sv");
@@ -107,7 +105,7 @@ public class DuckHunterFragment extends Fragment {
             }
         });
 
-        sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+        sharedpreferences = activity.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
         return rootView;
     }
 
@@ -126,13 +124,13 @@ public class DuckHunterFragment extends Fragment {
                 duckHuntAsyncTask.setListener(new DuckHuntAsyncTask.DuckHuntAsyncTaskListener(){
                     @Override
                     public void onAsyncTaskPrepare() {
-                        nh.showMessage(context, "Launching Attack");
+                        NhPaths.showMessage(context, "Launching Attack");
                     }
 
                     @Override
                     public void onAsyncTaskFinished(Object result) {
                         if (!(boolean)result){
-                            nh.showMessage_long(context, "HID interfaces are not enabled or something wrong with the permission of /dev/hidg*, make sure they are enabled and permissions are granted as 666");
+                            NhPaths.showMessage_long(context, "HID interfaces are not enabled or something wrong with the permission of /dev/hidg*, make sure they are enabled and permissions are granted as 666");
                         }
                     }
                 });

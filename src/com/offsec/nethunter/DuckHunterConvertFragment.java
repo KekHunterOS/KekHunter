@@ -40,7 +40,6 @@ import java.util.List;
 
 public class DuckHunterConvertFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "DuckHunterConvert";
-    private NhPaths nh;
     private String duckyInputFile;
     private String duckyOutputFile;
     private static final String loadFilePath = "/scripts/ducky/";
@@ -59,9 +58,8 @@ public class DuckHunterConvertFragment extends Fragment implements View.OnClickL
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.context = getContext();
-        this.activity = getActivity();
-        nh = new NhPaths();
+        context = getContext();
+        activity = getActivity();
 
     }
 
@@ -156,9 +154,9 @@ public class DuckHunterConvertFragment extends Fragment implements View.OnClickL
                         }
                         br.close();
                         editsource.setText(text);
-                        nh.showMessage(context, "Script loaded");
+                        NhPaths.showMessage(context, "Script loaded");
                     } catch (Exception e) {
-                        nh.showMessage(context, e.getMessage());
+                        NhPaths.showMessage(context, e.getMessage());
                     }
                     break;
                 }
@@ -174,7 +172,7 @@ public class DuckHunterConvertFragment extends Fragment implements View.OnClickL
         String filename_path = "/duckyscripts/";
         filename = filename_path + filename;
         EditText editsource = getView().findViewById(R.id.editSource);
-        File file = new File(nh.APP_SD_FILES_PATH, filename);
+        File file = new File(NhPaths.APP_SD_FILES_PATH, filename);
         StringBuilder text = new StringBuilder();
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
@@ -192,7 +190,7 @@ public class DuckHunterConvertFragment extends Fragment implements View.OnClickL
 
     private String[] getDuckyScriptFiles() {
         List<String> result = new ArrayList<>();
-        File script_folder = new File(nh.APP_SD_FILES_PATH + "/duckyscripts");
+        File script_folder = new File(NhPaths.APP_SD_FILES_PATH + "/duckyscripts");
         File[] filesInFolder = script_folder.listFiles();
         for (File file : filesInFolder) {
             if (!file.isDirectory()) {
@@ -213,29 +211,29 @@ public class DuckHunterConvertFragment extends Fragment implements View.OnClickL
             myOutWriter.close();
             fOut.close();
         } catch (Exception e) {
-            nh.showMessage(context, e.getMessage());
+            NhPaths.showMessage(context, e.getMessage());
         }
     }
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.duckyLoad:
                 try {
-                    File scriptsDir = new File(nh.APP_SD_FILES_PATH, loadFilePath);
+                    File scriptsDir = new File(NhPaths.APP_SD_FILES_PATH, loadFilePath);
                     if (!scriptsDir.exists()) scriptsDir.mkdirs();
                 } catch (Exception e) {
-                    nh.showMessage(context, e.getMessage());
+                    NhPaths.showMessage(context, e.getMessage());
                 }
                 Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                Uri selectedUri = Uri.parse(nh.APP_SD_FILES_PATH + loadFilePath);
+                Uri selectedUri = Uri.parse(NhPaths.APP_SD_FILES_PATH + loadFilePath);
                 intent.setDataAndType(selectedUri, "file/*");
                 startActivityForResult(intent, PICKFILE_RESULT_CODE);
                 break;
             case R.id.duckySave:
                 try {
-                    File scriptsDir = new File(nh.APP_SD_FILES_PATH, loadFilePath);
+                    File scriptsDir = new File(NhPaths.APP_SD_FILES_PATH, loadFilePath);
                     if (!scriptsDir.exists()) scriptsDir.mkdirs();
                 } catch (Exception e) {
-                    nh.showMessage(context, e.getMessage());
+                    NhPaths.showMessage(context, e.getMessage());
                 }
                 AlertDialog.Builder alert = new AlertDialog.Builder(activity);
 
@@ -243,14 +241,14 @@ public class DuckHunterConvertFragment extends Fragment implements View.OnClickL
                 alert.setMessage("Please enter a name for your script.");
 
                 // Set an EditText view to get user input
-                final EditText input = new EditText(getActivity());
+                final EditText input = new EditText(activity);
                 alert.setView(input);
 
                 alert.setPositiveButton("Ok", (dialog, whichButton) -> {
                     String value = input.getText().toString();
                     if (value.length() > 0) {
                         //Save file (ask name)
-                        File scriptFile = new File(nh.APP_SD_FILES_PATH + loadFilePath + File.separator + value + ".conf");
+                        File scriptFile = new File(NhPaths.APP_SD_FILES_PATH + loadFilePath + File.separator + value + ".conf");
                         System.out.println(scriptFile.getAbsolutePath());
                         if (!scriptFile.exists()) {
                             try {
@@ -263,16 +261,16 @@ public class DuckHunterConvertFragment extends Fragment implements View.OnClickL
                                     myOutWriter.append(text);
                                     myOutWriter.close();
                                     fOut.close();
-                                    nh.showMessage(context, "Script saved");
+                                    NhPaths.showMessage(context, "Script saved");
                                 }
                             } catch (Exception e) {
-                                nh.showMessage(context, e.getMessage());
+                                NhPaths.showMessage(context, e.getMessage());
                             }
                         } else {
-                            nh.showMessage(context, "File already exists");
+                            NhPaths.showMessage(context, "File already exists");
                         }
                     } else {
-                        nh.showMessage(context, "Wrong name provided");
+                        NhPaths.showMessage(context, "Wrong name provided");
                     }
                 });
 
@@ -282,7 +280,7 @@ public class DuckHunterConvertFragment extends Fragment implements View.OnClickL
                 alert.show();
                 break;
             default:
-                nh.showMessage(context, "Unknown click");
+                NhPaths.showMessage(context, "Unknown click");
                 break;
         }
     }

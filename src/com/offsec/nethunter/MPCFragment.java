@@ -31,7 +31,6 @@ public class MPCFragment extends Fragment {
     private String callbackVar;
     private String stagerVar;
     private Context context;
-    private NhPaths nh;
     private static final String ARG_SECTION_NUMBER = "section_number";
 
     public MPCFragment() {
@@ -49,13 +48,12 @@ public class MPCFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = getContext();
-        nh = new NhPaths();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.payload_maker, container, false);
-        SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+        SharedPreferences sharedpreferences = context.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
 
         // Payload Type Spinner
         Spinner typeSpinner = rootView.findViewById(R.id.mpc_type_spinner);
@@ -289,7 +287,7 @@ public class MPCFragment extends Fragment {
             intent.putExtra("com.offsec.nhterm.iInitialCommand", command);
             startActivity(intent);
         } catch (Exception e) {
-            nh.showMessage(context, getString(R.string.toast_install_terminal));
+            NhPaths.showMessage(context, getString(R.string.toast_install_terminal));
         }
     }
 

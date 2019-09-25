@@ -45,7 +45,6 @@ public class MacchangerFragment extends Fragment {
     private ShellExecuter exe;
     private Context context;
     private Activity activity;
-    private NhPaths nh;
     public MacchangerFragment() {
 
     }
@@ -97,9 +96,8 @@ public class MacchangerFragment extends Fragment {
         super.onCreate(savedInstanceState);
         context = getContext();
         activity = getActivity();
-        nh = new NhPaths();
         exe = new ShellExecuter();
-        sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+        sharedpreferences = context.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
     }
 
     @Override
@@ -199,7 +197,7 @@ public class MacchangerFragment extends Fragment {
         });
         setHostname.setOnClickListener(v -> new Thread(() -> {
             setHostname(phoneName.getText().toString());
-            v.post(() -> nh.showMessage(context, "Hostname changed"));
+            v.post(() -> NhPaths.showMessage(context, "Hostname changed"));
         }).start());
         reloadMAC.setOnClickListener(v -> {
             String selectedInterface = interfaceSpinner.getSelectedItem().toString();
@@ -277,13 +275,13 @@ public class MacchangerFragment extends Fragment {
                             exe.RunAsRootWithException(finalCommand);
                             macModeSpinner.post(() -> new android.os.Handler().postDelayed(
                                     () -> {
-                                        nh.showMessage(context,"Refreshing the current MAC.");
+                                        NhPaths.showMessage(context,"Refreshing the current MAC.");
                                         refreshMAc();
 
                                     }, 1000));
                         }).start();
                     } else {
-                        exe.RunAsRootWithException(nh.whichBusybox() + " ifconfig " + selectedDevice + " down");
+                        exe.RunAsRootWithException(NhPaths.BUSYBOX + " ifconfig " + selectedDevice + " down");
 
                         command = "bootkali macchanger_random " + selectedDevice;
                         exe.RunAsRootWithException(command);
@@ -291,8 +289,8 @@ public class MacchangerFragment extends Fragment {
 
                         new android.os.Handler().postDelayed(
                                 () -> {
-                                    exe.RunAsRootWithException(nh.whichBusybox() + " ifconfig " + selectedDevice + " up");
-                                    nh.showMessage(context,"Refreshing the current MAC.");
+                                    exe.RunAsRootWithException(NhPaths.BUSYBOX + " ifconfig " + selectedDevice + " up");
+                                    NhPaths.showMessage(context,"Refreshing the current MAC.");
                                     refreshMAc();
                                 }, 500);
                     }
@@ -302,7 +300,7 @@ public class MacchangerFragment extends Fragment {
                 if (macModeSpinner.getSelectedItem().toString().equals("Custom MAC")) {
                     if (macsArray != null) {
                         if (macsArray.length() != 17) {
-                            nh.showMessage(context,"Invalid custom MAC. Review it.");
+                            NhPaths.showMessage(context,"Invalid custom MAC. Review it.");
                             return;
                         }
                     }
@@ -324,21 +322,21 @@ public class MacchangerFragment extends Fragment {
                             exe.RunAsRootWithException(finalCommand);
                             macModeSpinner.post(() -> new android.os.Handler().postDelayed(
                                     () -> {
-                                        nh.showMessage(context,"Refreshing the current MAC.");
+                                        NhPaths.showMessage(context,"Refreshing the current MAC.");
                                         refreshMAc();
                                     }, 1000));
                         }).start();
 
                     } else {
-                        exe.RunAsRootWithException(nh.whichBusybox() + " ifconfig " + selectedDevice + " down");
+                        exe.RunAsRootWithException(NhPaths.BUSYBOX + " ifconfig " + selectedDevice + " down");
                         command = "bootkali macchanger_custom " + macsArray + " " + selectedDevice;
                         exe.RunAsRootWithException(command);
                         // macResult.setText();
 
                         new android.os.Handler().postDelayed(
                                 () -> {
-                                    exe.RunAsRootWithException(nh.whichBusybox() + " ifconfig " + selectedDevice + " up");
-                                    nh.showMessage(context,"Refreshing the current MAC.");
+                                    exe.RunAsRootWithException(NhPaths.BUSYBOX + " ifconfig " + selectedDevice + " up");
+                                    NhPaths.showMessage(context,"Refreshing the current MAC.");
                                     refreshMAc();
                                 }, 500);
 
@@ -428,7 +426,7 @@ public class MacchangerFragment extends Fragment {
                         setMacButton.setEnabled(true);
                         currMac.setText(_res); //set the current mac if found
 
-                        sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+                        sharedpreferences = context.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
                         String slt = sharedpreferences.getString("macchanger_opts", "");
 
 
@@ -462,7 +460,7 @@ public class MacchangerFragment extends Fragment {
         final String cleanInterface = selectedInterface.split(" ")[0];
         String command;
         if (cleanInterface.equals("wlan0")) {
-            nh.showMessage(context,"Resetting " + cleanInterface + " MAC");
+            NhPaths.showMessage(context,"Resetting " + cleanInterface + " MAC");
             if (isOPO()) {
                 Log.d("opo_original_mac", sharedpreferences.getString("opo_original_mac", ""));
                 command = "settings put global airplane_mode_on 1" +
@@ -484,21 +482,21 @@ public class MacchangerFragment extends Fragment {
                 exe.RunAsRootWithException(finalCommand);
                 interfaceSpinner.post(() -> new android.os.Handler().postDelayed(
                         () -> {
-                            nh.showMessage(context,"Refreshing the current MAC.");
+                            NhPaths.showMessage(context,"Refreshing the current MAC.");
                             refreshMAc();
                         }, 1000));
             }).start();
         } else {
-            nh.showMessage(context,"Resetting " + cleanInterface + " MAC");
-            exe.RunAsRootWithException(nh.whichBusybox() + " ifconfig " + cleanInterface + " down");
+            NhPaths.showMessage(context,"Resetting " + cleanInterface + " MAC");
+            exe.RunAsRootWithException(NhPaths.BUSYBOX + " ifconfig " + cleanInterface + " down");
 
             String resetCmd = "bootkali macchanger_original " + cleanInterface;
             exe.RunAsRootWithException(resetCmd);
 
             new android.os.Handler().postDelayed(
                     () -> {
-                        exe.RunAsRootWithException(nh.whichBusybox() + " ifconfig " + cleanInterface + " up");
-                        nh.showMessage(context,"Refreshing the current MAC.");
+                        exe.RunAsRootWithException(NhPaths.BUSYBOX + " ifconfig " + cleanInterface + " up");
+                        NhPaths.showMessage(context,"Refreshing the current MAC.");
                         refreshMAc();
                     }, 500);
 

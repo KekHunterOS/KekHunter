@@ -26,6 +26,7 @@ import com.offsec.nethunter.AsyncTask.CopyBootFilesAsyncTask;
 import com.offsec.nethunter.gps.KaliGPSUpdates;
 import com.offsec.nethunter.gps.LocationUpdateService;
 import com.offsec.nethunter.utils.CheckForRoot;
+import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.PermissionCheck;
 import com.winsontan520.wversionmanager.library.WVersionManager;
 
@@ -49,11 +50,9 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     private static final String CHROOT_INSTALLED_TAG = "CHROOT_INSTALLED_TAG";
     private static final String GPS_BACKGROUND_FRAGMENT_TAG = "BG_FRAGMENT_TAG";
     public static final String BOOT_CHANNEL_ID = "BOOT_CHANNEL";
-
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
-
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private static NavigationView navigationView;
@@ -61,12 +60,12 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     private final Stack<String> titles = new Stack<>();
     private static SharedPreferences prefs;
     private MenuItem lastSelected;
-    //private static Context c;
     public Context context;
     public Activity activity;
     private Integer permsCurrent = 1;
     private boolean locationUpdatesRequested = false;
     private KaliGPSUpdates.Receiver locationUpdateReceiver;
+    private NhPaths nhPaths;
 
     //public static Context getAppContext() {
     //   return c;
@@ -76,9 +75,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        // ************************************************
-        //c = getApplication(); //* DONT REMOVE ME *
-        // ************************************************
+
         this.context = getApplicationContext();
         this.activity = this;
 
@@ -87,6 +84,10 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         } else {
             CheckForRoot();
         }*/
+
+        // Initiate the NhPaths singleton class, and it will then keep living until the app dies.
+        // Also with its sharepreference listener registered, the CHROOT_PATH variable can be updated immediately on sharepreference changes.
+        nhPaths = NhPaths.getInstance(context);
 
         ProgressDialog progressDialog = new ProgressDialog(activity);
         CopyBootFilesAsyncTask copyBootFilesAsyncTask = new CopyBootFilesAsyncTask(context, activity, progressDialog);
@@ -176,7 +177,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd KK:mm:ss a zzz",
                         Locale.US);
 
-                prefs = getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+                prefs = getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
 
                 final String buildTime = sdf.format(BuildConfig.BUILD_TIME);
                 TextView buildInfo1 = navigationHeadView.findViewById(R.id.buildinfo1);
@@ -632,6 +633,14 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     public void onStopRequested() {
         if (locationService != null) {
             locationService.stopUpdates();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (nhPaths != null){
+            nhPaths.onDestroy();
         }
     }
 }

@@ -40,7 +40,6 @@ public class HidFragment extends Fragment {
 
     private ViewPager mViewPager;
     private SharedPreferences sharedpreferences;
-    private NhPaths nh;
     private final CharSequence[] platforms = {"No UAC Bypass", "Windows 7", "Windows 8", "Windows 10"};
     private final CharSequence[] languages = {"American English", "Belgian", "British English", "Danish", "French", "German", "Italian", "Norwegian", "Portugese", "Russian", "Spanish", "Swedish", "Canadian Multilingual", "Canadian", "Hungarian"};
     private String configFilePath;
@@ -62,7 +61,6 @@ public class HidFragment extends Fragment {
         super.onCreate(savedInstanceState);
         context = getContext();
         activity = getActivity();
-        nh = new NhPaths();
     }
 
     @Override
@@ -74,7 +72,7 @@ public class HidFragment extends Fragment {
         mViewPager = rootView.findViewById(R.id.pagerHid);
         mViewPager.setAdapter(tabsPagerAdapter);
 
-        configFilePath = nh.CHROOT_PATH + "/var/www/html/powersploit-payload";
+        configFilePath = NhPaths.CHROOT_PATH + "/var/www/html/powersploit-payload";
 
         mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
@@ -83,7 +81,7 @@ public class HidFragment extends Fragment {
             }
         });
         setHasOptionsMenu(true);
-        sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+        sharedpreferences = activity.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
         check_HID_enable();
         return rootView;
 
@@ -113,7 +111,7 @@ public class HidFragment extends Fragment {
                 if (isHIDenable) {
                     start();
                 } else {
-                    nh.showMessage_long(context,"HID interfaces are not enabled or something wrong with the permission of /dev/hidg*, make sure they are enabled and permissions are granted as 666");
+                    NhPaths.showMessage_long(context,"HID interfaces are not enabled or something wrong with the permission of /dev/hidg*, make sure they are enabled and permissions are granted as 666");
                 }
                 return true;
             case R.id.stop_service:
@@ -126,7 +124,7 @@ public class HidFragment extends Fragment {
                 openLanguageDialog();
                 return true;
             case R.id.source_button:
-                Intent i = new Intent(getActivity(), EditSourceActivity.class);
+                Intent i = new Intent(activity, EditSourceActivity.class);
                 i.putExtra("path", configFilePath);
                 startActivity(i);
                 return true;
@@ -192,46 +190,46 @@ public class HidFragment extends Fragment {
         if (pageNum == 0) {
             switch (UACBypassIndex) {
                 case 0:
-                    command[0] = "su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali start-rev-met --" + lang + "'";
+                    command[0] = "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali start-rev-met --" + lang + "'";
                     break;
                 case 1:
-                    command[0] = "su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali start-rev-met-elevated-win7 --" + lang + "'";
+                    command[0] = "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali start-rev-met-elevated-win7 --" + lang + "'";
                     break;
                 case 2:
-                    command[0] = "su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali start-rev-met-elevated-win8 --" + lang + "'";
+                    command[0] = "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali start-rev-met-elevated-win8 --" + lang + "'";
                     break;
                 case 3:
-                    command[0] = "su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali start-rev-met-elevated-win10 --" + lang + "'";
+                    command[0] = "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali start-rev-met-elevated-win10 --" + lang + "'";
                     break;
                 default:
-                    nh.showMessage(context,"No option selected 1");
+                    NhPaths.showMessage(context,"No option selected 1");
                     break;
             }
         } else if (pageNum == 1) {
             switch (UACBypassIndex) {
                 case 0:
-                    command[0] = "su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali hid-cmd --" + lang + "'";
+                    command[0] = "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali hid-cmd --" + lang + "'";
                     break;
                 case 1:
-                    command[0] = "su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali hid-cmd-elevated-win7 --" + lang + "'";
+                    command[0] = "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali hid-cmd-elevated-win7 --" + lang + "'";
                     break;
                 case 2:
-                    command[0] = "su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali hid-cmd-elevated-win8 --" + lang + "'";
+                    command[0] = "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali hid-cmd-elevated-win8 --" + lang + "'";
                     break;
                 case 3:
-                    command[0] = "su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali hid-cmd-elevated-win10 --" + lang + "'";
+                    command[0] = "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali hid-cmd-elevated-win10 --" + lang + "'";
                     break;
                 default:
-                    nh.showMessage(context,"No option selected 2");
+                    NhPaths.showMessage(context,"No option selected 2");
                     break;
             }
         }
-        nh.showMessage(context, getString(R.string.attack_launched));
+        NhPaths.showMessage(context, getString(R.string.attack_launched));
         new Thread(() -> {
             ShellExecuter exe = new ShellExecuter();
             exe.RunAsRoot(command);
             //Logger.appendLog(outp1);
-            mViewPager.post(() -> nh.showMessage(context,"Attack execution ended."));
+            mViewPager.post(() -> NhPaths.showMessage(context,"Attack execution ended."));
         }).start();
     }
 
@@ -239,7 +237,7 @@ public class HidFragment extends Fragment {
         ShellExecuter exe = new ShellExecuter();
         String[] command = {"stop-badusb"};
         exe.RunAsRoot(command);
-        nh.showMessage(context,"Reseting USB");
+        NhPaths.showMessage(context,"Reseting USB");
     }
 
 
@@ -320,7 +318,6 @@ public class HidFragment extends Fragment {
 
     public static class PowerSploitFragment extends HidFragment implements OnClickListener {
         private Context context;
-        private NhPaths nh;
         private String configFilePath;
         private String configFileUrlPath;
 
@@ -328,9 +325,8 @@ public class HidFragment extends Fragment {
         public void onCreate(@Nullable Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             context = getContext();
-            nh = new NhPaths();
-            configFilePath = nh.CHROOT_PATH + "/var/www/html/powersploit-payload";
-            configFileUrlPath = nh.CHROOT_PATH + "/var/www/html/powersploit-url";
+            configFilePath = NhPaths.CHROOT_PATH + "/var/www/html/powersploit-payload";
+            configFileUrlPath = NhPaths.CHROOT_PATH + "/var/www/html/powersploit-url";
         }
 
         @Override
@@ -362,11 +358,11 @@ public class HidFragment extends Fragment {
 
                     Boolean isSaved = exe.SaveFileContents(newText, configFileUrlPath);
                     if (!isSaved) {
-                        nh.showMessage(context,"Source not updated (configFileUrlPath)");
+                        NhPaths.showMessage(context,"Source not updated (configFileUrlPath)");
                     }
                     break;
                 default:
-                    nh.showMessage(context,"Unknown click");
+                    NhPaths.showMessage(context,"Unknown click");
                     break;
             }
         }
@@ -433,7 +429,6 @@ public class HidFragment extends Fragment {
     public static class WindowsCmdFragment extends HidFragment implements OnClickListener {
         private Context context;
         private Activity activity;
-        private NhPaths nh;
         private String configFilePath;
         private String loadFilePath;
         final ShellExecuter exe = new ShellExecuter();
@@ -443,9 +438,8 @@ public class HidFragment extends Fragment {
             super.onCreate(savedInstanceState);
             context = getContext();
             activity = getActivity();
-            nh = new NhPaths();
-            configFilePath = nh.APP_SD_FILES_PATH + "/configs/hid-cmd.conf";
-            loadFilePath = nh.APP_SD_FILES_PATH + "/scripts/hid/";
+            configFilePath = NhPaths.APP_SD_FILES_PATH + "/configs/hid-cmd.conf";
+            loadFilePath = NhPaths.APP_SD_FILES_PATH + "/scripts/hid/";
         }
 
         @Override
@@ -476,28 +470,28 @@ public class HidFragment extends Fragment {
                     String text = source.getText().toString();
                     Boolean isSaved = exe.SaveFileContents(text, configFilePath);
                     if (isSaved) {
-                        nh.showMessage(context, "Source updated");
+                        NhPaths.showMessage(context, "Source updated");
                     }
 
                     break;
                 case R.id.windowsCmdLoad:
                     try {
-                        File scriptsDir = new File(nh.APP_SD_FILES_PATH, loadFilePath);
+                        File scriptsDir = new File(NhPaths.APP_SD_FILES_PATH, loadFilePath);
                         if (!scriptsDir.exists()) scriptsDir.mkdirs();
                     } catch (Exception e) {
-                        nh.showMessage(context, e.getMessage());
+                        NhPaths.showMessage(context, e.getMessage());
                     }
                     Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                    Uri selectedUri = Uri.parse(nh.APP_SD_FILES_PATH + loadFilePath);
+                    Uri selectedUri = Uri.parse(NhPaths.APP_SD_FILES_PATH + loadFilePath);
                     intent.setDataAndType(selectedUri, "file/*");
                     startActivityForResult(intent, PICKFILE_RESULT_CODE);
                     break;
                 case R.id.windowsCmdSave:
                     try {
-                        File scriptsDir = new File(nh.APP_SD_FILES_PATH, loadFilePath);
+                        File scriptsDir = new File(NhPaths.APP_SD_FILES_PATH, loadFilePath);
                         if (!scriptsDir.exists()) scriptsDir.mkdirs();
                     } catch (Exception e) {
-                        nh.showMessage(context, e.getMessage());
+                        NhPaths.showMessage(context, e.getMessage());
                     }
                     AlertDialog.Builder alert = new AlertDialog.Builder(activity);
 
@@ -505,7 +499,7 @@ public class HidFragment extends Fragment {
                     alert.setMessage("Please enter a name for your script.");
 
                     // Set an EditText view to get user input
-                    final EditText input = new EditText(getActivity());
+                    final EditText input = new EditText(activity);
                     alert.setView(input);
 
                     alert.setPositiveButton("Ok", (dialog, whichButton) -> {
@@ -526,15 +520,15 @@ public class HidFragment extends Fragment {
                                     myOutWriter.append(text1);
                                     myOutWriter.close();
                                     fOut.close();
-                                    nh.showMessage(context,"Script saved");
+                                    NhPaths.showMessage(context,"Script saved");
                                 } catch (Exception e) {
-                                    nh.showMessage(context, e.getMessage());
+                                    NhPaths.showMessage(context, e.getMessage());
                                 }
                             } else {
-                                nh.showMessage(context,"File already exists");
+                                NhPaths.showMessage(context,"File already exists");
                             }
                         } else {
-                            nh.showMessage(context,"Wrong name provided");
+                            NhPaths.showMessage(context,"Wrong name provided");
                         }
                     });
                     alert.setNegativeButton("Cancel", (dialog, whichButton) -> {
@@ -543,7 +537,7 @@ public class HidFragment extends Fragment {
                     alert.show();
                     break;
                 default:
-                    nh.showMessage(context,"Unknown click");
+                    NhPaths.showMessage(context,"Unknown click");
                     break;
             }
         }
@@ -556,7 +550,7 @@ public class HidFragment extends Fragment {
                         String FilePath = data.getData().getPath();
                         EditText source = getView().findViewById(R.id.windowsCmdSource);
                         exe.ReadFile_ASYNC(FilePath, source);
-                        nh.showMessage(context,"Script loaded");
+                        NhPaths.showMessage(context,"Script loaded");
                     }
                     break;
             }
@@ -565,7 +559,6 @@ public class HidFragment extends Fragment {
 
     public static class PowershellHttpFragment extends HidFragment implements OnClickListener {
         private Context context;
-        private NhPaths nh;
         private String configFilePath;
         private String configFileUrlPath;
 
@@ -573,9 +566,8 @@ public class HidFragment extends Fragment {
         public void onCreate(@Nullable Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             context = getContext();
-            nh = new NhPaths();
-            configFilePath = nh.CHROOT_PATH + "/var/www/html/powershell-payload";
-            configFileUrlPath = nh.CHROOT_PATH + "/var/www/html/powershell-url";
+            configFilePath = NhPaths.CHROOT_PATH + "/var/www/html/powershell-payload";
+            configFileUrlPath = NhPaths.CHROOT_PATH + "/var/www/html/powershell-url";
         }
 
         @Override
@@ -600,11 +592,11 @@ public class HidFragment extends Fragment {
 
                     Boolean isSaved = exe.SaveFileContents(newText, configFileUrlPath);
                     if (!isSaved) {
-                        nh.showMessage(context,"Source not updated (configFileUrlPath)");
+                        NhPaths.showMessage(context,"Source not updated (configFileUrlPath)");
                     }
                     break;
                 default:
-                    nh.showMessage(context,"Unknown click");
+                    NhPaths.showMessage(context,"Unknown click");
                     break;
             }
         }
