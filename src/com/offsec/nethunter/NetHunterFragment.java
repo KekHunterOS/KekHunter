@@ -43,7 +43,6 @@ public class NetHunterFragment extends Fragment {
     private static final Pattern IP_REGEX_PATTERN = Pattern.compile(IP_REGEX);
     private Context context;
     private Activity activity;
-    private NhPaths nh;
     /**
      * Returns a new instance of this fragment for the given section
      * number.
@@ -67,7 +66,6 @@ public class NetHunterFragment extends Fragment {
         super.onCreate(savedInstanceState);
         context = getContext();
         activity = getActivity();
-        nh = new NhPaths();
     }
 
     @Override
@@ -151,7 +149,7 @@ public class NetHunterFragment extends Fragment {
 
         new Thread(() -> {
 
-            String busybox_ver = nh.whichBusybox();
+            String busybox_ver = NhPaths.BUSYBOX;
 
             ShellExecuter exe = new ShellExecuter();
             String commandNET[] = {"sh", "-c", "ip -o addr show | busybox awk '/inet/ {print $2, $3, $4}'"};
@@ -294,9 +292,9 @@ public class NetHunterFragment extends Fragment {
             android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
             android.content.ClipData clip = android.content.ClipData.newPlainText("WordKeeper", text);
             clipboard.setPrimaryClip(clip);
-            nh.showMessage(context, "Copied: " + text);
+            NhPaths.showMessage(context, "Copied: " + text);
         } catch (Exception e) {
-           nh.showMessage(context, "Error copying: " + text);
+           NhPaths.showMessage(context, "Error copying: " + text);
         }
     }
     private String getDeviceName() {

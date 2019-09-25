@@ -18,7 +18,6 @@ import com.offsec.nethunter.AsyncTask.DuckHuntAsyncTask;
 import com.offsec.nethunter.utils.NhPaths;
 
 public class DuckHunterPreviewFragment extends Fragment {
-    private NhPaths nh = new NhPaths();
     private DuckHuntAsyncTask duckHuntAsyncTask;
     private String duckyInputFile;
     private String duckyOutputFile;
@@ -91,7 +90,7 @@ public class DuckHunterPreviewFragment extends Fragment {
                             duckHuntAsyncTask.execute("cat " + duckyOutputFile);
                         }
                     });
-                    duckHuntAsyncTask.execute("sh " + nh.APP_SCRIPTS_PATH + "/duckyconverter -i " + duckyInputFile + " -o " + duckyOutputFile + " -l " + DuckHunterFragment.lang, intent.getBooleanExtra("SHOULDCONVERT", true));
+                    duckHuntAsyncTask.execute("sh " + NhPaths.APP_SCRIPTS_PATH + "/duckyconverter -i " + duckyInputFile + " -o " + duckyOutputFile + " -l " + DuckHunterFragment.lang, intent.getBooleanExtra("SHOULDCONVERT", true));
                     break;
             }
         }

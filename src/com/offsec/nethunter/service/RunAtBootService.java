@@ -8,6 +8,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.offsec.nethunter.AppNavHomeActivity;
+import com.offsec.nethunter.BuildConfig;
 import com.offsec.nethunter.ChrootManagerFragment;
 import com.offsec.nethunter.KaliServicesFragment;
 import com.offsec.nethunter.R;
@@ -24,7 +25,6 @@ public class RunAtBootService extends JobIntentService {
     private static final String TAG = "Nethunter: Startup";
     private static final int JOB_ID = 1;
     private final ShellExecuter x = new ShellExecuter();
-    private NhPaths nh;
     private Boolean runBootServices = true;
     private String doing_action = "";
     private NotificationCompat.Builder n = null;
@@ -56,8 +56,7 @@ public class RunAtBootService extends JobIntentService {
     @Override
     protected void onHandleWork(@NonNull Intent intent) {
         doNotification("Doing boot checks");
-        nh = new NhPaths(getFilesDir().toString());
-        SharedPreferences sharedpreferences = getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+        SharedPreferences sharedpreferences = getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
         // NOTE:  If the Nethunter app has not yet been run (to install these files), this won't do
         // anything.  For that reason it may be wise to do a full install of the files at boot as
         // well, but that doesn't happen now.  Easy to add, but merits some discussion if script
@@ -93,7 +92,7 @@ public class RunAtBootService extends JobIntentService {
             } else {
                 doNotification(getString(R.string.toastdeletingchroot));
 ///                Toast.makeText(getBaseContext(), getString(R.string.toastdeletingchroot), Toast.LENGTH_LONG).show();
-                x.RunAsRootOutput("su -c 'rm -rf " + nh.NH_SYSTEM_PATH + "/*'");
+                x.RunAsRootOutput("su -c 'rm -rf " + NhPaths.NH_SYSTEM_PATH + "/*'");
                 // remove the sp so we dont remove it again on next boot
                 sharedpreferences.edit().remove(ChrootManagerFragment.DELETE_CHROOT_TAG).apply();
                 sharedpreferences.edit().remove(ChrootManagerFragment.CHROOT_INSTALLED_TAG).apply();
@@ -122,7 +121,7 @@ public class RunAtBootService extends JobIntentService {
             } else {
                 doNotification("Starting chroot migration...");
 //                Toast.makeText(getBaseContext(), getString(R.string.toastmigratingchroot), Toast.LENGTH_LONG).show();
-                x.RunAsRootOutput("su -c 'mv " + nh.OLD_CHROOT_PATH + " " + nh.NH_SYSTEM_PATH + "'");
+                x.RunAsRootOutput("su -c 'mv " + NhPaths.OLD_CHROOT_PATH + " " + NhPaths.NH_SYSTEM_PATH + "'");
 //                Toast.makeText(getBaseContext(), getString(R.string.toastmigratedchroot), Toast.LENGTH_LONG).show();
                 sharedpreferences.edit().remove(ChrootManagerFragment.MIGRATE_CHROOT_TAG).apply();
                 doNotification(getString(R.string.toastmigratedchroot));
@@ -154,11 +153,11 @@ public class RunAtBootService extends JobIntentService {
         // Put scripts in fileDir/scripts/etc/init.d/ and set execute permission.  Scripts should
         // start with a number and include a hashbang such as #!/system/bin/sh as the first line.
         ShellExecuter exe = new ShellExecuter();
-        String busybox = nh.whichBusybox();
+        String busybox = NhPaths.BUSYBOX;
         if (!busybox.equals("")) {
-            exe.RunAsRootOutput("rm -rf " + nh.CHROOT_PATH + "/tmp/.X1*"); // remove posible vnc locks (if the phone is rebooted with the vnc server running)
+            exe.RunAsRootOutput("rm -rf " + NhPaths.CHROOT_PATH + "/tmp/.X1*"); // remove posible vnc locks (if the phone is rebooted with the vnc server running)
             // init.d
-            String[] runner = {busybox + " run-parts " + nh.APP_INITD_PATH};
+            String[] runner = {busybox + " run-parts " + NhPaths.APP_INITD_PATH};
             exe.RunAsRoot(runner);
 //            Toast.makeText(getBaseContext(), getString(R.string.autorunningscripts), Toast.LENGTH_SHORT).show();
             return true;

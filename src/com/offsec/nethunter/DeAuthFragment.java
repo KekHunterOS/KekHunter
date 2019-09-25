@@ -1,5 +1,6 @@
 package com.offsec.nethunter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -32,7 +33,7 @@ import androidx.fragment.app.FragmentActivity;
     public class DeAuthFragment  extends Fragment {
     private final ShellExecuter exe = new ShellExecuter();
     private Context context;
-    private NhPaths nh;
+    private Activity activity;
     private static final String ARG_SECTION_NUMBER = "section_number";
 
     public static DeAuthFragment newInstance(int sectionNumber) {
@@ -47,12 +48,12 @@ import androidx.fragment.app.FragmentActivity;
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = getContext();
-        nh = new NhPaths();
+        activity = getActivity();
     }
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.deauth, container, false);
-        SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+        SharedPreferences sharedpreferences = context.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
         setHasOptionsMenu(true);
         final Button scan = rootView.findViewById(R.id.scan_networks);
         final EditText wlan = rootView.findViewById(R.id.wlan_interface);
@@ -98,7 +99,6 @@ import androidx.fragment.app.FragmentActivity;
             new BootKali(cmd).run_bg();
             try {
                 Thread.sleep(5000);
-                nh = new NhPaths();
                 String output = exe.RunAsRootOutput("cat /sdcard/nh_files/deauth/output.txt").replace("Channel:","\n Channel:");
                 term.setText(output);
             } catch (Exception e) {
@@ -159,7 +159,7 @@ import androidx.fragment.app.FragmentActivity;
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.deauth_modify:
-                Intent i = new Intent(getActivity(), DeAuthWhitelistActivity.class);
+                Intent i = new Intent(activity, DeAuthWhitelistActivity.class);
                 startActivity(i);
                 return true;
             default:
@@ -175,7 +175,7 @@ import androidx.fragment.app.FragmentActivity;
             intent.putExtra("com.offsec.nhterm.iInitialCommand", command);
             startActivity(intent);
         } catch (Exception e) {
-            nh.showMessage(context, getString(R.string.toast_install_terminal));
+            NhPaths.showMessage(context, getString(R.string.toast_install_terminal));
 
         }
     }

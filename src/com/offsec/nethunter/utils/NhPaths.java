@@ -1,123 +1,87 @@
 package com.offsec.nethunter.utils;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Environment;
+import android.util.Log;
 import android.view.Gravity;
 import android.widget.Toast;
+
+import com.offsec.nethunter.BuildConfig;
 
 import java.io.File;
 
 
-/**********************************************
- *  IMPORTANT:   * KEEP THE APP CONSISTENT!   *
- **********************************************
- *
- *
- *   If you need to refer any path from your classes, please use this one as base,
- *
- *     Atm, all the app is using this class to get the main paths.
- *
- *
- *    You can add any path to this file but reusing the existent ones if possible.
- *
- *        Using paths in the app code:
- *
- *            all the paths in the class must start with '/' (they are all absolute)
- *            all the paths in this class must end WITHOUT "/"
- *
- *     How to use it: In the onCreate or in the onAttach you can do:
- *
- *         NhUtil nh = new NhUtil();
- *         // from the boot service (no appCTX)*
- *         NhUtil nh = new NhUtil(getFilesDir().toString());
- *
- *
- *        EX.: NhUtil nh = new NhUtil(); String myfile = nh.APP_SD_FILES_PATH + "/my/relative/route/xor.sh"
- *        EX.: NhUtil nh = new NhUtil(); String mypath = nh.APP_SD_FILES_PATH + "/my/relative/path"
- *
- *        jmingov.
- */
+public class NhPaths implements SharedPreferences.OnSharedPreferenceChangeListener{
+    private static final String TAG = "NhPaths";
+    private static NhPaths instance;
+    private SharedPreferences sharedPreferences;
 
-public class NhPaths {
-    // System paths
-    public final String APP_PATH;
-    public String APP_INITD_PATH;
-    public String APP_SCRIPTS_PATH;
-    // SD Paths
-    public String NH_SD_FOLDER_NAME;
-    public String SD_PATH;
-    public String APP_SD_FILES_PATH;
-    // NetHunter paths
-    private String BASE_PATH;
-    public String NH_SYSTEM_PATH;
-    // the chroot has this folder inside so...
-    private String ARCH_FOLDER;
-    // current deploy location: /data/local/nhsystem/kali-armhf
-    public String CHROOT_PATH;
-    // old CHROOT
-    public String OLD_CHROOT_PATH;
+    public static String APP_PATH;
+    public static String APP_INITD_PATH;
+    public static String APP_SCRIPTS_PATH;
+    public static String NH_SD_FOLDER_NAME;
+    public static String SD_PATH;
+    public static String APP_SD_FILES_PATH;
+    public static String BASE_PATH;
+    public static String NH_SYSTEM_PATH;
+    public static String ARCH_FOLDER;
+    public static String CHROOT_PATH;
+    //public static String CHROOT_DIR;
+    public static String CHROOT_SD_PATH;
+    public static String CHROOT_EXEC;
+    public static String APP_SD_SQLBACKUP_PATH;
+    public static String OLD_CHROOT_PATH;
+    public static String BUSYBOX;
 
-    // constructor for app Activities and Fragments, anything with appCtx;
-
-    public NhPaths() {
-        // App base path () /data/data/com.offsec.....
-        this.APP_PATH = "/data/data/com.offsec.nethunter/files";
-        //this.APP_PATH = getAppContext().getFilesDir().toString();
-        //final CheckForDevices UserDevice = new CheckForDevices();
-        doSetup(this);
-        /*  this one should be called from inside android app context
-         *   (anywhere but BOOTSERVICE):
-         *   nh = new NhUtil();
-        */
-    }
-    // constructor for service (different ctx)
-
-    public NhPaths(String _path) {
-        // App base path () /data/data/com.offsec.....
-        this.APP_PATH = _path;
-	//final CheckForDevices UserDevice = new CheckForDevices();
-        doSetup(this);
-        /*  this makes the bootService not cry about getAppContext()
-         *   this should be called ONLY from BOOTSERVICE like:
-         *   nh = new NhUtil(getFilesDir().toString());
-        */
+    private NhPaths(Context context) {
+        sharedPreferences = context.getApplicationContext().getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
+        APP_PATH                        = context.getApplicationContext().getFilesDir().getPath();
+        APP_INITD_PATH                  = APP_PATH + "/etc/init.d";
+        APP_SCRIPTS_PATH                = APP_PATH + "/scripts";
+        SD_PATH                         = getSdcardPath();
+        NH_SD_FOLDER_NAME               = "nh_files";
+        APP_SD_FILES_PATH               = SD_PATH + "/" + NH_SD_FOLDER_NAME;
+        APP_SD_SQLBACKUP_PATH           = APP_SD_FILES_PATH + "/nh_sql_backups";
+        BASE_PATH                       = "/data/local";
+        NH_SYSTEM_PATH                  = BASE_PATH + "/nhsystem";
+        ARCH_FOLDER                     = "/kali-armhf";
+        CHROOT_PATH                     = NH_SYSTEM_PATH + ARCH_FOLDER;
+        //CHROOT_DIR                      = sharedPreferences.getString("chroot_dir", NH_SYSTEM_PATH + "/kali-arm64");
+        CHROOT_SD_PATH                  = "/sdcard";
+        CHROOT_EXEC                     = "/usr/bin/sudo";
+        OLD_CHROOT_PATH                 = "/data/local/kali-armhf";
+        BUSYBOX                         = getBusyboxPath();
     }
 
-    private void doSetup(NhPaths nh) {
-        // APP_PATH is now available !!!
-        nh.APP_INITD_PATH = APP_PATH + "/etc/init.d";
-        nh.APP_SCRIPTS_PATH = APP_PATH + "/scripts";
-
-        // SD PATHS
-        CheckForDevices UserDevice = new CheckForDevices();
-        if (UserDevice.isOPO5()) {
-            nh.SD_PATH = "/sdcard";
-        } else {
-            nh.SD_PATH = Environment.getExternalStorageDirectory().toString(); // /sdcard for the friends.
+    public synchronized static NhPaths getInstance(Context context) {
+        if (instance == null) {
+            instance = new NhPaths(context);
         }
-        // changed from /files to /nh_files (was too generic.)
-        nh.NH_SD_FOLDER_NAME = "nh_files";  // MUST MATCH assets/nh_files change both or none!!!! ^^
-        nh.APP_SD_FILES_PATH = SD_PATH + "/" + NH_SD_FOLDER_NAME;
-        // NetHunter paths
-        nh.BASE_PATH = "/data/local";
-        nh.NH_SYSTEM_PATH = BASE_PATH + "/nhsystem";
-        // the chroot has this folder inside so...
-        nh.ARCH_FOLDER = "/kali-armhf";
-        // current deploy location: /data/local/nhsystem/kali-armhf
-        nh.CHROOT_PATH = NH_SYSTEM_PATH + ARCH_FOLDER;
-        // old CHROOT
-        nh.OLD_CHROOT_PATH = "/data/local/kali-armhf";
+        return instance;
+    }
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals("chroot_path")){
+            CHROOT_PATH = sharedPreferences.getString(key, NH_SYSTEM_PATH + "/kali-arm64");
+        }
     }
 
-    public String whichBusybox() {
+    private static String getSdcardPath(){
+        return Environment.getExternalStorageDirectory().toString();
+    }
+
+
+    private static String getBusyboxPath(){
         String[] BB_PATHS = {
+                "/data/adb/magisk/busybox",
+                "/sbin/.magisk/busybox/busybox",
                 "/system/xbin/busybox_nh",
                 "/sbin/busybox_nh",
                 "/system/bin/busybox",
                 "/data/local/bin/busybox",
                 "/system/xbin/busybox",
-                "/data/adb/magisk/busybox",
-                "/sbin/.magisk/busybox/busybox"
         };
         for (String BB_PATH : BB_PATHS) {
             File busybox = new File(BB_PATH);
@@ -125,20 +89,26 @@ public class NhPaths {
                 return BB_PATH;
             }
         }
-        return "";
+        return null;
     }
 
-    public String makeTermTitle(String title) {
+    public static String makeTermTitle(String title) {
         return "echo -ne \"\\033]0;" + title + "\\007\" && clear;";
     }
 
-    public void showMessage(Context context, String msg) {
+    public void onDestroy(){
+        if (sharedPreferences != null){
+            sharedPreferences.unregisterOnSharedPreferenceChangeListener(this);
+        }
+    }
+
+    public static void showMessage(Context context, String msg) {
         Toast toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, 0);
         toast.show();
     }
 
-    public void showMessage_long(Context context, String msg) {
+    public static void showMessage_long(Context context, String msg) {
         Toast toast = Toast.makeText(context, msg, Toast.LENGTH_LONG);
         toast.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, 0);
         toast.show();

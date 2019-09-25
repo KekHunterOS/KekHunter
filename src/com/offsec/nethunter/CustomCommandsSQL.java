@@ -21,7 +21,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 class CustomCommandsSQL extends SQLiteOpenHelper {
-    private NhPaths nh;
     private final static int DATABASE_VERSION = 2;
     private final static String DATABASE_NAME = "KaliLaunchers";
 
@@ -37,7 +36,6 @@ class CustomCommandsSQL extends SQLiteOpenHelper {
     CustomCommandsSQL(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.context = context;
-        nh = new NhPaths();
     }
 
     @Override
@@ -147,8 +145,8 @@ class CustomCommandsSQL extends SQLiteOpenHelper {
     }
     void importDB() {
         try {
-            String sd = nh.SD_PATH;
-            String data = nh.APP_PATH;
+            String sd = NhPaths.SD_PATH;
+            String data = NhPaths.APP_PATH;
             String currentDBPath = "../databases/"  + DATABASE_NAME;
             String backupDBPath = "/nh_bak_" + DATABASE_NAME + "_" + DATABASE_VERSION; // From SD directory.
             File backupDB = new File(data, currentDBPath);
@@ -160,7 +158,7 @@ class CustomCommandsSQL extends SQLiteOpenHelper {
             src.close();
             dst.close();
             Log.d("importDB", "Successful");
-            nh.showMessage(context, "Import DB Successful");
+            NhPaths.showMessage(context, "Import DB Successful");
 
         } catch (Exception e) {
             Log.d("importDB", e.toString());
@@ -169,8 +167,8 @@ class CustomCommandsSQL extends SQLiteOpenHelper {
 
     void exportDB() {
         try {
-            String sd = nh.SD_PATH;
-            String data = nh.APP_PATH;
+            String sd = NhPaths.SD_PATH;
+            String data = NhPaths.APP_PATH;
             Log.d("ExportDB sd =", sd);
             Log.d("ExportDB sd =", data);
             String currentDBPath = "../databases/"  + DATABASE_NAME;
@@ -184,7 +182,7 @@ class CustomCommandsSQL extends SQLiteOpenHelper {
             src.close();
             dst.close();
             Log.d("ExportDB", "Successful");
-            nh.showMessage(context, "Export DB Successful");
+            NhPaths.showMessage(context, "Export DB Successful");
 
         } catch (Exception e) {
             Log.d("ExportDB", "ExportDB Failed!");

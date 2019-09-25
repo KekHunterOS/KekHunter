@@ -24,16 +24,7 @@ public abstract class CheckForRoot {
     }
 
     public static boolean isBusyboxInstalled() {
-        ShellExecuter exe = new ShellExecuter();
-        BUSYBOX = exe.RunAsRootOutput("which busybox | head -n1");
-        if (BUSYBOX.isEmpty()) {
-            if (new File(MAGISK_BUSYBOX).canExecute()){
-                BUSYBOX = MAGISK_BUSYBOX;
-                return true;
-            }
-            return false;
-        }
-        return true;
+        return !NhPaths.BUSYBOX.isEmpty();
     }
 }
 

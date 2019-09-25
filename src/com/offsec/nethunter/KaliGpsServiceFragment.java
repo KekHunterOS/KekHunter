@@ -25,7 +25,6 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
     private KaliGPSUpdates.Provider gpsProvider = null;
     private TextView gpsTextView;
     private Context context;
-    private NhPaths nh;
 
     public KaliGpsServiceFragment() {
     }
@@ -42,7 +41,6 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = getContext();
-        nh = new NhPaths();
     }
 
     @Override
@@ -62,7 +60,7 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
                 gpsTextView.append("Stopping gps updates \n");
                 new Thread(() -> {
                     ShellExecuter exe = new ShellExecuter();
-                    String command = "su -c '" + nh.APP_SCRIPTS_PATH + "/stop-gpsd'";
+                    String command = "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/stop-gpsd'";
                     Log.d(TAG, command);
                     exe.RunAsRootOutput(command);
                 }).start();
@@ -113,7 +111,7 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
             intent.putExtra("com.offsec.nhterm.iInitialCommand", "/usr/bin/start-kismet");
             startActivity(intent);
         } catch (Exception e) {
-            nh.showMessage(context, getString(R.string.toast_install_terminal));
+            NhPaths.showMessage(context, getString(R.string.toast_install_terminal));
         }
     }
 }

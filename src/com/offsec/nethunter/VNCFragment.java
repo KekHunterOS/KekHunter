@@ -30,7 +30,6 @@ public class VNCFragment extends Fragment {
     private String localhostonly = "";
     private Context context;
     private Activity activity;
-    private NhPaths nh;
     private static final String ARG_SECTION_NUMBER = "section_number";
 
     public VNCFragment() {
@@ -49,13 +48,12 @@ public class VNCFragment extends Fragment {
         super.onCreate(savedInstanceState);
         context = getContext();
         activity = getActivity();
-        nh = new NhPaths();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.vnc_setup, container, false);
-        SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+        SharedPreferences sharedpreferences = context.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
 
         // Get screen size to pass to VNC
         DisplayMetrics displaymetrics = new DisplayMetrics();
@@ -144,7 +142,7 @@ public class VNCFragment extends Fragment {
 
         } catch (Exception e) {
             Log.d("errorLaunching", e.toString());
-            nh.showMessage(context, "NetHunter VNC not found!");
+            NhPaths.showMessage(context, "NetHunter VNC not found!");
         }
     }
 
@@ -156,7 +154,7 @@ public class VNCFragment extends Fragment {
             intent.putExtra("com.offsec.nhterm.iInitialCommand", command);
             startActivity(intent);
         } catch (Exception e) {
-            nh.showMessage(context, getString(R.string.toast_install_terminal));
+            NhPaths.showMessage(context, getString(R.string.toast_install_terminal));
 
         }
     }

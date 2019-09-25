@@ -30,7 +30,6 @@ import java.util.Objects;
 public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
 
     private final String COPY_ASSETS_TAG = "COPY_ASSETS_TAG";
-    private NhPaths nh;
     private File sdCardDir;
     private File scriptsDir;
     private File etcDir;
@@ -49,11 +48,10 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
         this.context = new WeakReference<>(context);
         this.activity = new WeakReference<>(activity);
         this.progressDialogRef = new WeakReference<>(progressDialog);
-        this.nh = new NhPaths();
-        this.sdCardDir = new File(nh.APP_SD_FILES_PATH);
-        this.scriptsDir = new File(nh.APP_SCRIPTS_PATH);
-        this.etcDir = new File(nh.APP_INITD_PATH);
-        this.prefs = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+        this.sdCardDir = new File(NhPaths.APP_SD_FILES_PATH);
+        this.scriptsDir = new File(NhPaths.APP_SCRIPTS_PATH);
+        this.etcDir = new File(NhPaths.APP_INITD_PATH);
+        this.prefs = context.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd KK:mm:ss a zzz",
                 Locale.US);
         this.buildTime = sdf.format(BuildConfig.BUILD_TIME);
@@ -94,13 +92,13 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
             Log.d(COPY_ASSETS_TAG, "COPYING FILES....");
             // 1:1 copy (recursive) of the assets/{scripts, etc, wallpapers} folders to /data/data/...
             publishProgress("Doing app files update. (init.d and filesDir).");
-            assetsToFiles(nh.APP_PATH, "", "data");
+            assetsToFiles(NhPaths.APP_PATH, "", "data");
             // 1:1 copy (recursive) of the configs to  /sdcard...
             publishProgress("Doing sdcard files update. (nh_files).");
-            assetsToFiles(nh.SD_PATH, "", "sdcard");
+            assetsToFiles(NhPaths.SD_PATH, "", "sdcard");
             publishProgress("Fixing permissions for new files");
             ShellExecuter exe = new ShellExecuter();
-            exe.RunAsRoot(new String[]{"chmod -R 700 " + nh.APP_SCRIPTS_PATH + "/*", "chmod -R 700 " + nh.APP_INITD_PATH + "/*"});
+            exe.RunAsRoot(new String[]{"chmod -R 700 " + NhPaths.APP_SCRIPTS_PATH + "/*", "chmod -R 700 " + NhPaths.APP_INITD_PATH + "/*"});
             SharedPreferences.Editor ed = prefs.edit();
             ed.putString(COPY_ASSETS_TAG, buildTime);
             ed.apply();
@@ -130,7 +128,7 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
             }
 
             publishProgress("Checking for chroot....");
-            String command = "if [ -d " + nh.CHROOT_PATH + " ];then echo 1; fi"; //check the dir existence
+            String command = "if [ -d " + NhPaths.CHROOT_PATH + " ];then echo 1; fi"; //check the dir existence
             final String _res = exe.RunAsRootOutput(command);
             if (_res.equals("1")) {
                 ed = prefs.edit();
@@ -138,7 +136,7 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
                 ed.commit();
                 publishProgress("Chroot Found!");
                 // Mount suid /data && fix sudo
-                publishProgress(exe.RunAsRootOutput("busybox mount -o remount,suid /data && chmod +s " + nh.CHROOT_PATH + "/usr/bin/sudo && echo \"Initial setup done!\""));
+                publishProgress(exe.RunAsRootOutput("busybox mount -o remount,suid /data && chmod +s " + NhPaths.CHROOT_PATH + "/usr/bin/sudo && echo \"Initial setup done!\""));
             } else {
                 publishProgress("Chroot not Found, install it in Chroot Manager");
             }
@@ -147,7 +145,7 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
             // We can no longer install user apps through TWRP so we copy them across and install them here
             // Get the list of *.apk files in /sdcard/nh_files/cache/apk and install them using "pm install"
             publishProgress("Installing additional apps....");
-            String ApkCachePath= nh.APP_SD_FILES_PATH + "/cache/apk/";
+            String ApkCachePath= NhPaths.APP_SD_FILES_PATH + "/cache/apk/";
             ArrayList<String> filenames = FetchFiles(ApkCachePath);
             int i, x;
 
@@ -170,7 +168,7 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
             if (copyType.equals("sdcard")) {
                 if (path.equals("")) {
                     return true;
-                } else return path.startsWith(nh.NH_SD_FOLDER_NAME);
+                } else return path.startsWith(NhPaths.NH_SD_FOLDER_NAME);
             }
             if (copyType.equals("data")) {
                 if (path.equals("")) {
@@ -278,9 +276,9 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
     private void NotFound(String filename){
         ShellExecuter exe = new ShellExecuter();
         Log.d(COPY_ASSETS_TAG, "Symlinking " + filename);
-        Log.d(COPY_ASSETS_TAG, "command output: ln -s " + nh.APP_SCRIPTS_PATH + "/" + filename + " /system/bin/" + filename);
+        Log.d(COPY_ASSETS_TAG, "command output: ln -s " + NhPaths.APP_SCRIPTS_PATH + "/" + filename + " /system/bin/" + filename);
 
-        exe.RunAsRoot(new String[]{"ln -s " + nh.APP_SCRIPTS_PATH + "/" + filename + " /system/bin/" + filename});
+        exe.RunAsRoot(new String[]{"ln -s " + NhPaths.APP_SCRIPTS_PATH + "/" + filename + " /system/bin/" + filename});
     }
 
     // Get a list of files from a directory
