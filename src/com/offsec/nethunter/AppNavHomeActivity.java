@@ -515,7 +515,6 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d("CCCC", "NethunterReceiver onReceive");
             if (intent.getAction() != null) {
                 switch (intent.getAction()) {
                     case CHECKCOMPAT: {

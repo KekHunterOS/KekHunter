@@ -15,7 +15,6 @@ public class BootCompletedReceiver extends BroadcastReceiver{
             if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
                 Intent serviceIntent = new Intent(context, RunAtBootService.class);
                 context.startService(serviceIntent);
-                Log.d("CCCC", "BootCompletedReceiver onReceive");
             }
         }
 }

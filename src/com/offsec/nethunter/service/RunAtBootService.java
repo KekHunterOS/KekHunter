@@ -50,7 +50,6 @@ public class RunAtBootService extends IntentService {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d("CCCC", "RunAtBoot onCreate");
         // Create notification channel
         createNotificationChannel();
         nhPaths = NhPaths.getInstance(getApplicationContext());
@@ -58,8 +57,6 @@ public class RunAtBootService extends IntentService {
     }
 
     private void doNotification(String contents) {
-
-        Log.d("CCCC", "RunAtBoot doNotification");
         if (n == null) {
             n = new NotificationCompat.Builder(getApplicationContext(), AppNavHomeActivity.BOOT_CHANNEL_ID);
         }
@@ -77,7 +74,6 @@ public class RunAtBootService extends IntentService {
 
     @Override
     protected void onHandleIntent(@NonNull Intent intent) {
-        Log.d("CCCC", "RunAtBoot onHandleWork");
         doNotification("Doing boot checks...");
 
         hashMap.put("ROOT", "No root access is granted.");
@@ -92,7 +88,6 @@ public class RunAtBootService extends IntentService {
             hashMap.put("BUSYBOX", "OK.");
         }
 
-        Log.d ("CCCC", NhPaths.CHROOT_PATH);
         if (new File((NhPaths.CHROOT_PATH + NhPaths.CHROOT_EXEC)).canExecute()){
             new ShellExecuter().RunAsRootOutput("rm -rf " + NhPaths.CHROOT_PATH + "/tmp/.X1*"); // remove posible vnc locks (if the phone is rebooted with the vnc server running)
             hashMap.put("CHROOT", "OK.");
