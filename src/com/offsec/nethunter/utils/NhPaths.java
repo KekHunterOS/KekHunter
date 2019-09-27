@@ -46,7 +46,7 @@ public class NhPaths implements SharedPreferences.OnSharedPreferenceChangeListen
         APP_SD_SQLBACKUP_PATH           = APP_SD_FILES_PATH + "/nh_sql_backups";
         BASE_PATH                       = "/data/local";
         NH_SYSTEM_PATH                  = BASE_PATH + "/nhsystem";
-        ARCH_FOLDER                     = "/kali-armhf";
+        ARCH_FOLDER                     = "/kali-arm64";
         CHROOT_PATH                     = NH_SYSTEM_PATH + ARCH_FOLDER;
         //CHROOT_DIR                      = sharedPreferences.getString("chroot_dir", NH_SYSTEM_PATH + "/kali-arm64");
         CHROOT_SD_PATH                  = "/sdcard";
