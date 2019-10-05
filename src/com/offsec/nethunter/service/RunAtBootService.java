@@ -79,7 +79,7 @@ public class RunAtBootService extends IntentService {
 
         hashMap.put("ROOT", "No root access is granted.");
         hashMap.put("BUSYBOX", "No busybox is found.");
-        hashMap.put("CHROOT", "Chroot is not yet installed.");
+        hashMap.put("KALICHROOT", "Chroot is not yet installed.");
 
         if (CheckForRoot.isRoot()) {
             hashMap.put("ROOT", isOK);
