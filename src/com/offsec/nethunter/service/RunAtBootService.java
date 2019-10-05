@@ -79,7 +79,7 @@ public class RunAtBootService extends IntentService {
 
         hashMap.put("ROOT", "No root access is granted.");
         hashMap.put("BUSYBOX", "No busybox is found.");
-        hashMap.put("KALICHROOT", "Chroot is not yet installed.");
+        hashMap.put("KALICHROOT", "kali Chroot is not yet installed.");
 
         if (CheckForRoot.isRoot()) {
             hashMap.put("ROOT", isOK);
@@ -96,7 +96,7 @@ public class RunAtBootService extends IntentService {
             hashMap.put("KALICHROOT", isOK);
         }
 
-        String resultMsg = "Kali Chroot has been started!";
+        String resultMsg = "Boot completed.\nEveryting is fine and Kali Chroot has been started!";
         for(Map.Entry<String, String> entry: hashMap.entrySet()){
             if (!entry.getValue().equals(isOK)){
                 isAllFine = false;
@@ -108,7 +108,7 @@ public class RunAtBootService extends IntentService {
         doNotification(
                 "Root: " + hashMap.get("ROOT") + "\n" +
                 "Busybox: " + hashMap.get("BUSYBOX") + "\n" +
-                "Chroot: " + hashMap.get("CHROOT") + "\n" +
+                "Kali Chroot: " + hashMap.get("KALICHROOT") + "\n" +
                 resultMsg);
     }
 
