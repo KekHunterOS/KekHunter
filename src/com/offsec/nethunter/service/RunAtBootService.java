@@ -35,9 +35,7 @@ public class RunAtBootService extends IntentService {
 
     private static final String CHROOT_INSTALLED_TAG = "CHROOT_INSTALLED_TAG";
     private static final String TAG = "Nethunter: Startup";
-    private static final int JOB_ID = 1;
-    private final ShellExecuter x = new ShellExecuter();
-    private String doing_action = "";
+    private final ShellExecuter exe = new ShellExecuter();
     boolean isAllFine = true;
     private NotificationCompat.Builder n = null;
     private HashMap<String, String> hashMap = new HashMap<>();
@@ -50,7 +48,7 @@ public class RunAtBootService extends IntentService {
     @Override
     public void onCreate() {
         super.onCreate();
-        // Create notification channel
+        // Create notification channel first.
         createNotificationChannel();
         nhPaths = NhPaths.getInstance(getApplicationContext());
 
@@ -74,6 +72,9 @@ public class RunAtBootService extends IntentService {
 
     @Override
     protected void onHandleIntent(@NonNull Intent intent) {
+
+        //1. Check root -> 2. Check Busybox -> 3. run nethunter init.d files. -> Push notifications.
+        String isOK = "OK.";
         doNotification("Doing boot checks...");
 
         hashMap.put("ROOT", "No root access is granted.");
@@ -81,33 +82,34 @@ public class RunAtBootService extends IntentService {
         hashMap.put("CHROOT", "Chroot is not yet installed.");
 
         if (CheckForRoot.isRoot()) {
-            hashMap.put("ROOT", "OK.");
+            hashMap.put("ROOT", isOK);
         }
 
         if (CheckForRoot.isBusyboxInstalled()) {
-            hashMap.put("BUSYBOX", "OK.");
+            hashMap.put("BUSYBOX", isOK);
         }
 
-        if (new File((NhPaths.CHROOT_PATH + NhPaths.CHROOT_EXEC)).canExecute()){
-            new ShellExecuter().RunAsRootOutput("rm -rf " + NhPaths.CHROOT_PATH + "/tmp/.X1*"); // remove posible vnc locks (if the phone is rebooted with the vnc server running)
-            hashMap.put("CHROOT", "OK.");
+        exe.RunAsRootOutput(NhPaths.BUSYBOX + " run-parts " + NhPaths.APP_INITD_PATH);
+        if (exe.RunAsRootReturnValue(NhPaths.APP_SCRIPTS_PATH + "/chrootmgr -c \"status\"") == 0){
+            // remove possible vnc locks (if the phone is rebooted with the vnc server running)
+            exe.RunAsRootOutput("rm -rf " + NhPaths.CHROOT_PATH() + "/tmp/.X1*");
+            hashMap.put("KALICHROOT", isOK);
         }
 
-        String resultMsg = "All should work fine now.";
+        String resultMsg = "Kali Chroot has been started!";
         for(Map.Entry<String, String> entry: hashMap.entrySet()){
-            if (!entry.getValue().equals("OK")){
+            if (!entry.getValue().equals(isOK)){
                 isAllFine = false;
                 resultMsg = "Make sure the above requirements are met.";
                 break;
             }
         }
 
-        String result = "Root: " + hashMap.get("ROOT") + "\n" +
-                        "Busybox: " + hashMap.get("BUSYBOX") + "\n" +
-                        "Chroot: " + hashMap.get("CHROOT") + "\n" +
-                        resultMsg;
-
-        doNotification(result);
+        doNotification(
+                "Root: " + hashMap.get("ROOT") + "\n" +
+                "Busybox: " + hashMap.get("BUSYBOX") + "\n" +
+                "Chroot: " + hashMap.get("CHROOT") + "\n" +
+                resultMsg);
     }
 
     @Override
@@ -118,36 +120,12 @@ public class RunAtBootService extends IntentService {
         }
     }
 
-    /*private boolean userinit(Boolean ShouldRun) {
-            if (!ShouldRun) {
-                return false;
-            }
-            doing_action = "RUNNING BOOT SERVICES";
-            // doNotification(TAG, "RUNNING BOOT SERVICES");
-            // this duplicates the functionality of the userinit service, formerly in init.rc
-            // These scripts will start up after the system is booted.
-            // Put scripts in fileDir/scripts/etc/init.d/ and set execute permission.  Scripts should
-            // start with a number and include a hashbang such as #!/system/bin/sh as the first line.
-            ShellExecuter exe = new ShellExecuter();
-            if (!NhPaths.BUSYBOX.equals("")) {
-                exe.RunAsRootOutput("rm -rf " + NhPaths.CHROOT_PATH + "/tmp/.X1*"); // remove posible vnc locks (if the phone is rebooted with the vnc server running)
-                // init.d
-                String[] runner = {NhPaths.BUSYBOX + " run-parts " + NhPaths.APP_INITD_PATH};
-                exe.RunAsRoot(runner);
-    //            Toast.makeText(getBaseContext(), getString(R.string.autorunningscripts), Toast.LENGTH_SHORT).show();
-                return true;
-            }
-    //        Toast.makeText(getBaseContext(), getString(R.string.toastForNoBusybox), Toast.LENGTH_SHORT).show();
-            doNotification(getString(R.string.toastForNoBusybox));
-            return false;
-        }*/
-
     private void createNotificationChannel() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel serviceChannel = new NotificationChannel(
                     AppNavHomeActivity.BOOT_CHANNEL_ID,
-                    "Boot Check Service",
+                    "Nethunter Boot Check Service",
                     NotificationManager.IMPORTANCE_HIGH
             );
 
