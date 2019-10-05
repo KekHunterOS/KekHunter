@@ -2,6 +2,63 @@
 
 ######### IMPORT BOOTKALI ENVIRONMENT #########
 SCRIPT_PATH=$(readlink -f $0)
+. ${SCRIPT_PATH%/*}/bootkali_init
+. ${SCRIPT_PATH%/*}/bootkali_log
+
+## Define the nethunter app package name.
+APP_PGK_NAME=com.offsec.nethunter
+
+## Define busybox path.
+BUSYBOX=`which busybox | head -n1`
+if [ -z "$BUSYBOX" ]; then
+    if [ -x "/data/adb/magisk/busybox" ]; then
+        BUSYBOX="/data/adb/magisk/busybox"
+    elif [ -x "/sbin/.magisk/busybox/busybox" ]; then
+        BUSYBOX="/sbin/.magisk/busybox/busybox"
+    elif [ -x "/system/xbin/busybox_nh" ]; then
+        BUSYBOX="/system/xbin/busybox_nh"
+    elif [ -x "/sbin/busybox_nh" ]; then
+        BUSYBOX="/sbin/busybox_nh"
+    elif [ -x "/system/bin/busybox" ]; then
+        BUSYBOX="/system/bin/busybox"
+    elif [ -x "/data/local/bin/busybox" ]; then
+        BUSYBOX="/data/local/bin/busybox"
+    elif [ -x "/system/xbin/busybox" ]; then
+        BUSYBOX="/system/xbin/busybox"
+    else
+        bklog "[-] No busybox is installed or busybox is not granted execute permission, if you did have it installed, please symlink it to /system/bin and grant it the permission."
+        exit 1
+    fi
+fi
+
+## Define the Kali Chroot path.
+MNT=`cat /data/data/$APP_PGK_NAME/shared_prefs/$APP_PGK_NAME.xml | grep "\"chroot_path\"" | $BUSYBOX sed "s/^.*\"chroot_path\">\(.*\)<\/string>/\1/g"`
+if [ ! -d "$MNT" ]; then
+    bklog "[-] \"$MNT\" directory not exist!"
+    bklog "[!] Click the button [INSTALL KALI CHROOT] down below now!"
+    exit 2
+fi
+if [ -z "$MNT" ]; then
+    bklog "[-] The \$MNT variable is not defined, please run nethunter app first."
+    exit 2
+fi
+
+## Define chroot shell executable path.
+if [ -x $MNT/usr/bin/bash ]; then
+    CHROOT_EXEC=/usr/bin/bash
+#elif [ -f $MNT/usr/bin/sudo ]; then
+#    CHROOT_EXEC=/usr/bin/sudo
+#elif [ -f $MNT/bin/sudo ]; then
+#    CHROOT_EXEC=/bin/sudo
+else
+    bklog "[-] Your chroot has no \"bash\" installed, please install it manually first."
+    bklog "[-] Also make sure your Kali Chroot is not corrupted."
+    exit 2
+fi
+
+
 . ${SCRIPT_PATH%/*}/bootkali_env
 
-$busybox chroot $mnt /bin/bash -c "if [ -f $HOME/.hushlogin ]; then rm $HOME/.hushlogin; fi; /bin/login -f root"
+#$BUSYBOX chroot $MNT $CHROOT_EXEC -i -u root
+$BUSYBOX chroot $MNT $CHROOT_EXEC -i
+#BUSYBOX chroot $MNT /usr/bin/login -f root

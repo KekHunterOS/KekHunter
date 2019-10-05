@@ -2,7 +2,8 @@
 
 ######### IMPORT BOOTKALI ENVIRONMENT #########
 SCRIPT_PATH=$(readlink -f $0)
-. ${SCRIPT_PATH%/*}/bootkali_env
+. ${SCRIPT_PATH%/*}/bootkali_init
+
 
 # EXECUTE CHROOT / ADD ARGUMENTS TO LAUNCH SPECIFIC PROGRAMS
 #
@@ -14,8 +15,20 @@ SCRIPT_PATH=$(readlink -f $0)
 # hid-cmd, hid-cmd-elevated-win[7-8], wifite, iptables, update
 # start-rev-met, start-rev-met-elevated-win[8-7]
 
+busybox=$BUSYBOX
+mnt=$MNT
+unset BUSYBOX
+unset MNT
+
 if [ $# -eq 0 ]; then
-	$busybox chroot $mnt /bin/bash -i
+    ######### Custom initial scripts can be run here after mounting the chroot #########
+    [ ! -f $mnt/root/.hushlogin ] && touch "$mnt/root/.hushlogin"
+    [ ! -d $mnt/root/.ssh ] && mkdir -p "$mnt/root/.ssh"
+
+    . ${SCRIPT_PATH%/*}/bootkali_env
+	#$busybox chroot $mnt /usr/bin/sudo -i -u root
+	$busybox chroot $mnt /usr/bin/bash -i
+	#$busybox chroot $mnt /bin/login -f root
 else
 
 	#APACHE

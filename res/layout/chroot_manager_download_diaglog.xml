@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="20dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:textSize="18dp"
+            android:textColor="@color/clearTitle"
+            android:text="Arch:"/>
+
+        <Spinner
+            android:id="@+id/f_chrootmanager_arch_adb_spr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="18dp"
+            android:textColor="@color/clearTitle"
+            android:entries="@array/f_chrootmanager_build_chroot_arm_opts"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:textSize="18dp"
+            android:textColor="@color/clearTitle"
+            android:text="Min or Full install:"/>
+
+        <Spinner
+            android:id="@+id/f_chrootmanager_minorfull_adb_spr"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="18dp"
+            android:textColor="@color/clearTitle"
+            android:entries="@array/f_chrootmanager_build_chroot_full_or_min"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="Path of the folder you want to donwload to:"
+            android:textSize="18dp"
+            android:textColor="@color/clearTitle"/>
+
+        <EditText
+            android:id="@+id/f_chrootmanager_storepath_et"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:textSize="18dp"
+            android:textColor="@color/clearTitle"/>
+
+    </LinearLayout>
+</LinearLayout>
