@@ -12,9 +12,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.PowerManager;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -31,8 +35,11 @@ import com.offsec.nethunter.service.CompatCheckService;
 import com.offsec.nethunter.utils.CheckForRoot;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.PermissionCheck;
+import com.offsec.nethunter.utils.SharePrefTag;
+import com.offsec.nethunter.utils.ShellExecuter;
 import com.winsontan520.wversionmanager.library.WVersionManager;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.Stack;
@@ -47,12 +54,13 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 
 public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpdates.Provider {
 
     public final static String TAG = "AppNavHomeActivity";
-    private static final String CHROOT_INSTALLED_TAG = "CHROOT_INSTALLED_TAG";
+    public static final String CHROOT_INSTALLED_TAG = "CHROOT_INSTALLED_TAG";
     private static final String GPS_BACKGROUND_FRAGMENT_TAG = "BG_FRAGMENT_TAG";
     public static final String BOOT_CHANNEL_ID = "BOOT_CHANNEL";
     /**
@@ -60,7 +68,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
      */
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
-    private static NavigationView navigationView;
+    private NavigationView navigationView;
     private CharSequence mTitle = "NetHunter";
     private final Stack<String> titles = new Stack<>();
     private static SharedPreferences prefs;
@@ -73,28 +81,31 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     private NhPaths nhPaths;
     private PermissionCheck permissionCheck;
     private BroadcastReceiver nethunterReceiver;
+    public static Boolean isBackPressEnabled = true;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-
         this.context = getApplicationContext();
         this.activity = this;
-        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            askMarshmallowPerms(permsCurrent);
-        } else {
-            CheckForRoot();
-        }*/
 
         // Initiate the NhPaths singleton class, and it will then keep living until the app dies.
         // Also with its sharepreference listener registered, the CHROOT_PATH variable can be updated immediately on sharepreference changes.
         nhPaths = NhPaths.getInstance(context);
         // Initiate the PermissionCheck class.
         permissionCheck = new PermissionCheck(activity, context);
-        // Register the nethunter receiver with passing the main activity.
+        // Register the nethunter receiver with intent actions.
         nethunterReceiver = new NethunterReceiver();
-        activity.registerReceiver(nethunterReceiver, new IntentFilter(NethunterReceiver.CHECKCOMPAT));
+        IntentFilter AppNavHomeIntentFilter = new IntentFilter();
+        AppNavHomeIntentFilter.addAction(NethunterReceiver.CHECKCOMPAT);
+        AppNavHomeIntentFilter.addAction(NethunterReceiver.BACKPRESSED);
+        AppNavHomeIntentFilter.addAction(NethunterReceiver.CHECKCHROOT);
+        AppNavHomeIntentFilter.addAction("ChrootManager");
+        activity.registerReceiver(nethunterReceiver, new IntentFilter(AppNavHomeIntentFilter));
+        // initiate prefs.
+        prefs = getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
 
         // Start copying the app files to the corresponding path.
         ProgressDialog progressDialog = new ProgressDialog(activity);
@@ -102,26 +113,32 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         copyBootFilesAsyncTask.setListener(new CopyBootFilesAsyncTask.CopyBootFilesAsyncTaskListener() {
             @Override
             public void onAsyncTaskPrepare() {
-                // Can be done other things here.
+                // Can run other things here.
             }
 
             @Override
             public void onAsyncTaskFinished(Object result) {
+                // Setup the default SharePreference value.
+                setDefaultSharePreference();
+
                 // After finishing copying app files, we do a compatibility check before allowing user to use it.
                 // First, check if the app has gained the root already.
                 if (!CheckForRoot.isRoot()){
                     showWarningDialog("Nethunter app cannot be run properly", "Root permission is required!!", true);
                 }
+
                 // Secondly, check if busybox is present.
                 if (!CheckForRoot.isBusyboxInstalled()){
                     showWarningDialog("Nethunter app cannot be run properly", "No busybox is detected, please make sure you have busybox installed!!", true);
                 }
+
                 // Thirdly, check if nethunter terminal app has been installed.
                 if (context.getPackageManager().getLaunchIntentForPackage("com.offsec.nhterm") == null) {
                     showWarningDialog("Nethunter app cannot be run properly", "Nethunter terminal is not installed yet.", true);
                 }
+
                 // Lastly, check if all required permissions are granted, if yes, show the view to user.
-                if (isAllPermissionsGranted()){
+                if (isAllRequiredPermissionsGranted()){
                     setRootView();
                 }
             }
@@ -129,7 +146,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         copyBootFilesAsyncTask.execute();
     }
 
-    /* if the chroot isn't set up, don't show the chroot options */
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (mDrawerToggle.onOptionsItemSelected(item)) {
@@ -150,14 +167,33 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        for (int grantResult:grantResults){
-            if (grantResult != 0){
-                showWarningDialog("Nethunter app cannot be run properly", "Please grant all the permission requests from outside the app or restart the app to grant the rest of permissions again.", true);
-                return;
+
+        if (requestCode == PermissionCheck.DEFAULT_PERMISSION_RQCODE || requestCode == PermissionCheck.NH_TERM_PERMISSIONS_RQCODE){
+            for (int grantResult:grantResults){
+                if (grantResult != 0){
+                    showWarningDialog("Nethunter app cannot be run properly", "Please grant all the permission requests from outside the app or restart the app to grant the rest of permissions again.", true);
+                    return;
+                }
             }
-        }
-        if (isAllPermissionsGranted()) {
-            setRootView();
+            if (isAllRequiredPermissionsGranted()) {
+                setRootView();
+            }
+        } else if (requestCode == PermissionCheck.NH_VNC_PERMISSIONS_RQCODE){
+            for (int grantResult:grantResults){
+                if (grantResult != 0){
+                    showWarningDialog("VNC Manager not available", "Please grant all the permission requests from outside the app or restart the app to grant the rest of permissions again.", false);
+                    return;
+                }
+            }
+        } else if (requestCode == PermissionCheck.NH_VNC_PERMISSIONS_ONFRAGMENTCLICK_RQCODE){
+            for (int grantResult:grantResults){
+                if (grantResult != 0){
+                    showWarningDialog("VNC Manager not available", "Please grant all the permission requests from outside the app or restart the app to grant the rest of permissions again.", false);
+                    return;
+                }
+            }
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            changeFragment(fragmentManager, VNCFragment.newInstance(R.id.vnc_item));
         }
     }
 
@@ -194,30 +230,33 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        if (titles.size() > 1) {
-            titles.pop();
-            mTitle = titles.peek();
-        }
-        Menu menuNav = navigationView.getMenu();
-        int i = 0;
-        int mSize = menuNav.size();
-        while (i < mSize) {
-            if (menuNav.getItem(i).getTitle() == mTitle) {
-                MenuItem _current = menuNav.getItem(i);
-                if (lastSelected != _current) {
-                    //remove last
-                    lastSelected.setChecked(false);
-                    // udpate for the next
-                    lastSelected = _current;
-                }
-                //set checked
-                _current.setChecked(true);
-                i = mSize;
+        //If isBackPressEnable is false then not allow user to press back button.
+        if (isBackPressEnabled) {
+            super.onBackPressed();
+            if (titles.size() > 1) {
+                titles.pop();
+                mTitle = titles.peek();
             }
-            i++;
+            Menu menuNav = navigationView.getMenu();
+            int i = 0;
+            int mSize = menuNav.size();
+            while (i < mSize) {
+                if (menuNav.getItem(i).getTitle() == mTitle) {
+                    MenuItem _current = menuNav.getItem(i);
+                    if (lastSelected != _current) {
+                        //remove last
+                        lastSelected.setChecked(false);
+                        // udpate for the next
+                        lastSelected = _current;
+                    }
+                    //set checked
+                    _current.setChecked(true);
+                    i = mSize;
+                }
+                i++;
+            }
+            restoreActionBar();
         }
-        restoreActionBar();
     }
 
     @Override
@@ -228,9 +267,9 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     }
 
     @Override
-    protected void onRestart() {
-        super.onRestart();
-        startService(new Intent(context, CompatCheckService.class));
+    protected void onStart() {
+        super.onStart();
+        if (navigationView != null) startService(new Intent(context, CompatCheckService.class));
     }
 
     @Override
@@ -254,6 +293,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
             ab.setHomeButtonEnabled(true);
             ab.setDisplayHomeAsUpEnabled(true);
         }
+
         mDrawerLayout = findViewById(R.id.drawer_layout);
 
         navigationView = findViewById(R.id.navigation_view);
@@ -271,8 +311,6 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         /// moved build info to the menu
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd KK:mm:ss a zzz",
                 Locale.US);
-
-        prefs = getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
 
         final String buildTime = sdf.format(BuildConfig.BUILD_TIME);
         TextView buildInfo1 = navigationHeadView.findViewById(R.id.buildinfo1);
@@ -296,6 +334,8 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
 
         // and put the title in the queue for when you need to back through them
         titles.push(navigationView.getMenu().getItem(0).getTitle().toString());
+        // disable all fragment first until it passes the compat check.
+        navigationView.getMenu().setGroupEnabled(R.id.chrootDependentGroup, false);
         // if the nav bar hasn't been seen, let's show it
         if (!prefs.getBoolean("seenNav", false)) {
             mDrawerLayout.openDrawer(GravityCompat.START);
@@ -310,40 +350,8 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         }
         mDrawerToggle = new ActionBarDrawerToggle(activity, mDrawerLayout, R.string.drawer_opened, R.string.drawer_closed);
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-
-        mDrawerLayout.setOnFocusChangeListener((v, hasFocus) -> {
-            if (!hasFocus) {
-                setDrawerOptions();
-            }
-        });
         mDrawerToggle.syncState();
-        // pre-set the drawer options
-        setDrawerOptions();
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // Create the NotificationChannel
-            CharSequence name = getString(R.string.boot_notification_channel);
-            String description = getString(R.string.boot_notification_channel_description);
-            int importance = NotificationManager.IMPORTANCE_LOW;
-            NotificationChannel mChannel = new NotificationChannel(BOOT_CHANNEL_ID, name, importance);
-            mChannel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
-            NotificationManager notificationManager = (NotificationManager) getSystemService(
-                    NOTIFICATION_SERVICE);
-            if (notificationManager != null) {
-                notificationManager.createNotificationChannel(mChannel);
-            }
-        }
-    }
-
-    public static void setDrawerOptions() {
-        Menu menuNav = navigationView.getMenu();
-        if (prefs.getBoolean(CHROOT_INSTALLED_TAG, false)) {
-            menuNav.setGroupEnabled(R.id.chrootDependentGroup, true);
-        } else {
-            menuNav.setGroupEnabled(R.id.chrootDependentGroup, false);
-        }
+        startService(new Intent(context, CompatCheckService.class));
     }
 
     private void checkUpdate() {
@@ -374,7 +382,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     private void setupDrawerContent(NavigationView navigationView) {
         navigationView.setNavigationItemSelectedListener(
                 menuItem -> {
-                    // only change it if is no the same as the last one
+                    // only change it if is not the same as the last one
                     if (lastSelected != menuItem) {
                         //remove last
                         lastSelected.setChecked(false);
@@ -441,7 +449,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                             } else {
                                 PermissionCheck permissionCheck = new PermissionCheck(activity, context);
                                 if (!permissionCheck.isAllPermitted(PermissionCheck.NH_VNC_PERMISSIONS)) {
-                                    permissionCheck.checkPermissions(PermissionCheck.NH_VNC_PERMISSIONS, PermissionCheck.NH_VNC_PERMISSIONS_RQCODE);
+                                    permissionCheck.checkPermissions(PermissionCheck.NH_VNC_PERMISSIONS, PermissionCheck.NH_VNC_PERMISSIONS_ONFRAGMENTCLICK_RQCODE);
                                 } else {
                                     changeFragment(fragmentManager, VNCFragment.newInstance(itemId));
                                 }
@@ -465,24 +473,36 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                 });
     }
 
-    private void restoreActionBar() {
+    public void restoreActionBar() {
         ActionBar ab = getSupportActionBar();
         if (ab != null) {
+            ab.setHomeButtonEnabled(true);
+            ab.setDisplayHomeAsUpEnabled(true);
             ab.setDisplayShowTitleEnabled(true);
+            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
             ab.setTitle(mTitle);
-
         }
     }
 
-    private boolean isAllPermissionsGranted(){
-        if (!permissionCheck.isAllPermitted(PermissionCheck.DEFAULT_PERMISSIONS)) {
-            permissionCheck.checkPermissions(PermissionCheck.DEFAULT_PERMISSIONS, PermissionCheck.DEFAULT_PERMISSION_RQCODE);
-            return false;
-        } else if (!permissionCheck.isAllPermitted(PermissionCheck.NH_TERM_PERMISSIONS)) {
-            permissionCheck.checkPermissions(PermissionCheck.NH_TERM_PERMISSIONS, PermissionCheck.NH_TERM_PERMISSIONS_RQCODE);
-            return false;
+    public void blockActionBar(){
+        ActionBar ab = getSupportActionBar();
+        if (ab != null) {
+            ab.setHomeButtonEnabled(false);
+            ab.setDisplayHomeAsUpEnabled(false);
+            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         }
-        return true;
+    }
+
+    public void setDefaultSharePreference () {
+        if (prefs.getString(SharePrefTag.DUCKHUNTER_LANG_SHAREPREF_TAG, null) == null) {
+            prefs.edit().putString(SharePrefTag.DUCKHUNTER_LANG_SHAREPREF_TAG, "us").apply();
+        }
+        if (prefs.getString(SharePrefTag.CHROOT_DEFAULT_BACKUP_SHAREPREF_TAG, null) == null) {
+            prefs.edit().putString(SharePrefTag.CHROOT_DEFAULT_BACKUP_SHAREPREF_TAG, NhPaths.SD_PATH + "/kalifs-backup.tar.gz").apply();
+        }
+        if (prefs.getString(SharePrefTag.CHROOT_DEFAULT_STORE_DOWNLOAD_SHAREPREF_TAG, null) == null) {
+            prefs.edit().putString(SharePrefTag.CHROOT_DEFAULT_STORE_DOWNLOAD_SHAREPREF_TAG, NhPaths.SD_PATH + "/Download").apply();
+        }
     }
 
     private void changeFragment(FragmentManager fragmentManager, Fragment fragment) {
@@ -491,6 +511,20 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                 .replace(R.id.container, fragment)
                 .addToBackStack(null)
                 .commit();
+    }
+
+    private boolean isAllRequiredPermissionsGranted(){
+        if (!permissionCheck.isAllPermitted(PermissionCheck.DEFAULT_PERMISSIONS)) {
+            permissionCheck.checkPermissions(PermissionCheck.DEFAULT_PERMISSIONS, PermissionCheck.DEFAULT_PERMISSION_RQCODE);
+            return false;
+        } else if (!permissionCheck.isAllPermitted(PermissionCheck.NH_TERM_PERMISSIONS)) {
+            permissionCheck.checkPermissions(PermissionCheck.NH_TERM_PERMISSIONS, PermissionCheck.NH_TERM_PERMISSIONS_RQCODE);
+            return false;
+        } else if (!permissionCheck.isAllPermitted(PermissionCheck.NH_VNC_PERMISSIONS)) {
+            permissionCheck.checkPermissions(PermissionCheck.NH_VNC_PERMISSIONS, PermissionCheck.NH_VNC_PERMISSIONS_RQCODE);
+        }
+
+        return true;
     }
 
     public void showWarningDialog(String title, String message, boolean NeedToExit) {
@@ -509,24 +543,45 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         warningAD.create().show();
     }
 
+    // Main app broadcastRecevier to response for different actions.
     public class NethunterReceiver extends BroadcastReceiver{
         public static final String CHECKCOMPAT = BuildConfig.APPLICATION_ID + ".CHECKCOMPAT";
-        private Activity activity;
+        public static final String BACKPRESSED = BuildConfig.APPLICATION_ID + ".BACKPRESSED";
+        public static final String CHECKCHROOT = BuildConfig.APPLICATION_ID + ".CHECKCHROOT";
 
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction() != null) {
                 switch (intent.getAction()) {
-                    case CHECKCOMPAT: {
+                    case CHECKCOMPAT:
                         showWarningDialog("Nethunter app cannot be run properly",
-                                intent.getStringExtra("message"),
-                                true);
-                    }
-                    break;
+                            intent.getStringExtra("message"),
+                            true);
+                        break;
+                    case BACKPRESSED:
+                        isBackPressEnabled = (intent.getBooleanExtra("isEnable", true));
+                        if (isBackPressEnabled) {
+                            restoreActionBar();
+                        } else {
+                            blockActionBar();
+                        }
+                        break;
+                    case CHECKCHROOT:
+                        try{
+                            if (intent.getBooleanExtra("ENABLEFRAGMENT", false)){
+                                navigationView.getMenu().setGroupEnabled(R.id.chrootDependentGroup, true);
+                            } else {
+                                navigationView.getMenu().setGroupEnabled(R.id.chrootDependentGroup, false);
+                                //FragmentManager fragmentManager = getSupportFragmentManager();
+                                //changeFragment(fragmentManager, NetHunterFragment.newInstance(R.id.nethunter_item));
+                            }
+                        } catch (Exception e) {
+                            Log.e(AppNavHomeActivity.TAG, e.getMessage());
+                        }
+                        break;
                 }
             }
         }
     }
-
 }
 
