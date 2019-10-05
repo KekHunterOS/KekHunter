@@ -11,6 +11,12 @@ public class PermissionCheck {
     private static final String TAG = "PermissionCheck";
     private Activity activity;
     private Context context;
+
+    public static final int DEFAULT_PERMISSION_RQCODE = 1;
+    public static final int NH_TERM_PERMISSIONS_RQCODE = 2;
+    public static final int NH_VNC_PERMISSIONS_RQCODE = 3;
+    public static final int NH_VNC_PERMISSIONS_ONFRAGMENTCLICK_RQCODE = 4;
+
     public static final String[] DEFAULT_PERMISSIONS = {
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
             android.Manifest.permission.ACCESS_FINE_LOCATION,
@@ -27,10 +33,6 @@ public class PermissionCheck {
     public static final String[] NH_VNC_PERMISSIONS = {
             "com.offsec.nhvnc.permission.OPEN_VNC_CONN"
     };
-
-    public static final int DEFAULT_PERMISSION_RQCODE = 1;
-    public static final int NH_TERM_PERMISSIONS_RQCODE = 2;
-    public static final int NH_VNC_PERMISSIONS_RQCODE = 3;
 
     public PermissionCheck(Activity activity, Context context) {
         this.activity = activity;
