@@ -558,7 +558,7 @@ public class ManaFragment extends Fragment {
         public void onCreate(@Nullable Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             context = getContext();
-            configFilePath = NhPaths.CHROOT_PATH + "/etc/dhcp/dhcpd.conf";
+            configFilePath = NhPaths.CHROOT_PATH() + "/etc/dhcp/dhcpd.conf";
         }
 
         @Override
@@ -594,7 +594,7 @@ public class ManaFragment extends Fragment {
         public void onCreate(@Nullable Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             context = getContext();
-            configFilePath = NhPaths.CHROOT_PATH + "/etc/mana-toolkit/dnsspoof.conf";
+            configFilePath = NhPaths.CHROOT_PATH() + "/etc/mana-toolkit/dnsspoof.conf";
         }
 
         @Override
@@ -631,9 +631,9 @@ public class ManaFragment extends Fragment {
             super.onCreate(savedInstanceState);
             context = getContext();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                configFilePath = NhPaths.CHROOT_PATH + "/usr/share/mana-toolkit/run-mana/start-nat-full-lollipop.sh";
+                configFilePath = NhPaths.CHROOT_PATH() + "/usr/share/mana-toolkit/run-mana/start-nat-full-lollipop.sh";
             } else {
-                configFilePath = NhPaths.CHROOT_PATH + "/usr/share/mana-toolkit/run-mana/start-nat-full-kitkat.sh";
+                configFilePath = NhPaths.CHROOT_PATH() + "/usr/share/mana-toolkit/run-mana/start-nat-full-kitkat.sh";
             }
         }
 
@@ -672,9 +672,9 @@ public class ManaFragment extends Fragment {
             super.onCreate(savedInstanceState);
             context = getContext();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                configFilePath = NhPaths.CHROOT_PATH + "/usr/share/mana-toolkit/run-mana/start-nat-simple-lollipop.sh";
+                configFilePath = NhPaths.CHROOT_PATH() + "/usr/share/mana-toolkit/run-mana/start-nat-simple-lollipop.sh";
             } else {
-                configFilePath = NhPaths.CHROOT_PATH + "/usr/share/mana-toolkit/run-mana/start-nat-simple-kitkat.sh";
+                configFilePath = NhPaths.CHROOT_PATH() + "/usr/share/mana-toolkit/run-mana/start-nat-simple-kitkat.sh";
             }
         }
 
@@ -715,7 +715,7 @@ public class ManaFragment extends Fragment {
         public void onCreate(@Nullable Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             context = getContext();
-            configFilePath = NhPaths.CHROOT_PATH + "/usr/bin/start-nat-transproxy-lollipop.sh";
+            configFilePath = NhPaths.CHROOT_PATH() + "/usr/bin/start-nat-transproxy-lollipop.sh";
         }
 
         @Override
@@ -797,9 +797,9 @@ public class ManaFragment extends Fragment {
             super.onCreate(savedInstanceState);
             context = getContext();
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                configFilePath = NhPaths.CHROOT_PATH + "/usr/share/mana-toolkit/run-mana/start-nat-simple-bdf-lollipop.sh";
+                configFilePath = NhPaths.CHROOT_PATH() + "/usr/share/mana-toolkit/run-mana/start-nat-simple-bdf-lollipop.sh";
             } else {
-                configFilePath = NhPaths.CHROOT_PATH + "/usr/share/mana-toolkit/run-mana/start-nat-simple-bdf-kitkat.sh";
+                configFilePath = NhPaths.CHROOT_PATH() + "/usr/share/mana-toolkit/run-mana/start-nat-simple-bdf-kitkat.sh";
             }
         }
 
