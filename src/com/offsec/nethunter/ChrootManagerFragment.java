@@ -71,7 +71,6 @@ public class ChrootManagerFragment extends Fragment {
     private Button backupChrootButton;
     private SharedPreferences sharedPreferences;
     private ChrootManagerAsynctask chrootManagerAsynctask;
-    private String selectedFile = null;
     private Intent backPressedintent = new Intent();
     private static final int IS_MOUNTED = 0;
     private static final int IS_UNMOUNTED = 1;
@@ -137,18 +136,6 @@ public class ChrootManagerFragment extends Fragment {
         setRemoveChrootButton();
         setAddMetaPkgButton();
         setBackupChrootButton();
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == SELECT_FILE_RCODE && resultCode == RESULT_OK){
-            if (data != null) {
-                selectedFile = data.getData().toString();
-                NhPaths.showMessage(context, selectedFile);
-            }
-        }
-
     }
 
     @Override
