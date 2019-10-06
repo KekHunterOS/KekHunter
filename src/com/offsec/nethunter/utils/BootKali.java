@@ -93,7 +93,7 @@ public class BootKali {
 
     //
     private String GEN_BOOTKALI() {
-        return "chroot" + SPACE + NhPaths.CHROOT_PATH + SPACE;
+        return "chroot" + SPACE + NhPaths.CHROOT_PATH() + SPACE;
     }
 
     private String GEN__KALI_CMD(String cmd) {

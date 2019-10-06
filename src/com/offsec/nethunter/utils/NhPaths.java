@@ -23,15 +23,11 @@ public class NhPaths implements SharedPreferences.OnSharedPreferenceChangeListen
     public static String NH_SD_FOLDER_NAME;
     public static String SD_PATH;
     public static String APP_SD_FILES_PATH;
-    public static String BASE_PATH;
+    private static String BASE_PATH;
     public static String NH_SYSTEM_PATH;
     public static String ARCH_FOLDER;
-    public static String CHROOT_PATH;
-    //public static String CHROOT_DIR;
     public static String CHROOT_SD_PATH;
-    public static String CHROOT_EXEC;
     public static String APP_SD_SQLBACKUP_PATH;
-    public static String OLD_CHROOT_PATH;
     public static String BUSYBOX;
 
     private NhPaths(Context context) {
@@ -46,12 +42,8 @@ public class NhPaths implements SharedPreferences.OnSharedPreferenceChangeListen
         APP_SD_SQLBACKUP_PATH           = APP_SD_FILES_PATH + "/nh_sql_backups";
         BASE_PATH                       = "/data/local";
         NH_SYSTEM_PATH                  = BASE_PATH + "/nhsystem";
-        ARCH_FOLDER                     = "/kali-armhf";
-        CHROOT_PATH                     = NH_SYSTEM_PATH + ARCH_FOLDER;
-        //CHROOT_DIR                      = sharedPreferences.getString("chroot_dir", NH_SYSTEM_PATH + "/kali-arm64");
+        ARCH_FOLDER                     = sharedPreferences.getString(SharePrefTag.CHROOT_ARCH_SHAREPREF_TAG, "kali-arm64");
         CHROOT_SD_PATH                  = "/sdcard";
-        CHROOT_EXEC                     = "/usr/bin/sudo";
-        OLD_CHROOT_PATH                 = "/data/local/kali-armhf";
         BUSYBOX                         = getBusyboxPath();
     }
 
@@ -61,17 +53,21 @@ public class NhPaths implements SharedPreferences.OnSharedPreferenceChangeListen
         }
         return instance;
     }
+
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals("chroot_path")){
-            CHROOT_PATH = sharedPreferences.getString(key, NH_SYSTEM_PATH + "/kali-arm64");
+        if (key.equals(SharePrefTag.CHROOT_ARCH_SHAREPREF_TAG)){
+            ARCH_FOLDER = sharedPreferences.getString(SharePrefTag.CHROOT_ARCH_SHAREPREF_TAG, "kali-arm64");
         }
+    }
+
+    public static String CHROOT_PATH() {
+        return NH_SYSTEM_PATH + "/" + ARCH_FOLDER;
     }
 
     private static String getSdcardPath(){
         return Environment.getExternalStorageDirectory().toString();
     }
-
 
     private static String getBusyboxPath(){
         String[] BB_PATHS = {

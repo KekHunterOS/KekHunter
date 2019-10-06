@@ -283,7 +283,7 @@ public class MacchangerFragment extends Fragment {
                     } else {
                         exe.RunAsRootWithException(NhPaths.BUSYBOX + " ifconfig " + selectedDevice + " down");
 
-                        command = "bootkali macchanger_random " + selectedDevice;
+                        command = NhPaths.APP_SCRIPTS_PATH + "/bootkali macchanger_random " + selectedDevice;
                         exe.RunAsRootWithException(command);
                         // macResult.setText();
 
@@ -329,7 +329,7 @@ public class MacchangerFragment extends Fragment {
 
                     } else {
                         exe.RunAsRootWithException(NhPaths.BUSYBOX + " ifconfig " + selectedDevice + " down");
-                        command = "bootkali macchanger_custom " + macsArray + " " + selectedDevice;
+                        command = NhPaths.APP_SCRIPTS_PATH + "/bootkali macchanger_custom " + macsArray + " " + selectedDevice;
                         exe.RunAsRootWithException(command);
                         // macResult.setText();
 
@@ -490,7 +490,7 @@ public class MacchangerFragment extends Fragment {
             NhPaths.showMessage(context,"Resetting " + cleanInterface + " MAC");
             exe.RunAsRootWithException(NhPaths.BUSYBOX + " ifconfig " + cleanInterface + " down");
 
-            String resetCmd = "bootkali macchanger_original " + cleanInterface;
+            String resetCmd = NhPaths.APP_SCRIPTS_PATH + "/bootkali macchanger_original " + cleanInterface;
             exe.RunAsRootWithException(resetCmd);
 
             new android.os.Handler().postDelayed(

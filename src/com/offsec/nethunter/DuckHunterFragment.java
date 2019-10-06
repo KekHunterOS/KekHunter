@@ -18,8 +18,11 @@ import android.view.ViewGroup;
 
 import com.offsec.nethunter.AsyncTask.DuckHuntAsyncTask;
 import com.offsec.nethunter.utils.NhPaths;
+import com.offsec.nethunter.utils.SharePrefTag;
+
 import java.util.HashMap;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
@@ -106,11 +109,21 @@ public class DuckHunterFragment extends Fragment {
         });
 
         sharedpreferences = activity.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
+
+        if (!sharedpreferences.contains("DuckHunterLanguageIndex")){
+            for (int i = 0; i < keyboardLayoutString.length; i++){
+                if ("us".equals(map.get(keyboardLayoutString[i]))) {
+                    sharedpreferences.edit().putInt("DuckHunterLanguageIndex", i).apply();
+                    break;
+                }
+            }
+        }
+
         return rootView;
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
         this.menu = menu;
         inflater.inflate(R.menu.duck_hunter, menu);
         menu.findItem(R.id.duckConvertAttack).setVisible(false);
@@ -183,7 +196,7 @@ public class DuckHunterFragment extends Fragment {
         builder.setSingleChoiceItems(keyboardLayoutString, keyboardLayoutIndex, (dialog, which) -> {
             Editor editor = sharedpreferences.edit();
             editor.putInt("DuckHunterLanguageIndex", which);
-            //editor.putString("DuckHunterLanguage", map.get(keyboardLayoutString[which]));
+            editor.putString(SharePrefTag.DUCKHUNTER_LANG_SHAREPREF_TAG, map.get(keyboardLayoutString[which]));
             editor.apply();
         });
         builder.show();
