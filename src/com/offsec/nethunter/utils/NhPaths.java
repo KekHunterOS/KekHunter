@@ -57,7 +57,7 @@ public class NhPaths implements SharedPreferences.OnSharedPreferenceChangeListen
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(SharePrefTag.CHROOT_ARCH_SHAREPREF_TAG)){
-            ARCH_FOLDER = sharedPreferences.getString(SharePrefTag.CHROOT_ARCH_SHAREPREF_TAG, null);
+            ARCH_FOLDER = sharedPreferences.getString(SharePrefTag.CHROOT_ARCH_SHAREPREF_TAG, "kali-arm64");
         }
     }
 
