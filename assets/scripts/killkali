@@ -1,53 +1,175 @@
 #!/system/bin/sh
 
-if [ -x /system/xbin/busybox_nh ]; then
-	busybox=/system/xbin/busybox_nh
-elif [ -x /sbin/busybox_nh ]; then
-	busybox=/sbin/busybox_nh
-elif [ -x /system/xbin/busybox ]; then
-	busybox=/system/xbin/busybox
-elif [ -x /data/local/bin/busybox ]; then
-	busybox=/data/local/bin/busybox
-elif [ -x /system/bin/busybox ]; then
-	busybox=/system/bin/busybox
-elif [ -x /su/bin/busybox ]; then
-	busybox=/su/bin/busybox
-else
-	echo "Busybox not found!  Install it, dummy!"
-	log "Busybox not found!  Install it, dummy!"
-	exit
+SCRIPT_PATH=$(readlink -f $0)
+. ${SCRIPT_PATH%/*}/bootkali_log
+
+#################################
+#### DEFINE GLOBAL VARIABLES ####
+#################################
+
+## Define the nethunter app package name.
+APP_PGK_NAME=com.offsec.nethunter
+
+## Define busybox path.
+BUSYBOX=`which busybox | head -n1`
+if [ -z "$BUSYBOX" ]; then
+    if [ -x "/data/adb/magisk/busybox" ]; then
+        BUSYBOX="/data/adb/magisk/busybox"
+    elif [ -x "/sbin/.magisk/busybox/busybox" ]; then
+        BUSYBOX="/sbin/.magisk/busybox/busybox"
+    elif [ -x "/system/xbin/busybox_nh" ]; then
+        BUSYBOX="/system/xbin/busybox_nh"
+    elif [ -x "/sbin/busybox_nh" ]; then
+        BUSYBOX="/sbin/busybox_nh"
+    elif [ -x "/system/bin/busybox" ]; then
+        BUSYBOX="/system/bin/busybox"
+    elif [ -x "/data/local/bin/busybox" ]; then
+        BUSYBOX="/data/local/bin/busybox"
+    elif [ -x "/system/xbin/busybox" ]; then
+        BUSYBOX="/system/xbin/busybox"
+    else
+        bklog "[-] No busybox is installed or busybox is not granted execute permission, if you did have it installed, please symlink it to /system/bin and grant it the permission."
+        exit 1
+    fi
 fi
 
-export bin=/system/bin
-export mnt=/data/local/nhsystem/kali-armhf
-PRESERVED_PATH=$PATH
-export PATH=/usr/bin:/usr/sbin:/bin:/usr/local/bin:/usr/local/sbin:$PATH
-export TERM=linux
-export HOME=/root
-export LOGNAME=root
+## Define the Kali Chroot path.
+MNT=`cat /data/data/$APP_PGK_NAME/shared_prefs/$APP_PGK_NAME.xml | $BUSYBOX grep "\"chroot_path\"" | $BUSYBOX sed "s/^.*\"chroot_path\">\(.*\)<\/string>/\1/g"`
+if [ ! -d "$MNT" ]; then
+    bklog "[-] \"$MNT\" directory not exist!"
+    bklog "[!] Click the button [INSTALL KALI CHROOT] down below now!"
+    exit 2
+fi
+if [ -z "$MNT" ]; then
+    bklog "[-] The \$MNT variable is not defined, please run nethunter app first."
+    exit 2
+fi
+
+## Define chroot shell executable path.
+if [ -x $MNT/usr/bin/bash ]; then
+    CHROOT_EXEC=/usr/bin/bash
+#elif [ -f $MNT/usr/bin/sudo ]; then
+#    CHROOT_EXEC=/usr/bin/sudo
+#elif [ -f $MNT/bin/sudo ]; then
+#    CHROOT_EXEC=/bin/sudo
+else
+    bklog "[-] Your chroot has no \"bash\" installed, please install it manually first."
+    bklog "[-] Also make sure your Kali Chroot is not corrupted."
+    exit 2
+fi
+
+isAllunmounted=0
 unset LD_PRELOAD
 
-# set shmmax to 128mb to free memory#
 
-$busybox sysctl -w kernel.shmmax=134217728
+##########################
+#### DEFINE FUNCTIONS ####
+##########################
 
-echo "Shutting down SSH Server"
-$busybox chmod 666 /dev/null
+########## Kill all running kali services and processes ##########
+f_kill_pids() {
+    bklog "[!] Killing all running kali services .."
+    local lsof_full=$($BUSYBOX lsof | awk '{print $1}' | grep -c '^lsof')
+    if [ "${lsof_full}" -eq 0 ]; then
+        local pids=$($BUSYBOX lsof | grep "$MNT" | awk '{print $1}' | uniq)
+    else
+        local pids=$($BUSYBOX lsof | grep "$MNT" | awk '{print $2}' | uniq)
+    fi
+    if [ -n "${pids}" ]; then
+        kill -9 ${pids} 2> /dev/null
+        return $?
+    fi
+    return 0
+}
 
-$busybox chroot $mnt /etc/init.d/ssh stop
+########## Restore the setup ##########
+f_restore_setup() {
+    bklog "[!] Restoring the setup to previous state.."
 
-echo "Shutting down Postgresql"
-$busybox chroot $mnt /etc/init.d/postgresql stop
+    ## set shmmax to 128mb to free memory ##
+    $BUSYBOX sysctl -w kernel.shmmax=134217728
 
-# unmount everything
+    ## remove all the remaining chroot vnc session pids ##
+    rm -rf $MNT/tmp/.X11* > /dev/null 2>&1
+}
 
-echo "Removing all Kali mounts"
-$busybox umount $mnt/dev/pts && echo "unmounted pts"
-$busybox umount $mnt/dev && echo "unmounted dev"
-$busybox umount $mnt/proc && echo "unmounted proc"
-$busybox umount $mnt/sys && echo "unmounted sys"
-$busybox umount $mnt/system && echo "unmounted system"
-$busybox umount $mnt/sdcard && echo "unmounted sdcard"
-$busybox umount $mnt/external_sd && echo "unmounted external_sd"
+########## umount the fs one by one ##########
+f_umount_fs() {
+    if $BUSYBOX mountpoint -q $MNT/$1; then
+        if $BUSYBOX umount -f $MNT/$1; then
+            bklog "[+] umounted $MNT/$1"
+            if [ ! "$1" = "dev/pts" ]; then
+                if rm -rf $MNT/$1; then
+                    bklog "[+] removed $MNT/$1"
+                else
+                    bklog "[-] Failed to remove $MNT/$1"
+                    isAllunmounted=1
+                fi
+            fi
+        else
+            bklog "[-] failed to umounted $MNT/$1"
+            isAllunmounted=1
+        fi
+    else
+        if [ -d $MNT/$1 ]; then
+            bklog "[+] $MNT/$1 is unmounted already."
+            if rm -rf $MNT/$1; then
+                bklog "[+] removed $MNT/$1"
+            else
+                bklog "[-] Failed to remove $MNT/$1"
+                isAllunmounted=1
+            fi
+        fi
+    fi
 
-export PATH=$PRESERVED_PATH
+}
+
+########## umount if chroot directory is NOT a mountpoint(directory method) ##########
+f_dir_umount() {
+    $BUSYBOX chroot $MNT $CHROOT_EXEC -c "sync"
+    $BUSYBOX sync
+    f_kill_pids
+    f_restore_setup
+    bklog "[!] Removing all fs mounts.."
+    fs=(dev/pts dev/shm dev proc sys sdcard)
+    for i in "${fs[@]}"; do
+        f_umount_fs "$i"
+    done
+}
+
+########## Check if chroot directory is a mountpoint ##########
+f_is_mntpoint() {
+    if [ -d "$MNT" ]; then
+        $BUSYBOX mountpoint -q "$MNT" && return 0
+        return 1
+    fi
+}
+
+
+###################
+#### MAIN PART ####
+###################
+
+f_is_mntpoint
+res=$?
+case $res in
+1)
+    bklog "[!] $MNT is NOT a mountpoint"
+    f_dir_umount
+    ;;
+*)
+    bklog "[!] $MNT directory is not existed!!! Aborting.."
+    exit 1
+esac
+
+if [ -z "$(cat /proc/mounts | grep $MNT)" ]; then
+    bklog "[+] All done."
+    isAllunmounted=0
+else
+    bklog "[-] there are still mounted points not unmounted yet."
+    bklog "[-] Try run this script again and see if they can be unmounted now."
+    isAllunmounted=1
+fi
+
+return $isAllunmounted
+

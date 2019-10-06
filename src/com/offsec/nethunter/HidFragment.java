@@ -72,7 +72,7 @@ public class HidFragment extends Fragment {
         mViewPager = rootView.findViewById(R.id.pagerHid);
         mViewPager.setAdapter(tabsPagerAdapter);
 
-        configFilePath = NhPaths.CHROOT_PATH + "/var/www/html/powersploit-payload";
+        configFilePath = NhPaths.CHROOT_PATH() + "/var/www/html/powersploit-payload";
 
         mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
@@ -325,8 +325,8 @@ public class HidFragment extends Fragment {
         public void onCreate(@Nullable Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             context = getContext();
-            configFilePath = NhPaths.CHROOT_PATH + "/var/www/html/powersploit-payload";
-            configFileUrlPath = NhPaths.CHROOT_PATH + "/var/www/html/powersploit-url";
+            configFilePath = NhPaths.CHROOT_PATH() + "/var/www/html/powersploit-payload";
+            configFileUrlPath = NhPaths.CHROOT_PATH() + "/var/www/html/powersploit-url";
         }
 
         @Override
@@ -566,8 +566,8 @@ public class HidFragment extends Fragment {
         public void onCreate(@Nullable Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             context = getContext();
-            configFilePath = NhPaths.CHROOT_PATH + "/var/www/html/powershell-payload";
-            configFileUrlPath = NhPaths.CHROOT_PATH + "/var/www/html/powershell-url";
+            configFilePath = NhPaths.CHROOT_PATH() + "/var/www/html/powershell-payload";
+            configFileUrlPath = NhPaths.CHROOT_PATH() + "/var/www/html/powershell-url";
         }
 
         @Override

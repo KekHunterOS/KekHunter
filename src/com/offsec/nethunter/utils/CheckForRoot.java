@@ -16,7 +16,6 @@ import java.io.File;
 public abstract class CheckForRoot {
 
     public static String BUSYBOX;
-    private static final String MAGISK_BUSYBOX = "/sbin/.magisk/busybox/busybox";
 
     public static boolean isRoot() {
         ShellExecuter exe = new ShellExecuter();

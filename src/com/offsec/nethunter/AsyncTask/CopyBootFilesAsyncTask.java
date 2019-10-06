@@ -33,13 +33,11 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
     private File sdCardDir;
     private File scriptsDir;
     private File etcDir;
-    //private final SharedPreferences prefs;
     private String buildTime;
     private Boolean shouldRun;
     private final WeakReference<ProgressDialog> progressDialogRef;
     private CopyBootFilesAsyncTaskListener listener;
     private String result = "";
-    private String progress = "";
     private SharedPreferences prefs;
     private final WeakReference<Context> context;
     private final WeakReference<Activity> activity;
@@ -60,6 +58,7 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
 
     @Override
     protected void onPreExecute() {
+        // Check if it is a new build and inflates the nethunter files again if yes.
         if (!prefs.getString(COPY_ASSETS_TAG, buildTime).equals(buildTime) || !sdCardDir.isDirectory() || !scriptsDir.isDirectory() || !etcDir.isDirectory()) {
             ProgressDialog progressDialog = progressDialogRef.get();
             progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
@@ -81,12 +80,13 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
     protected String doInBackground(String ...strings) {
         // setup
         if(shouldRun){
-
             List<String> bootkali_list = new ArrayList<>();
             bootkali_list.add("bootkali");
             bootkali_list.add("bootkali_init");
             bootkali_list.add("bootkali_login");
             bootkali_list.add("bootkali_bash");
+            bootkali_list.add("chrootmgr");
+            bootkali_list.add("duckyconverter");
             bootkali_list.add("killkali");
 
             Log.d(COPY_ASSETS_TAG, "COPYING FILES....");
@@ -106,7 +106,6 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
             publishProgress("Checking for SYMLINKS to bootkali....");
             try {
                 MakeSYSWriteable();
-
                 // Loop over bootkali list (e.g. bootkali | bootkali_bash | bootkali_env)
                 for (String temp : bootkali_list) {
 
@@ -122,21 +121,23 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
                     }
                 }
                 MakeSYSReadOnly();
-
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
             publishProgress("Checking for chroot....");
-            String command = "if [ -d " + NhPaths.CHROOT_PATH + " ];then echo 1; fi"; //check the dir existence
+            String command = "if [ -d " + NhPaths.CHROOT_PATH() + " ];then echo 1; fi"; //check the dir existence
             final String _res = exe.RunAsRootOutput(command);
             if (_res.equals("1")) {
                 ed = prefs.edit();
-                ed.putBoolean(ChrootManagerFragment.CHROOT_INSTALLED_TAG, true);
+                ed.putBoolean(AppNavHomeActivity.CHROOT_INSTALLED_TAG, true);
                 ed.commit();
                 publishProgress("Chroot Found!");
+                // @Re4son @kimocoder @yesimxev is it still necessnary to remount /data partition and chmod +s the chroot /usr/bin/sudo?
                 // Mount suid /data && fix sudo
-                publishProgress(exe.RunAsRootOutput("busybox mount -o remount,suid /data && chmod +s " + NhPaths.CHROOT_PATH + "/usr/bin/sudo && echo \"Initial setup done!\""));
+                /*publishProgress(exe.RunAsRootOutput(NhPaths.BUSYBOX + " mount -o remount,suid /data && chmod +s " +
+                        NhPaths.CHROOT_PATH() + "/usr/bin/sudo" +
+                        " && echo \"Initial setup done!\""));*/
             } else {
                 publishProgress("Chroot not Found, install it in Chroot Manager");
             }
@@ -155,7 +156,6 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
                     //publishProgress("Installing additional apps.\nThe device may be unresponsive for a few minutes\nInstalling " + object);
                     ShellExecuter install = new ShellExecuter();
                     install.RunAsRoot(new String[]{"mv " + apk + " /data/local/tmp/ && pm install /data/local/tmp/" + object + " && rm -f /data/local/tmp/" + object});
-
                 }
             }
         }
@@ -230,6 +230,7 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
             // Log.i("tag", "copyFile() "+filename);
             in = assetManager.open(filename);
             newFileName = TARGET_BASE_PATH + "/" + filename;
+            /* rename the file name if its suffix is either -arm64 or -armhf before copying the file.*/
             out = new FileOutputStream(renameAssetIfneeded(newFileName));
             byte[] buffer = new byte[8092];
             int read;
@@ -277,7 +278,6 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
         ShellExecuter exe = new ShellExecuter();
         Log.d(COPY_ASSETS_TAG, "Symlinking " + filename);
         Log.d(COPY_ASSETS_TAG, "command output: ln -s " + NhPaths.APP_SCRIPTS_PATH + "/" + filename + " /system/bin/" + filename);
-
         exe.RunAsRoot(new String[]{"ln -s " + NhPaths.APP_SCRIPTS_PATH + "/" + filename + " /system/bin/" + filename});
     }
 
@@ -299,6 +299,7 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
         return filenames;
     }
 
+    // This rename the filename which suffix is either [name]-arm64 or [name]-armhf to [name] according to the user's CPU ABI.
     private String renameAssetIfneeded(String asset){
         if (asset.matches("^.*-arm64$")){
             if (Build.CPU_ABI.equals("arm64-v8a")){

@@ -465,7 +465,7 @@ public class MITMfFragment extends Fragment {
         public void onCreate(@Nullable Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             context = getContext();
-            configFilePath = NhPaths.CHROOT_PATH + "/etc/mitmf/mitmf.conf";
+            configFilePath = NhPaths.CHROOT_PATH() + "/etc/mitmf/mitmf.conf";
         }
 
         @Override

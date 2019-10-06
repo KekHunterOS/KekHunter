@@ -3,18 +3,23 @@
 ######### IMPORT BOOTKALI INITIALIZATION #########
 SCRIPT_PATH=$(readlink -f $0)
 . ${SCRIPT_PATH%/*}/bootkali_log
-. ${SCRIPT_PATH%/*}/bootkali_init
 
-######### EXPORT ENVIRONMENT #########
+#################################################
+#### DEFINE ENVIRONMENT VARIABLES FOR CHROOT ####
+#################################################
+
+export SHELL=/bin/bash
 export bin=/system/bin
-export mnt=$mnt
 PRESERVED_PATH=$PATH
 export PATH=/usr/bin:/usr/sbin:/bin:/usr/local/bin:/usr/local/sbin:$PATH
-export TERM=linux
+export TERM=xterm-256color
 export HOME=/root
 export USER=root
 export LOGNAME=root
+export MAIL=/var/mail/root
+export PWD=/root
+export OLDPWD=/root
+
 unset LD_PRELOAD
 
-######### TERMINAL SETUP #########
 clear
