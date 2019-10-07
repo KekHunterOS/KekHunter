@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 
 import com.offsec.nethunter.AppNavHomeActivity;
 import com.offsec.nethunter.BuildConfig;
+import com.offsec.nethunter.R;
 import com.offsec.nethunter.utils.CheckForRoot;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.SharePrefTag;
@@ -98,11 +99,15 @@ public class CompatCheckService extends IntentService {
 
         // Check chroot status, push notification to user and disable all the fragments if chroot is not yet up.
         if (RESULTCODE == -1){
-            if ((new ShellExecuter().RunAsRootReturnValue(NhPaths.APP_SCRIPTS_PATH + "/chrootmgr -c \"status\" -p " + NhPaths.CHROOT_PATH()) != 0)){
-                startService(new Intent(getApplicationContext(), NotificationChannelService.class).setAction(NotificationChannelService.REMINDMOUNTCHROOT));
-                getApplicationContext().sendBroadcast(new Intent()
-                        .putExtra("ENABLEFRAGMENT", false)
-                        .setAction(AppNavHomeActivity.NethunterReceiver.CHECKCHROOT));
+            if ((new ShellExecuter().RunAsRootReturnValue(NhPaths.APP_SCRIPTS_PATH + "/chrootmgr -c \"status\" -p " + NhPaths.CHROOT_PATH()) != 0)) {
+                if (AppNavHomeActivity.lastSelectedMenuItem.getItemId() != R.id.createchroot_item) {
+                    startService(new Intent(getApplicationContext(), NotificationChannelService.class).setAction(NotificationChannelService.REMINDMOUNTCHROOT));
+                    getApplicationContext().sendBroadcast(new Intent()
+                            .putExtra("ENABLEFRAGMENT", false)
+                            .setAction(AppNavHomeActivity.NethunterReceiver.CHECKCHROOT));
+                } else {
+                    sendBroadcast(new Intent().putExtra("ENABLEFRAGMENT", false).setAction(AppNavHomeActivity.NethunterReceiver.CHECKCHROOT));
+                }
             } else {
                 getApplicationContext().sendBroadcast(new Intent()
                         .putExtra("ENABLEFRAGMENT", true)
@@ -110,17 +115,20 @@ public class CompatCheckService extends IntentService {
             }
         } else {
             if (RESULTCODE != 0) {
-                startService(new Intent(getApplicationContext(), NotificationChannelService.class).setAction(NotificationChannelService.REMINDMOUNTCHROOT));
-                getApplicationContext().sendBroadcast(new Intent()
-                        .putExtra("ENABLEFRAGMENT", false)
-                        .setAction(AppNavHomeActivity.NethunterReceiver.CHECKCHROOT));
+                if (AppNavHomeActivity.lastSelectedMenuItem.getItemId() != R.id.createchroot_item) {
+                    startService(new Intent(getApplicationContext(), NotificationChannelService.class).setAction(NotificationChannelService.REMINDMOUNTCHROOT));
+                    getApplicationContext().sendBroadcast(new Intent()
+                            .putExtra("ENABLEFRAGMENT", false)
+                            .setAction(AppNavHomeActivity.NethunterReceiver.CHECKCHROOT));
+                } else {
+                    sendBroadcast(new Intent().putExtra("ENABLEFRAGMENT", false).setAction(AppNavHomeActivity.NethunterReceiver.CHECKCHROOT));
+                }
             } else {
                 getApplicationContext().sendBroadcast(new Intent()
                         .putExtra("ENABLEFRAGMENT", true)
                         .setAction(AppNavHomeActivity.NethunterReceiver.CHECKCHROOT));
             }
         }
-
         return true;
     }
 }
