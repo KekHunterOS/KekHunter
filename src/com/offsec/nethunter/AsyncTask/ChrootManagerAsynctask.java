@@ -1,6 +1,7 @@
 package com.offsec.nethunter.AsyncTask;
 
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.offsec.nethunter.utils.NhPaths;
@@ -10,6 +11,7 @@ import java.io.BufferedInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -54,6 +56,7 @@ public class ChrootManagerAsynctask extends AsyncTask<Object, Integer, Void> {
                 break;
             case MOUNT_CHROOT:
                 resultCode = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/bootkali_init", ((TextView)objects[0]));
+                exe.RunAsRootOutput("sleep 1 && " + NhPaths.CHROOT_INITD_SCRIPT_PATH, ((TextView)objects[0]));
                 break;
             case UNMOUNT_CHROOT:
                 resultCode = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/killkali", ((TextView)objects[0]));
@@ -72,15 +75,17 @@ public class ChrootManagerAsynctask extends AsyncTask<Object, Integer, Void> {
                 break;
             case DOWNLOAD_CHROOT:
                 try {
-                    resultCode = exe.RunAsRootOutput("echo \"[!] The Download has been started...Please wait.\"", ((TextView)objects[0]));
+                    exe.RunAsRootOutput("echo \"[!] The Download has been started...Please wait.\"", ((TextView)objects[0]));
                     int count;
-                    URL url = new URL(objects[1].toString());
+                    URL url = new URL("https://" + objects[1].toString() + objects[2].toString());
                     URLConnection connection = url.openConnection();
                     connection.connect();
+                    connection.setConnectTimeout(10000);
+                    connection.setReadTimeout(10000);
                     int lengthOfFile = connection.getContentLength();
 
                     InputStream input = new BufferedInputStream(url.openStream(), 8192);
-                    OutputStream output = new FileOutputStream(objects[2].toString());
+                    OutputStream output = new FileOutputStream(objects[3].toString());
 
                     byte[] data = new byte[1024];
                     long total = 0;
@@ -94,8 +99,10 @@ public class ChrootManagerAsynctask extends AsyncTask<Object, Integer, Void> {
                     output.flush();
                     output.close();
                     input.close();
-                    resultCode = exe.RunAsRootOutput("echo \"[+] Download completed.\"", ((TextView)objects[0]));
-                    resultCode = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/chrootmgr -c \"checksha256 " + objects[1].toString() + ".sha256 " + objects[2].toString() + "\"", ((TextView)objects[0]));
+                    exe.RunAsRootOutput("echo \"[+] Download completed.\"", ((TextView)objects[0]));
+                    resultCode = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/chrootmgr -c \"checksha256 " +
+                            exe.RunAsRootOutput("ping -c 1 " + objects[1].toString() + " | head -n1 | sed 's/\\(^.*(\\)\\(.*\\)\\().*(.*$\\)/\\2/g'") +
+                            objects[2].toString() + ".sha256 " + objects[3].toString() + "\"", ((TextView)objects[0]));
                 } catch (Exception e) {
                     exe.RunAsRootOutput("echo \"[-]" + e.getMessage() + "\"", ((TextView)objects[0]));
                     resultCode = 1;

@@ -46,7 +46,7 @@ public class ChrootManagerFragment extends Fragment {
 
     public static final String TAG = "ChrootManager";
     private static final String ARG_SECTION_NUMBER = "section_number";
-    private static final String IMAGE_SERVER = "https://images.offensive-security.com/nethunter/";
+    private static final String IMAGE_SERVER = "images.offensive-security.com";
     private static String ARCH = "";
     private static String MINORFULL = "";
     private final ShellExecuter x = new ShellExecuter();
@@ -67,7 +67,7 @@ public class ChrootManagerFragment extends Fragment {
     private static final int IS_MOUNTED = 0;
     private static final int IS_UNMOUNTED = 1;
     private static final int NEED_TO_INSTALL = 2;
-    private static final int SELECT_FILE_RCODE = 404;
+    public static boolean isAsyncTaskRunning = false;
     private Context context;
     private Activity activity;
 
@@ -133,8 +133,10 @@ public class ChrootManagerFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        showBanner();
-        compatCheck();
+        if (!isAsyncTaskRunning){
+            showBanner();
+            compatCheck();
+        }
     }
 
     private void setEditButton(){
@@ -451,7 +453,6 @@ public class ChrootManagerFragment extends Fragment {
 
     private void startDownloadChroot(String targetDownloadFileName, File downloadDir){
         ProgressDialog progressDialog = new ProgressDialog(activity);
-        //startDownloadChroot(IMAGE_SERVER + targetDownFileName, downloadDir.getAbsolutePath() + "/" + targetDownFileName);
         chrootManagerAsynctask = new ChrootManagerAsynctask(ChrootManagerAsynctask.DOWNLOAD_CHROOT);
         chrootManagerAsynctask.setListener(new ChrootManagerAsynctask.ChrootManagerAsyncTaskListener() {
             @Override
@@ -503,10 +504,12 @@ public class ChrootManagerFragment extends Fragment {
                         }
                     });
                     chrootManagerAsynctask.execute(resultViewerLoggerTextView, downloadDir.getAbsolutePath() + "/" + targetDownloadFileName, NhPaths.CHROOT_PATH());
+                } else {
+                    progressDialog.dismiss();
                 }
             }
         });
-        chrootManagerAsynctask.execute(resultViewerLoggerTextView, IMAGE_SERVER + targetDownloadFileName, downloadDir.getAbsolutePath() + "/" + targetDownloadFileName);
+        chrootManagerAsynctask.execute(resultViewerLoggerTextView, IMAGE_SERVER, "/nethunter/" + targetDownloadFileName, downloadDir.getAbsolutePath() + "/" + targetDownloadFileName);
     }
 
     private void setAddMetaPkgButton() {

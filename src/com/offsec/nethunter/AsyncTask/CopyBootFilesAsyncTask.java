@@ -29,7 +29,7 @@ import java.util.Objects;
 
 public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
 
-    private final String COPY_ASSETS_TAG = "COPY_ASSETS_TAG";
+    private final String TAG = "CopyBootFilesAsyncTask";
     private File sdCardDir;
     private File scriptsDir;
     private File etcDir;
@@ -59,7 +59,7 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
     @Override
     protected void onPreExecute() {
         // Check if it is a new build and inflates the nethunter files again if yes.
-        if (!prefs.getString(COPY_ASSETS_TAG, buildTime).equals(buildTime) || !sdCardDir.isDirectory() || !scriptsDir.isDirectory() || !etcDir.isDirectory()) {
+        if (!prefs.getString(TAG, buildTime).equals(buildTime) || !sdCardDir.isDirectory() || !scriptsDir.isDirectory() || !etcDir.isDirectory()) {
             ProgressDialog progressDialog = progressDialogRef.get();
             progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
             progressDialog.setTitle("New app build detected:");
@@ -67,7 +67,7 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
             progressDialog.setCancelable(false);
             progressDialog.show();
         } else {
-            Log.d(COPY_ASSETS_TAG, "FILES NOT COPIED");
+            Log.d(TAG, "FILES NOT COPIED");
             shouldRun = false;
         }
         super.onPreExecute();
@@ -80,16 +80,16 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
     protected String doInBackground(String ...strings) {
         // setup
         if(shouldRun){
-            List<String> bootkali_list = new ArrayList<>();
+            /*List<String> bootkali_list = new ArrayList<>();
             bootkali_list.add("bootkali");
             bootkali_list.add("bootkali_init");
             bootkali_list.add("bootkali_login");
             bootkali_list.add("bootkali_bash");
             bootkali_list.add("chrootmgr");
             bootkali_list.add("duckyconverter");
-            bootkali_list.add("killkali");
+            bootkali_list.add("killkali");*/
 
-            Log.d(COPY_ASSETS_TAG, "COPYING FILES....");
+            Log.d(TAG, "COPYING FILES....");
             // 1:1 copy (recursive) of the assets/{scripts, etc, wallpapers} folders to /data/data/...
             publishProgress("Doing app files update. (init.d and filesDir).");
             assetsToFiles(NhPaths.APP_PATH, "", "data");
@@ -100,10 +100,10 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
             ShellExecuter exe = new ShellExecuter();
             exe.RunAsRoot(new String[]{"chmod -R 700 " + NhPaths.APP_SCRIPTS_PATH + "/*", "chmod -R 700 " + NhPaths.APP_INITD_PATH + "/*"});
             SharedPreferences.Editor ed = prefs.edit();
-            ed.putString(COPY_ASSETS_TAG, buildTime);
+            ed.putString(TAG, buildTime);
             ed.apply();
 
-            publishProgress("Checking for SYMLINKS to bootkali....");
+            /*publishProgress("Checking for SYMLINKS to bootkali....");
             try {
                 MakeSYSWriteable();
                 // Loop over bootkali list (e.g. bootkali | bootkali_bash | bootkali_env)
@@ -123,7 +123,7 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
                 MakeSYSReadOnly();
             } catch (IOException e) {
                 e.printStackTrace();
-            }
+            }*/
 
             publishProgress("Checking for chroot....");
             String command = "if [ -d " + NhPaths.CHROOT_PATH() + " ];then echo 1; fi"; //check the dir existence
@@ -134,6 +134,8 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
                 ed.commit();
                 publishProgress("Chroot Found!");
                 // @Re4son @kimocoder @yesimxev is it still necessnary to remount /data partition and chmod +s the chroot /usr/bin/sudo?
+                // @simonpunk thinks it is no need to do so.
+
                 // Mount suid /data && fix sudo
                 /*publishProgress(exe.RunAsRootOutput(NhPaths.BUSYBOX + " mount -o remount,suid /data && chmod +s " +
                         NhPaths.CHROOT_PATH() + "/usr/bin/sudo" +
@@ -200,7 +202,7 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
                 File dir = new File(fullPath);
                 if (!dir.exists() && pathIsAllowed(path, copyType)) { // copy those dirs
                     if (!dir.mkdirs()) {
-                        Log.i("tag", "could not create dir " + fullPath);
+                        Log.i(TAG, "could not create dir " + fullPath);
                     }
                 }
                 for (String asset : assets) {
@@ -217,11 +219,14 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
 
             }
         } catch (IOException ex) {
-            Log.e("tag", "I/O Exception", ex);
+            Log.e(TAG, "I/O Exception", ex);
         }
     }
 
     private void copyFile(String TARGET_BASE_PATH, String filename) {
+        if (filename.matches("^.*kaliservices$")){
+            return;
+        }
         AssetManager assetManager = context.get().getAssets();
         InputStream in;
         OutputStream out;
@@ -241,8 +246,8 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
             out.flush();
             out.close();
         } catch (Exception e) {
-            Log.e("tag", "Exception in copyFile() of " + newFileName);
-            Log.e("tag", "Exception in copyFile() " + e.toString());
+            Log.e(TAG, "Exception in copyFile() of " + newFileName);
+            Log.e(TAG, "Exception in copyFile() " + e.toString());
         }
 
     }
@@ -264,20 +269,20 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
 
     private void MakeSYSWriteable(){
         ShellExecuter exe = new ShellExecuter();
-        Log.d(COPY_ASSETS_TAG, "Making /system writeable for symlink");
+        Log.d(TAG, "Making /system writeable for symlink");
         exe.RunAsRoot(new String[]{"mount -o rw,remount,rw /system"});
     }
 
     private void MakeSYSReadOnly(){
         ShellExecuter exe = new ShellExecuter();
-        Log.d(COPY_ASSETS_TAG, "Making /system readonly for symlink");
+        Log.d(TAG, "Making /system readonly for symlink");
         exe.RunAsRoot(new String[]{"mount -o ro,remount,ro /system"});
     }
 
     private void NotFound(String filename){
         ShellExecuter exe = new ShellExecuter();
-        Log.d(COPY_ASSETS_TAG, "Symlinking " + filename);
-        Log.d(COPY_ASSETS_TAG, "command output: ln -s " + NhPaths.APP_SCRIPTS_PATH + "/" + filename + " /system/bin/" + filename);
+        Log.d(TAG, "Symlinking " + filename);
+        Log.d(TAG, "command output: ln -s " + NhPaths.APP_SCRIPTS_PATH + "/" + filename + " /system/bin/" + filename);
         exe.RunAsRoot(new String[]{"ln -s " + NhPaths.APP_SCRIPTS_PATH + "/" + filename + " /system/bin/" + filename});
     }
 

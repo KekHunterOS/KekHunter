@@ -176,7 +176,7 @@ public class ShellExecuter {
                 final Spannable tempText = new SpannableString(line + "\n");
                 final Spannable timestamp = new SpannableString("[ " + timeStamp.format(new Date()) + " ]  ");
                 timestamp.setSpan(new ForegroundColorSpan(Color.parseColor("#FFD561")),0,timestamp.length(),0);
-                tempText.setSpan(new ForegroundColorSpan(line.startsWith("[!]")?Color.CYAN:line.startsWith("[+]")?Color.GREEN:line.startsWith("[-]")?Color.parseColor("#D81B60"):Color.LTGRAY),0,tempText.length(),0);
+                tempText.setSpan(new ForegroundColorSpan(line.startsWith("[!]")?Color.CYAN:line.startsWith("[+]")?Color.GREEN:line.startsWith("[-]")?Color.parseColor("#D81B60"):Color.WHITE),0,tempText.length(),0);
                 viewLogger.post(new Runnable() {
                     @Override
                     public void run() {
@@ -213,6 +213,63 @@ public class ShellExecuter {
         try {
             Process process = Runtime.getRuntime().exec("su -mm");
             OutputStream stdin = process.getOutputStream();
+            stdin.write((command + '\n').getBytes());
+            stdin.write(("exit\n").getBytes());
+            stdin.flush();
+            stdin.close();
+            process.waitFor();
+            process.destroy();
+            resultCode = process.exitValue();
+        } catch (IOException e) {
+            Log.d(TAG, "An IOException was caught: " + e.getMessage());
+        } catch (InterruptedException ex) {
+            Log.d(TAG, "An InterruptedException was caught: " + ex.getMessage());
+        }
+        return resultCode;
+    }
+
+    public String RunAsChrootOutput(String command) {
+        String output = "";
+        String line;
+        try {
+            Process process = Runtime.getRuntime().exec("su -mm");
+            OutputStream stdin = process.getOutputStream();
+            InputStream stderr = process.getErrorStream();
+            InputStream stdout = process.getInputStream();
+            stdin.write((NhPaths.BUSYBOX + " chroot " + NhPaths.CHROOT_PATH() + " " + NhPaths.CHROOT_SUDO + " -i -u root" + '\n').getBytes());
+            stdin.write((command + '\n').getBytes());
+            stdin.write(("exit\n").getBytes());
+            stdin.flush();
+            stdin.close();
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(stdout));
+            while ((line = br.readLine()) != null) {
+                output = output + line + '\n';
+            }
+            /* remove the last \n */
+            if (output.length() > 0) output = output.substring(0,output.length()-1);
+            br.close();
+            br = new BufferedReader(new InputStreamReader(stderr));
+            while ((line = br.readLine()) != null) {
+                Log.e("Shell Error:", line);
+            }
+            br.close();
+            process.waitFor();
+            process.destroy();
+        } catch (IOException e) {
+            Log.d(TAG, "An IOException was caught: " + e.getMessage());
+        } catch (InterruptedException ex) {
+            Log.d(TAG, "An InterruptedException was caught: " + ex.getMessage());
+        }
+        return output;
+    }
+
+    public int RunAsChrootReturnValue(String command) {
+        int resultCode = 0;
+        try {
+            Process process = Runtime.getRuntime().exec("su -mm");
+            OutputStream stdin = process.getOutputStream();
+            stdin.write((NhPaths.BUSYBOX + " chroot " + NhPaths.CHROOT_PATH() + " " + NhPaths.CHROOT_SUDO + " -i -u root" + '\n').getBytes());
             stdin.write((command + '\n').getBytes());
             stdin.write(("exit\n").getBytes());
             stdin.flush();

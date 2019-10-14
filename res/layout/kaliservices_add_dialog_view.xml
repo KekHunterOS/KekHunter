@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.LinearLayoutCompat
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <android.support.v7.widget.LinearLayoutCompat
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -19,7 +19,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:layout_marginLeft="4dp"
             android:text="Title:"/>
 
         <EditText
@@ -27,50 +26,43 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:layout_marginLeft="4dp"/>
+            android:hint="Enter your title name here"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:layout_marginLeft="4dp"
             android:text="Command for starting the service:\n(This command will be run INSIDE CHROOT)"/>
 
         <EditText
-
             android:id="@+id/f_kaliservice_add_adb_et_startcommand"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_marginLeft="4dp"/>
+            android:layout_marginStart="4dp"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:layout_marginLeft="4dp"
             android:text="Command for stopping the service:\n(This command will be run INSIDE CHROOT)"/>
 
         <EditText
             android:id="@+id/f_kaliservice_add_adb_et_stopcommand"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_marginLeft="4dp" />
+            android:layout_marginStart="4dp" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:layout_marginLeft="4dp"
             android:text="Command for checking the service:\n(This command will be run OUTSIDE CHROOT)\nThe service is considered as UP if the return value equals to 0 and vice versa."/>
 
         <EditText
             android:id="@+id/f_kaliservice_add_adb_et_checkstatuscommand"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_marginLeft="4dp" />
+            android:layout_marginStart="4dp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -82,18 +74,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
-                android:layout_marginLeft="4dp"
-                android:entries="@array/f_home_array_insert_position"
+                android:entries="@array/array_move_position"
                 >
             </Spinner>
             <Spinner
                 android:id="@+id/f_kaliservice_add_adb_spr_titles"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:layout_marginLeft="4dp">
+                android:layout_marginStart="4dp">
             </Spinner>
         </LinearLayout>
-
-    </android.support.v7.widget.LinearLayoutCompat>
-</android.support.v7.widget.LinearLayoutCompat>
+    </LinearLayout>
+</LinearLayout>

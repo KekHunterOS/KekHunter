@@ -27,6 +27,8 @@ public class NhPaths implements SharedPreferences.OnSharedPreferenceChangeListen
     public static String NH_SYSTEM_PATH;
     public static String ARCH_FOLDER;
     public static String CHROOT_SD_PATH;
+    public static String CHROOT_SUDO;
+    public static String CHROOT_INITD_SCRIPT_PATH;
     public static String APP_SD_SQLBACKUP_PATH;
     public static String BUSYBOX;
 
@@ -43,6 +45,8 @@ public class NhPaths implements SharedPreferences.OnSharedPreferenceChangeListen
         BASE_PATH                       = "/data/local";
         NH_SYSTEM_PATH                  = BASE_PATH + "/nhsystem";
         ARCH_FOLDER                     = sharedPreferences.getString(SharePrefTag.CHROOT_ARCH_SHAREPREF_TAG, "kali-arm64");
+        CHROOT_SUDO                     = "/usr/bin/sudo";
+        CHROOT_INITD_SCRIPT_PATH        = APP_INITD_PATH + "/80postservices";
         CHROOT_SD_PATH                  = "/sdcard";
         BUSYBOX                         = getBusyboxPath();
     }

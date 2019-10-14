@@ -33,7 +33,6 @@ import java.util.Map;
 
 public class RunAtBootService extends IntentService {
 
-    private static final String CHROOT_INSTALLED_TAG = "CHROOT_INSTALLED_TAG";
     private static final String TAG = "Nethunter: Startup";
     private final ShellExecuter exe = new ShellExecuter();
     boolean isAllFine = true;

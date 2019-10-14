@@ -41,19 +41,6 @@ if [ -z "$MNT" ]; then
     exit 2
 fi
 
-## Define chroot shell executable path.
-if [ -x $MNT/usr/bin/bash ]; then
-    CHROOT_EXEC=/usr/bin/bash
-#elif [ -f $MNT/usr/bin/sudo ]; then
-#    CHROOT_EXEC=/usr/bin/sudo
-#elif [ -f $MNT/bin/sudo ]; then
-#    CHROOT_EXEC=/bin/sudo
-else
-    bklog "[-] Your chroot has no \"bash\" installed, please install it manually first."
-    bklog "[-] Also make sure your Kali Chroot is not corrupted."
-    exit 2
-fi
-
 ##########################
 #### DEFINE FUNCTIONS ####
 ##########################
@@ -110,9 +97,6 @@ f_mount_sdcard() {
 
 ######### [ MOUNTING AND BINDING FILESYSTEM ] #########
 f_mount_fs_to_kali() {
-    #$BUSYBOX chmod 4755 $MNT/$CHROOT_EXEC
-    #$BUSYBOX chmod 4755 $MNT/usr/bin/su
-    #$BUSYBOX chmod 4755 $MNT/usr/bin/login
 
     ######### SET FD, Thanks @feefik and @zer0conf ########
     if [ ! -e "/dev/fd" -o ! -e "/dev/stdin" -o ! -e "/dev/stdout" -o ! -e "/dev/stderr" ]; then
