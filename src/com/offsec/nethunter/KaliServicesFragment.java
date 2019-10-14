@@ -1,43 +1,59 @@
 package com.offsec.nethunter;
 
+import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.ListView;
-import android.widget.Switch;
+import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.offsec.nethunter.AsyncTask.KaliServicesAsyncTask;
+import com.offsec.nethunter.RecyclerViewAdapter.KaliServiceRecycleViewAdapterTitles;
+import com.offsec.nethunter.RecyclerViewAdapter.KaliServicesRecycleViewAdapterDeleteItems;
+import com.offsec.nethunter.RecyclerViewData.KaliServicesData;
+import com.offsec.nethunter.SQL.KaliServicesSQL;
 import com.offsec.nethunter.utils.NhPaths;
-import com.offsec.nethunter.utils.ShellExecuter;
+import java.util.ArrayList;
 
-import java.io.File;
-
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class KaliServicesFragment extends Fragment {
-    /**
-     * The fragment argument representing the section number for this
-     * fragment.
-     */
-    private String[][] KaliServices; //
+    private static final String TAG = "KaliServicesFragment";
     private static final String ARG_SECTION_NUMBER = "section_number";
-    public static final String RUN_AT_BOOT = "RUN_AT_BOOT";
-    private SharedPreferences prefs;
+    private View fragmentView;
+    private Activity activity;
     private Context context;
-    /**
-     * Returns a new instance of this fragment for the given section
-     * number.
-     */
+    private RecyclerView recyclerViewServiceTitle;
+    private Button refreshButton;
+    private Button addButton;
+    private Button deleteButton;
+    private Button moveButton;
+    private KaliServiceRecycleViewAdapterTitles kaliServiceRecycleViewAdapterTitles;
+    private KaliServicesSQL kaliServicesSQL;
+    private KaliServicesData kaliServicesData;
+    private KaliServicesAsyncTask kaliServicesAsyncTask;
+    private int targetPositionId;
+
     public static KaliServicesFragment newInstance(int sectionNumber) {
         KaliServicesFragment fragment = new KaliServicesFragment();
         Bundle args = new Bundle();
@@ -46,289 +62,556 @@ public class KaliServicesFragment extends Fragment {
         return fragment;
     }
 
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        context = getContext();
-        KaliServices = new String[][]{
-                // {name, check_cmd, start_cmd, stop_cmd, init_service_filename}
-                {"SSH", "sh " + NhPaths.APP_SCRIPTS_PATH + "/check-kalissh", "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali ssh start'", "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali ssh stop'", "70ssh"},
-                {"Dnsmasq", "sh " + NhPaths.APP_SCRIPTS_PATH + "/check-kalidnsmq", "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali dnsmasq start'", "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali dnsmasq stop'", "70dnsmasq"},
-                {"Hostapd", "sh " + NhPaths.APP_SCRIPTS_PATH + "/check-kalihostapd", "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali hostapd start'", "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali hostapd stop'", "70hostapd"},
-                {"OpenVPN", "sh " + NhPaths.APP_SCRIPTS_PATH + "/check-kalivpn", "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali openvpn start'", "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali openvpn stop'", "70openvpn"},
-                {"Apache", "sh " + NhPaths.APP_SCRIPTS_PATH + "/check-kaliapache", "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali apache start'", "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali apache stop'", "70apache"},
-                {"Metasploit", "sh " + NhPaths.APP_SCRIPTS_PATH + "/check-kalimetasploit", "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali msf start'", "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali msf stop'", "70msf"},
-                {"Fruity WiFi", "sh " + NhPaths.APP_SCRIPTS_PATH + "/check-fruity-wifi", "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali fruitywifi start'", "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali fruitywifi stop'", "70fruity"},
-                //{"DHCP", "sh " + NhPaths.APP_SCRIPTS_PATH + "/check-kalidhcp","su -c '" + cachedir + "/bootkali dhcp start'","su -c '" + cachedir + "/bootkali dhcp stop'", "70dhcp"},
-                {"BeEF Framework", "sh " + NhPaths.APP_SCRIPTS_PATH + "/check-kalibeef-xss", "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali beef-xss start'", "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/bootkali beef-xss stop'", "70beef"},
-                {"Y-cable Charging", "sh " + NhPaths.APP_SCRIPTS_PATH + "/check-ycable", "su -c 'bootkali ycable start'", "su -c 'bootkali ycable stop'", "70ycable"}
-                // the stop script isnt working well, doing a raw cmd instead to stop vnc
-                // {"VNC", "sh " + NhPaths.APP_SCRIPTS_PATH + "/check-kalivnc", "" + cachedir + "/bootkali\nvncserver", "" + cachedir + "/bootkali\nkill $(ps aux | grep 'Xtightvnc' | awk '{print $2}');CT=0;for x in $(ps aux | grep 'Xtightvnc' | awk '{print $2}'); do CT=$[$CT +1];tightvncserver -kill :$CT; done;rm /root/.vnc/*.log;rm -r /tmp/.X*", "70vnc"},
-        };
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.kali_services, container, false);
         setHasOptionsMenu(true);
-        checkServices(rootView);
-
-        return rootView;
-
+        //First to get the stored data from SQL, and bind it to KaliServicesData;
+        this.activity = getActivity();
+        this.context = getContext();
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        prefs = context.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
-        inflater.inflate(R.menu.kali_services, menu);
-    }
-
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        MenuItem item = menu.findItem(R.id.bootServicesState);
-        if (item != null) {
-            if (prefs.getBoolean(RUN_AT_BOOT, true)) {
-                item.setTitle("DISABLE Services At Boot");
-            } else {
-                item.setTitle("ENABLE Services At Boot");
-            }
+    public View onCreateView(@NonNull final LayoutInflater inflater, final ViewGroup parent, Bundle savedInstanceState) {
+        if (fragmentView != null){
+            NhPaths.showMessage(context, "HOHO");
+            return fragmentView;
         }
+        View view = inflater.inflate(R.layout.kaliservices, parent, false);
+        recyclerViewServiceTitle = view.findViewById(R.id.f_kaliservices_recycleviewServiceTitle);
+        refreshButton = view.findViewById(R.id.f_kaliservices_refreshButton);
+        addButton = view.findViewById(R.id.f_kaliservices_addItemButton);
+        deleteButton = view.findViewById(R.id.f_kaliservices_deleteItemButton);
+        moveButton = view.findViewById(R.id.f_kaliservices_moveItemButton);
+        fragmentView = view;
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        this.kaliServicesSQL = new KaliServicesSQL(context);
+        this.kaliServicesData = new KaliServicesData(context, kaliServicesSQL.getData());
+        kaliServiceRecycleViewAdapterTitles = new KaliServiceRecycleViewAdapterTitles(context, kaliServicesData);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
+        recyclerViewServiceTitle.setLayoutManager(linearLayoutManager);
+        recyclerViewServiceTitle.setAdapter(kaliServiceRecycleViewAdapterTitles);
+
+        kaliServicesAsyncTask = new KaliServicesAsyncTask(KaliServicesAsyncTask.CHECK_SERVICE);
+        kaliServicesAsyncTask.setListener(new KaliServicesAsyncTask.KaliServiceTaskListener() {
+            @Override
+            public void onAsyncTaskPrepare() {
+
+            }
+
+            @Override
+            public void onAsyncTaskFinished() {
+                kaliServiceRecycleViewAdapterTitles.notifyDataSetChanged();
+            }
+        });
+        kaliServicesAsyncTask.execute(kaliServicesData);
+        onRefreshItemSetup();
+        onAddItemSetup();
+        onDeleteItemSetup();
+        onMoveItemSetup();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.kaliservices, menu);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle presses on the action bar items
-        switch (item.getItemId()) {
-            case R.id.bootServicesState:
-                if (prefs.getBoolean(RUN_AT_BOOT, true)) {
-                    SharedPreferences.Editor ed = prefs.edit();
-                    ed.putBoolean(RUN_AT_BOOT, false);
-                    ed.apply();
-                    NhPaths.showMessage(context,"Boot Services DISABLED");
-                } else {
-                    SharedPreferences.Editor ed = prefs.edit();
-                    ed.putBoolean(RUN_AT_BOOT, true);
-                    ed.apply();
-                    NhPaths.showMessage(context,"Boot Services ENABLED");
-                }
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
+        final LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final View promptView = inflater.inflate(R.layout.kaliservices_custom_dialog_view, null);
+        final TextView titleTextView = promptView.findViewById(R.id.f_kaliservices_adb_tv_title1);
+        final EditText storedpathEditText = promptView.findViewById(R.id.f_kaliservices_adb_et_storedpath);
 
-    private void checkServices(final View rootView) {
-
-        new Thread(() -> {
-
-
-            ShellExecuter exe = new ShellExecuter();
-            final ListView servicesList = rootView.findViewById(R.id.servicesList);
-            String checkCmd = "";
-            String checkBootStates = "";
-            final String bootScriptPath = NhPaths.APP_INITD_PATH;
-
-            if (KaliServices == null) {
-                Log.d("Services", "Null KaliServices");
-            } else {
-
-                for (String[] KaliService : KaliServices) {
-                    Log.d("bootScriptPath", KaliService[4]);
-                }
-
-                for (String[] KaliService : KaliServices) {
-                    Log.d("bootScriptPath", bootScriptPath + "/" + KaliService[4]);
-
-                    File checkBootFile = new File(bootScriptPath + "/" + KaliService[4]);
-                    if (checkBootFile.exists()) {
-                        checkBootStates += "1";
-                    } else {
-                        checkBootStates += "0";
+        switch (item.getItemId()){
+            case R.id.f_kaliservices_menu_backupDB:
+                titleTextView.setText("Full path to where you want to save the database:");
+                storedpathEditText.setText(NhPaths.APP_SD_SQLBACKUP_PATH + "/FragmentKaliService");
+                final AlertDialog.Builder adbBackup = new AlertDialog.Builder(activity);
+                adbBackup.setView(promptView);
+                adbBackup.setCancelable(true);
+                adbBackup.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
                     }
-                    checkCmd += KaliService[1] + ";";
-                }
+                });
+                adbBackup.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
 
-                final String serviceStates = exe.RunAsRootOutput(checkCmd);
-                final String finalCheckBootStates = checkBootStates;
-                servicesList.post(() -> servicesList.setAdapter(new KaliServicesLoader(context, serviceStates, finalCheckBootStates, KaliServices, bootScriptPath)));
+                    }
+                });
+                final AlertDialog adBackup = adbBackup.create();
+                adBackup.setOnShowListener(new DialogInterface.OnShowListener() {
+                    @Override
+                    public void onShow(final DialogInterface dialog) {
+                        final Button buttonOK = adBackup.getButton(DialogInterface.BUTTON_POSITIVE);
+                        buttonOK.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if (kaliServicesSQL.backupData(storedpathEditText.getText().toString())){
+                                    dialog.dismiss();
+                                }
+                            }
+                        });
+                    }
+                });
+                adBackup.show();
+                break;
+            case R.id.f_kaliservices_menu_restoreDB:
+                titleTextView.setText("Full path of the db file from where you want to restore:");
+                storedpathEditText.setText(NhPaths.APP_SD_SQLBACKUP_PATH + "/FragmentKaliService");
+                final AlertDialog.Builder adbRestore = new AlertDialog.Builder(activity);
+                adbRestore.setView(promptView);
+                adbRestore.setCancelable(true);
+                adbRestore.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                adbRestore.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                final AlertDialog adRestore = adbRestore.create();
+                adRestore.setOnShowListener(new DialogInterface.OnShowListener() {
+                    @Override
+                    public void onShow(final DialogInterface dialog) {
+                        final Button buttonOK = adRestore.getButton(DialogInterface.BUTTON_POSITIVE);
+                        buttonOK.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if (kaliServicesSQL.restoreData(storedpathEditText.getText().toString())){
+                                    kaliServicesAsyncTask = new KaliServicesAsyncTask(KaliServicesAsyncTask.CHECK_SERVICE);
+                                    kaliServicesAsyncTask.setListener(new KaliServicesAsyncTask.KaliServiceTaskListener() {
+                                        @Override
+                                        public void onAsyncTaskPrepare() {
+                                            kaliServicesData.resetService(kaliServicesSQL.getData());
+                                        }
+
+                                        @Override
+                                        public void onAsyncTaskFinished() {
+                                            dialog.dismiss();
+                                            kaliServiceRecycleViewAdapterTitles.notifyDataSetChanged();
+                                        }
+                                    });
+                                    kaliServicesAsyncTask.execute(kaliServicesData);
+                                }
+                            }
+                        });
+                    }
+                });
+                adRestore.show();
+                break;
+            case R.id.f_kaliservices_menu_ResetToDefault:
+                kaliServicesAsyncTask = new KaliServicesAsyncTask(KaliServicesAsyncTask.RESET_SERVICE);
+                kaliServicesAsyncTask.setListener(new KaliServicesAsyncTask.KaliServiceTaskListener() {
+                    @Override
+                    public void onAsyncTaskPrepare() {
+
+                    }
+
+                    @Override
+                    public void onAsyncTaskFinished() {
+                        kaliServiceRecycleViewAdapterTitles.notifyDataSetChanged();
+                    }
+                });
+                kaliServicesAsyncTask.execute(kaliServicesData, kaliServicesSQL);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        kaliServicesAsyncTask = new KaliServicesAsyncTask(KaliServicesAsyncTask.CHECK_SERVICE);
+        kaliServicesAsyncTask.setListener(new KaliServicesAsyncTask.KaliServiceTaskListener() {
+            @Override
+            public void onAsyncTaskPrepare() {
 
             }
-        }).start();
-    }
 
-}
-
-
-// This class is the main for the services
-
-
-class KaliServicesLoader extends BaseAdapter {
-
-    private final Context mContext;
-    private final String[] _serviceStates;
-    private final String[] _serviceBootStates;
-    private final String[][] services;
-    private final String bootScriptPath;
-    private final String shebang;
-    private final ShellExecuter exe = new ShellExecuter();
-
-
-    KaliServicesLoader(Context context, String serviceStates, String bootStates, String[][] KaliServices, String _bootScriptPath) {
-
-        mContext = context;
-
-        services = KaliServices;
-        _serviceStates = serviceStates.split("(?!^)");
-        _serviceBootStates = bootStates.split("(?!^)");
-
-        bootScriptPath = _bootScriptPath;
-        shebang = "#!/system/bin/sh\n\n# Init at boot kaliSevice: ";
-
-    }
-
-    private static class ViewHolderItem {
-        // The switch
-        Switch sw;
-        // the msg holder
-        TextView swholder;
-        // the service title
-        TextView swTitle;
-        // run at boot checkbox
-        CheckBox swBootCheckbox;
-    }
-
-    public int getCount() {
-        // return the number of services
-        return services.length;
-    }
-
-    private void addBootService(int serviceId) {
-        String bootServiceFile = bootScriptPath + "/" + services[serviceId][4];
-        String fileContents = shebang + services[serviceId][0] + "\n" + services[serviceId][2];
-        Log.d("bootScript", fileContents);
-        exe.RunAsRoot(new String[]{
-                "cat > " + bootServiceFile + " <<s0133717hur75\n" + fileContents + "\ns0133717hur75\n",
-                "chmod 700 " + bootServiceFile
-        });
-
-        // return the number of services
-
-    }
-
-    private void removeBootService(int serviceId) {
-        // return the number of services
-        String bootServiceFile = bootScriptPath + "/" + services[serviceId][4];
-        exe.RunAsRoot(new String[]{"rm -rf " + bootServiceFile});
-    }
-
-    // getView method is called for each item of ListView
-    public View getView(final int position, View convertView, ViewGroup parent) {
-        // inflate the layout for each item of listView (our services)
-
-        ViewHolderItem vH;
-
-        if (convertView == null) {
-            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.kali_services_item, parent, false);
-
-            // set up the ViewHolder
-            vH = new ViewHolderItem();
-            // get the reference of switch and the text view
-            vH.swTitle = convertView.findViewById(R.id.switchTitle);
-            vH.sw = convertView.findViewById(R.id.switch1);
-            vH.swholder = convertView.findViewById(R.id.switchHolder);
-            vH.swBootCheckbox = convertView.findViewById(R.id.initAtBoot);
-            convertView.setTag(vH);
-            //System.out.println ("created row");
-        } else {
-            // recycle the items in the list is already exists
-            vH = (ViewHolderItem) convertView.getTag();
-        }
-        if (position >= _serviceStates.length) {
-            // out of range, return ,do nothing
-            return convertView;
-        }
-        // remove listeners
-        vH.sw.setOnCheckedChangeListener(null);
-        vH.swBootCheckbox.setOnCheckedChangeListener(null);
-        // set service name
-        vH.swTitle.setText(services[position][0]);
-        // clear state
-        vH.sw.setChecked(false);
-        vH.swBootCheckbox.setChecked(false);
-        // check it
-
-        // running services
-        if (_serviceStates[position].equals("1")) {
-            vH.sw.setChecked(true);
-            vH.swTitle.setTextColor(mContext.getResources().getColor(R.color.blue));
-            vH.swholder.setText(services[position][0] + " Service is UP");
-            vH.swholder.setTextColor(mContext.getResources().getColor(R.color.blue));
-        } else {
-            vH.sw.setChecked(false);
-
-            vH.swTitle.setTextColor(mContext.getResources().getColor(R.color.clearTitle));
-            vH.swholder.setText(services[position][0] + " Service is DOWN");
-            vH.swholder.setTextColor(mContext.getResources().getColor(R.color.clearText));
-        }
-        // services enabled at boot
-        if (_serviceBootStates[position].equals("1")) {
-            // is enabled
-            vH.swBootCheckbox.setChecked(true);
-            vH.swBootCheckbox.setTextColor(mContext.getResources().getColor(R.color.blue));
-        } else {
-            // is not :)
-            vH.swBootCheckbox.setChecked(false);
-            vH.swBootCheckbox.setTextColor(mContext.getResources().getColor(R.color.clearTitle));
-        }
-
-        // add listeners
-        final ViewHolderItem finalVH = vH;
-        vH.sw.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                new Thread(() -> exe.RunAsRoot(new String[]{services[position][2]})).start();
-                _serviceStates[position] = "1";
-                finalVH.swholder.setText(services[position][0] + " Service Started");
-                finalVH.swTitle.setTextColor(mContext.getResources().getColor(R.color.blue));
-                finalVH.swholder.setTextColor(mContext.getResources().getColor(R.color.blue));
-
-            } else {
-                new Thread(() -> exe.RunAsRoot(new String[]{services[position][3]})).start();
-                _serviceStates[position] = "0";
-                finalVH.swholder.setText(services[position][0] + " Service Stopped");
-                finalVH.swTitle.setTextColor(mContext.getResources().getColor(R.color.clearTitle));
-                finalVH.swholder.setTextColor(mContext.getResources().getColor(R.color.clearText));
-
+            @Override
+            public void onAsyncTaskFinished() {
+                kaliServiceRecycleViewAdapterTitles.notifyDataSetChanged();
             }
         });
-        vH.swBootCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked) {
-                new Thread(() -> {
-                    Log.d("bootservice", "ADD " + services[position][4]);
-                    addBootService(position);
-                }).start();
-                _serviceBootStates[position] = "1";
-                finalVH.swBootCheckbox.setTextColor(mContext.getResources().getColor(R.color.blue));
-            } else {
-                new Thread(() -> {
-                    Log.d("bootservice", "REMOVE " + services[position][4]);
-                    removeBootService(position);
-                }).start();
-                _serviceBootStates[position] = "0";
-                finalVH.swBootCheckbox.setTextColor(mContext.getResources().getColor(R.color.clearTitle));
+        kaliServicesAsyncTask.execute(kaliServicesData);
+    }
 
+    private void onRefreshItemSetup(){
+        refreshButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                kaliServicesAsyncTask = new KaliServicesAsyncTask(KaliServicesAsyncTask.CHECK_SERVICE);
+                kaliServicesAsyncTask.setListener(new KaliServicesAsyncTask.KaliServiceTaskListener() {
+                    @Override
+                    public void onAsyncTaskPrepare() {
+                        setAllButtonDisable(false);
+                    }
+
+                    @Override
+                    public void onAsyncTaskFinished() {
+                        kaliServiceRecycleViewAdapterTitles.notifyDataSetChanged();
+                        setAllButtonDisable(true);
+                    }
+                });
+                kaliServicesAsyncTask.execute(kaliServicesData);
             }
         });
-        return convertView;
     }
 
-    public String[] getItem(int position) {
+    private void onAddItemSetup(){
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                final View promptViewAdd = inflater.inflate(R.layout.kaliservices_add_dialog_view, null);
+                final EditText titleEditText = promptViewAdd.findViewById(R.id.f_kaliservices_add_adb_et_title);
+                final EditText startCmdEditText = promptViewAdd.findViewById(R.id.f_kaliservices_add_adb_et_startcommand);
+                final EditText stopCmdEditText = promptViewAdd.findViewById(R.id.f_kaliservices_add_adb_et_stopcommand);
+                final EditText checkstatusEditText = promptViewAdd.findViewById(R.id.f_kaliservices_add_adb_et_checkstatuscommand);
+                final CheckBox runOnBootCheckbox = promptViewAdd.findViewById(R.id.f_kaliservices_add_adb_checkbox_runonboot);
+                final FloatingActionButton readmeButton1 = promptViewAdd.findViewById(R.id.f_kaliservices_add_btn_info_fab1);
+                final FloatingActionButton readmeButton2 = promptViewAdd.findViewById(R.id.f_kaliservices_add_btn_info_fab2);
+                final FloatingActionButton readmeButton3 = promptViewAdd.findViewById(R.id.f_kaliservices_add_btn_info_fab3);
+                final FloatingActionButton readmeButton4 = promptViewAdd.findViewById(R.id.f_kaliservices_add_btn_info_fab4);
+                final Spinner insertPositions = promptViewAdd.findViewById(R.id.f_kaliservices_add_adb_spr_positions);
+                final Spinner insertTitles = promptViewAdd.findViewById(R.id.f_kaliservices_add_adb_spr_titles);
+                final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, kaliServicesData.ServiceName);
+                arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-        return services[position];
+                startCmdEditText.setText("service <servicename> start");
+                stopCmdEditText.setText("service <servicename> stop");
+                checkstatusEditText.setText("<servicename>");
+
+                readmeButton1.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        AlertDialog.Builder adb = new AlertDialog.Builder(activity);
+                        adb.setTitle("HOW TO USE:")
+                                .setMessage(getString(R.string.kaliservices_howto_startservice))
+                                .setNegativeButton("Close", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.dismiss();
+                                    }
+                                });
+                        AlertDialog ad = adb.create();
+                        ad.setCancelable(true);
+                        ad.show();
+                    }
+                });
+
+                readmeButton2.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        AlertDialog.Builder adb = new AlertDialog.Builder(activity);
+                        adb.setTitle("HOW TO USE:")
+                                .setMessage(getString(R.string.kaliservices_howto_stopservice))
+                                .setNegativeButton("Close", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.dismiss();
+                                    }
+                                });
+                        AlertDialog ad = adb.create();
+                        ad.setCancelable(true);
+                        ad.show();
+                    }
+                });
+
+                readmeButton3.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        AlertDialog.Builder adb = new AlertDialog.Builder(activity);
+                        adb.setTitle("HOW TO USE:")
+                                .setMessage(getString(R.string.kaliservices_howto_checkservice))
+                                .setNegativeButton("Close", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.dismiss();
+                                    }
+                                });
+                        AlertDialog ad = adb.create();
+                        ad.setCancelable(true);
+                        ad.show();
+                    }
+                });
+
+                readmeButton4.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        AlertDialog.Builder adb = new AlertDialog.Builder(activity);
+                        adb.setTitle("HOW TO USE:")
+                                .setMessage(getString(R.string.kaliservices_howto_runServiceOnBoot))
+                                .setNegativeButton("Close", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.dismiss();
+                                    }
+                                });
+                        AlertDialog ad = adb.create();
+                        ad.setCancelable(true);
+                        ad.show();
+                    }
+                });
+
+                insertPositions.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        //if Insert to Top
+                        if (position == 0) {
+                            insertTitles.setVisibility(View.INVISIBLE);
+                            targetPositionId = 1;
+                            //if Insert to Bottom
+                        } else if (position == 1) {
+                            insertTitles.setVisibility(View.INVISIBLE);
+                            targetPositionId = kaliServicesData.ServiceName.size() + 1;
+                            //if Insert Before
+                        } else if (position == 2) {
+                            insertTitles.setVisibility(View.VISIBLE);
+                            insertTitles.setAdapter(arrayAdapter);
+                            insertTitles.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                @Override
+                                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                                    targetPositionId = position + 1;
+                                }
+                                @Override
+                                public void onNothingSelected(AdapterView<?> parent) {
+
+                                }
+                            });
+                            //if Insert After
+                        } else {
+                            insertTitles.setVisibility(View.VISIBLE);
+                            insertTitles.setAdapter(arrayAdapter);
+                            insertTitles.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                @Override
+                                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                                    targetPositionId = position + 2;
+                                }
+                                @Override
+                                public void onNothingSelected(AdapterView<?> parent) {
+
+                                }
+                            });
+                        }
+                    }
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                final AlertDialog.Builder adbAdd = new AlertDialog.Builder(activity);
+                adbAdd.setView(promptViewAdd);
+                adbAdd.setCancelable(true);
+                adbAdd.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                adbAdd.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+
+                //If you want the dialog to stay open after clicking OK, you need to do it this way...
+                final AlertDialog adAdd = adbAdd.create();
+                adAdd.setOnShowListener(new DialogInterface.OnShowListener() {
+                    @Override
+                    public void onShow(DialogInterface dialog) {
+                        final Button buttonAdd = adAdd.getButton(DialogInterface.BUTTON_POSITIVE);
+                        final ArrayList<String> tempData = new ArrayList<>();
+                        buttonAdd.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if (titleEditText.getText().toString().isEmpty()){
+                                    NhPaths.showMessage(context, "Title cannot be empty");
+                                } else if (startCmdEditText.getText().toString().isEmpty()){
+                                    NhPaths.showMessage(context, "Start Command cannot be empty");
+                                } else if (stopCmdEditText.getText().toString().isEmpty()){
+                                    NhPaths.showMessage(context, "Stop Command cannot be empty");
+                                } else if (checkstatusEditText.getText().toString().isEmpty()){
+                                    NhPaths.showMessage(context, "Check Status Command cannot be empty");
+                                } else {
+                                    kaliServicesAsyncTask = new KaliServicesAsyncTask(KaliServicesAsyncTask.ADD_SERVICE);
+                                    kaliServicesAsyncTask.setListener(new KaliServicesAsyncTask.KaliServiceTaskListener() {
+                                        @Override
+                                        public void onAsyncTaskPrepare() {
+                                            tempData.add(Integer.toString(targetPositionId));
+                                            tempData.add(titleEditText.getText().toString());
+                                            tempData.add(startCmdEditText.getText().toString());
+                                            tempData.add(stopCmdEditText.getText().toString());
+                                            tempData.add(checkstatusEditText.getText().toString());
+                                            tempData.add(runOnBootCheckbox.isChecked()?"1":"0");
+                                            kaliServicesSQL.addData(targetPositionId, tempData);
+                                        }
+
+                                        @Override
+                                        public void onAsyncTaskFinished() {
+                                            kaliServiceRecycleViewAdapterTitles.notifyDataSetChanged();
+                                            NhPaths.showMessage(context, "Successfully added.");
+                                            adAdd.dismiss();
+                                        }
+                                    });
+                                    kaliServicesAsyncTask.execute(kaliServicesData, targetPositionId -1, tempData);
+                                }
+                            }
+                        });
+                    }
+                });
+                adAdd.show();
+            }
+        });
     }
 
-    public long getItemId(int position) {
+    private void onDeleteItemSetup(){
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                final View promptViewDelete = inflater.inflate(R.layout.kaliservices_delete_dialog_view, null, false);
+                final RecyclerView recyclerViewDeleteItem = promptViewDelete.findViewById(R.id.f_kaliservices_delete_recycleview);
+                final KaliServicesRecycleViewAdapterDeleteItems kaliServicesRecycleViewAdapterDeleteItems = new KaliServicesRecycleViewAdapterDeleteItems(context, kaliServicesData);
 
-        return position;
+                LinearLayoutManager linearLayoutManagerDelete = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
+                recyclerViewDeleteItem.setLayoutManager(linearLayoutManagerDelete);
+                recyclerViewDeleteItem.setAdapter(kaliServicesRecycleViewAdapterDeleteItems);
+
+                final AlertDialog.Builder adbDelete = new AlertDialog.Builder(activity);
+                adbDelete.setMessage("Select the service you want to remove: ");
+                adbDelete.setView(promptViewDelete);
+                adbDelete.setCancelable(true);
+                adbDelete.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                adbDelete.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                //If you want the dialog to stay open after clicking OK, you need to do it this way...
+                final AlertDialog adDelete = adbDelete.create();
+                adDelete.setOnShowListener(new DialogInterface.OnShowListener() {
+                    @Override
+                    public void onShow(DialogInterface dialog) {
+                        final Button buttonDelete = adDelete.getButton(DialogInterface.BUTTON_POSITIVE);
+                        buttonDelete.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                RecyclerView.ViewHolder viewHolder;
+                                ArrayList<Integer> selectedPosition = new ArrayList<>();
+                                ArrayList<Integer> selectedTargetIds = new ArrayList<>();
+                                for (int i = 0; i < recyclerViewDeleteItem.getChildCount(); i++) {
+                                    viewHolder = recyclerViewDeleteItem.findViewHolderForAdapterPosition(i);
+                                    if (viewHolder != null){
+                                        CheckBox box = viewHolder.itemView.findViewById(R.id.f_kaliservices_recycleview_dialog_chkbox);
+                                        if (box.isChecked()){
+                                            selectedPosition.add(i);
+                                            selectedTargetIds.add(i+1);
+                                        }
+                                    }
+                                }
+                                if (selectedPosition.size() != 0) {
+                                    kaliServicesSQL.deleteData(selectedTargetIds);
+                                    kaliServicesData.deleteService(selectedPosition);
+                                    kaliServiceRecycleViewAdapterTitles.notifyDataSetChanged();
+                                    NhPaths.showMessage(context, "Successfully deleted " + selectedPosition.size() + " items.");
+                                    adDelete.dismiss();
+                                } else NhPaths.showMessage(context, "Nothing to be deleted.");
+                            }
+                        });
+                    }
+                });
+                adDelete.show();
+            }
+        });
+    }
+
+    private void onMoveItemSetup(){
+        moveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                final View promptViewMove = inflater.inflate(R.layout.kaliservices_move_dialog_view, null, false);
+                final Spinner titlesBefore = promptViewMove.findViewById(R.id.f_kaliservices_move_adb_spr_titlesbefore);
+                final Spinner titlesAfter = promptViewMove.findViewById(R.id.f_kaliservices_move_adb_spr_titlesafter);
+                final Spinner actions = promptViewMove.findViewById(R.id.f_kaliservices_move_adb_spr_actions);
+                final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, kaliServicesData.ServiceName);
+                arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                titlesBefore.setAdapter(arrayAdapter);
+                titlesAfter.setAdapter(arrayAdapter);
+                final AlertDialog.Builder adbMove = new AlertDialog.Builder(activity);
+                adbMove.setView(promptViewMove);
+                adbMove.setCancelable(true);
+                adbMove.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                adbMove.setPositiveButton("Move", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                final AlertDialog adMove = adbMove.create();
+                adMove.setOnShowListener(new DialogInterface.OnShowListener() {
+                    @Override
+                    public void onShow(DialogInterface dialog) {
+                        final Button buttonMove = adMove.getButton(DialogInterface.BUTTON_POSITIVE);
+                        buttonMove.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                int originalPositionIndex = titlesBefore.getSelectedItemPosition();
+                                int targetPositionIndex = titlesAfter.getSelectedItemPosition();
+                                if (originalPositionIndex == targetPositionIndex ||
+                                        (actions.getSelectedItemPosition() == 0 && targetPositionIndex == (originalPositionIndex + 1)) ||
+                                        (actions.getSelectedItemPosition() == 1 && targetPositionIndex == (originalPositionIndex - 1))) {
+                                    NhPaths.showMessage(context, "You are moving the item to the same position, nothing to be moved.");
+                                } else {
+                                    if (actions.getSelectedItemPosition() == 1) targetPositionIndex += 1;
+                                    kaliServicesSQL.moveData(originalPositionIndex, targetPositionIndex);
+                                    kaliServicesData.moveService(originalPositionIndex, targetPositionIndex);
+                                    kaliServiceRecycleViewAdapterTitles.notifyDataSetChanged();
+                                    NhPaths.showMessage(context, "Successfully moved item.");
+                                    adMove.dismiss();
+                                }
+                            }
+                        });
+                    }
+                });
+                adMove.show();
+            }
+        });
+    }
+
+    private void setAllButtonDisable(boolean needToEnable) {
+        refreshButton.setEnabled(needToEnable);
+        addButton.setEnabled(needToEnable);
+        deleteButton.setEnabled(needToEnable);
+        moveButton.setEnabled(needToEnable);
     }
 }

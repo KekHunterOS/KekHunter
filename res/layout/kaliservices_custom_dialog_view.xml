@@ -16,13 +16,13 @@
         android:layout_marginTop="20dp">
 
         <TextView
-            android:id="@+id/f_kaliservice_adb_tv_title1"
+            android:id="@+id/f_kaliservices_adb_tv_title1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"/>
 
         <EditText
-            android:id="@+id/f_kaliservice_adb_et_storedpath"
+            android:id="@+id/f_kaliservices_adb_et_storedpath"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"/>

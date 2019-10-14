@@ -152,7 +152,7 @@ public class NetHunterFragment extends Fragment {
             String busybox_ver = NhPaths.BUSYBOX;
 
             ShellExecuter exe = new ShellExecuter();
-            String commandNET[] = {"sh", "-c", "ip -o addr show | busybox awk '/inet/ {print $2, $3, $4}'"};
+            String commandNET[] = {"sh", "-c", "ip addr | awk '/inet/ {print $2, $7}'"};
             String commandHID[] = {"sh", "-c", "ls /dev/hidg*"};
             String commandBUSYBOX[] = {"sh", "-c", busybox_ver + " | " + busybox_ver + " head -1 | " + busybox_ver + " awk '{print $2}'"};
             String commandKERNELVER[] = {"sh", "-c", "cat /proc/version"};

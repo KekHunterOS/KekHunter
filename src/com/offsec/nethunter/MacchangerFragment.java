@@ -39,7 +39,6 @@ import androidx.fragment.app.Fragment;
 
 public class MacchangerFragment extends Fragment {
 
-
     private SharedPreferences sharedpreferences;
     private static final String ARG_SECTION_NUMBER = "section_number";
     private ShellExecuter exe;
@@ -55,40 +54,6 @@ public class MacchangerFragment extends Fragment {
         args.putInt(ARG_SECTION_NUMBER, sectionNumber);
         fragment.setArguments(args);
         return fragment;
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.macchanger, menu);
-
-    }
-
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        if (getView() == null) {
-            return;
-        }
-        View v = getView();
-        final Spinner interfaceSpinner = v.findViewById(R.id.interface_opts);
-        String selectedInterface = interfaceSpinner.getSelectedItem().toString();
-        String cleanInterface = selectedInterface.split(" ")[0];
-        menu.findItem(R.id.reset_mac).setTitle(String.format("Reset %s MAC", cleanInterface));
-
-
-    }
-
-    // menu options
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        switch (item.getItemId()) {
-            case R.id.reset_mac:
-                resetMac();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 
     @Override
@@ -110,6 +75,7 @@ public class MacchangerFragment extends Fragment {
         final Button setMacButton = rootView.findViewById(R.id.set_mac_button);
         final Button setHostname = rootView.findViewById(R.id.setHostname);
         final EditText phoneName = rootView.findViewById(R.id.phone_nameText);
+
         if (isOPO() && !sharedpreferences.contains("opo_original_mac")) {
             Editor editor = sharedpreferences.edit();
             editor.putString("opo_original_mac", exe.RunAsRootWithException("cat /sys/devices/fb000000.qcom,wcnss-wlan/wcnss_mac_addr"));
@@ -349,6 +315,40 @@ public class MacchangerFragment extends Fragment {
         });
 
         return rootView;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.macchanger, menu);
+
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        if (getView() == null) {
+            return;
+        }
+        View v = getView();
+        final Spinner interfaceSpinner = v.findViewById(R.id.interface_opts);
+        String selectedInterface = interfaceSpinner.getSelectedItem().toString();
+        String cleanInterface = selectedInterface.split(" ")[0];
+        menu.findItem(R.id.reset_mac).setTitle(String.format("Reset %s MAC", cleanInterface));
+
+
+    }
+
+    // menu options
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.reset_mac:
+                resetMac();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private String[] delFromArray(String[] originalArr, int itemid) {

@@ -12,10 +12,15 @@
     <string name="nethunter_kernelver_detect">Kernel Version</string>
     <string name="nethunter_terminal_detect">Nethunter Terminal Status</string>
 
-
-    <string name="kali_services_description">Various Kali network services can be started and stopped via the buttons in this part of the interface.</string>
     <string name="hid_powersploit_description">The Powersploit payload provides you a choice of reverse meterpreter HTTP/S payloads. "URL to payload" should be a URL accessible to the victim machine where the larger payload is downloaded to.</string>
     <string name="hid_windows_cmd_description">This Windows CMD payload allows you to enter raw commands to a Windows command prompt. Hitting the list menu will allow you to choose keyboard layout or UAC bypass options. </string>
+
+    <!-- KaliServices -->
+    <string name="kali_services_description">Various Kali network services can be started and stopped via the buttons in this part of the interface.</string>
+    <string name="kaliservices_howto_startservice">To START a service in kali, a command will be run INSIDE KaliChroot that looks like this:\n\nbusybox chroot &lt;chroot_folder> /bin/bash -c \'&lt;command_to_start_service>\'\n\nService is considered STARTED if the return value is 0 and vice versa.</string>
+    <string name="kaliservices_howto_stopservice">To STOP a service in kali, a command will be run INSIDE KaliChroot that looks like this:\n\nbusybox chroot &lt;chroot_folder> /bin/bash -c \'&lt;command_to_stop_service>\'\n\nService is considered STOPPED if the return value is 0 and vice versa.</string>
+    <string name="kaliservices_howto_checkservice">To Check if a service in kali is up or not, a command will be run OUTSIDE KaliChroot that looks like this:\n\nbusybox ps -o pid,comm | grep \'&lt;service_name>\'\n\nService is considered UP if the return value is 0 and vice versa.</string>
+    <string name="kaliservices_howto_runServiceOnBoot">To automacticailly start the service after Kali Chroot is up, check this option.</string>
 
 
     <string name="badusb_label">BadUSB MITM Attack</string>
@@ -85,6 +90,7 @@
     <string name="choose_language">Keyboard Layout</string>
     <string name="reset_usb">Reset USB</string>
 
+    <!-- Macchanger -->
     <string name="iface">Interface</string>
     <string name="payload">Payload</string>
     <string name="loading_service">Loading service state</string>
@@ -124,6 +130,8 @@
         <item>rndis0 (USB > Ethernet)</item>
         <item>usb0 (USB > Ethernet Nexus7 2013 when tethering | badusb)</item>
     </string-array>
+
+    <!-- USB Army(Not in use yet) -->
     <string-array name="usb_states">
         <item>Reset</item>
         <item>mtp,hid</item>
@@ -423,4 +431,19 @@
     <string name="boot_notification_channel">Boot</string>
     <string name="boot_notification_channel_description">Notification for run at boot services</string>
 
+    <!--Custom Spinner Array-->
+    <string-array name="array_move_position">
+        <item>Before:</item>
+        <item>After:</item>
+    </string-array>
+
+    <string-array name="array_insert_position">
+        <item>Insert to Top</item>
+        <item>Insert to Bottom</item>
+        <item>Insert Before:</item>
+        <item>Insert After:</item>
+    </string-array>
+
+    <!-- dummy_accessibility_service -->
+    <string name="dummy_accessibility_service">dummy_accessibility_service</string>
 </resources>

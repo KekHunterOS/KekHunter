@@ -9,14 +9,14 @@
     android:layout_marginEnd="5dp"
     android:layout_marginRight="5dp"
     android:layout_marginTop="5dp"
-    android:id="@+id/fragment_kaliservice_delete_dialog_view">
+    android:id="@+id/fragment_kaliservices_delete_dialog_view">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/f_kaliservice_delete_recycleview"
+            android:id="@+id/f_kaliservices_delete_recycleview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
         </androidx.recyclerview.widget.RecyclerView>
