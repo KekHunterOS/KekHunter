@@ -33,12 +33,10 @@ public class NethunterRecyclerViewAdapter extends RecyclerView.Adapter<Nethunter
     private static final String TAG = "NethunterRecyclerView";
     private Context context;
     private List<NethunterModel> nethunterModelList;
-    private NethunterSQL nethunterSQL;
 
     public NethunterRecyclerViewAdapter(Context context, List<NethunterModel> nethunterModelList) {
         this.context = context;
         this.nethunterModelList = nethunterModelList;
-        this.nethunterSQL = new NethunterSQL(context);
     }
 
     @NonNull
@@ -53,8 +51,7 @@ public class NethunterRecyclerViewAdapter extends RecyclerView.Adapter<Nethunter
         holder.titleTextView.setText(nethunterModelList.get(position).getTitle());
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
         holder.resultRecyclerView.setLayoutManager(linearLayoutManager);
-        NethunterRecyclerViewAdapterResult nethunterRecyclerViewAdapterResult = new NethunterRecyclerViewAdapterResult(context, nethunterModelList.get(position).getResult());
-        holder.resultRecyclerView.setAdapter(nethunterRecyclerViewAdapterResult);
+        holder.resultRecyclerView.setAdapter(new NethunterRecyclerViewAdapterResult(context, nethunterModelList.get(position).getResult()));
         holder.runButton.setOnClickListener(v -> NethunterData.getInstance().runCommandforItem(position));
         holder.editButton.setOnClickListener(v -> {
             final LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -119,7 +116,7 @@ public class NethunterRecyclerViewAdapter extends RecyclerView.Adapter<Nethunter
                 dataArrayList.add(delimiterEditText.getText().toString());
                 dataArrayList.add(runOnCreateCheckbox.isChecked()?"1":"0");
                 NethunterData.getInstance().editData(NethunterData.getInstance().nethunterModelListFull.indexOf(
-                        nethunterModelList.get(position)), dataArrayList, nethunterSQL);
+                        nethunterModelList.get(position)), dataArrayList, NethunterSQL.getInstance(context));
             });
             ad.show();
         });

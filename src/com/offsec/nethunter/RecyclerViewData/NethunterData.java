@@ -29,6 +29,7 @@ public class NethunterData {
     private ArrayList<NethunterModel> nethunterModelArrayList = new ArrayList<>();
     private MutableLiveData<List<NethunterModel>> data = new MutableLiveData<>();
     public List<NethunterModel> nethunterModelListFull;
+    private List<NethunterModel> copyOfNethunterModelListFull = new ArrayList<>();
 
     public synchronized static NethunterData getInstance(){
         if (instance == null) {
@@ -39,7 +40,7 @@ public class NethunterData {
 
     public MutableLiveData<List<NethunterModel>> getNethunterModels(Context context){
         if (!isDataInitiated) {
-            data.setValue(new NethunterSQL(context).bindData(nethunterModelArrayList));
+            data.setValue(NethunterSQL.getInstance(context).bindData(nethunterModelArrayList));
             nethunterModelListFull = new ArrayList<>(data.getValue());
             isDataInitiated = true;
         }
@@ -65,7 +66,7 @@ public class NethunterData {
                 getNethunterModels().postValue(getNethunterModels().getValue());
             }
         });
-        nethunterAsynctask.execute(new ArrayList<>(nethunterModelListFull));
+        nethunterAsynctask.execute(getInitCopyOfNethunterModelListFull());
     }
 
     public void runCommandforItem(int position){
@@ -83,7 +84,7 @@ public class NethunterData {
                 getNethunterModels().postValue(getNethunterModels().getValue());
             }
         });
-        nethunterAsynctask.execute(new ArrayList<>(nethunterModelListFull));
+        nethunterAsynctask.execute(getInitCopyOfNethunterModelListFull());
     }
 
     public void editData(int position, ArrayList<String> dataArrayList, NethunterSQL nethunterSQL){
@@ -101,7 +102,7 @@ public class NethunterData {
                 getNethunterModels().postValue(getNethunterModels().getValue());
             }
         });
-        nethunterAsynctask.execute(new ArrayList<>(nethunterModelListFull));
+        nethunterAsynctask.execute(getInitCopyOfNethunterModelListFull());
     }
 
     public void addData(int position, ArrayList<String> dataArrayList, NethunterSQL nethunterSQL){
@@ -119,7 +120,7 @@ public class NethunterData {
                 getNethunterModels().postValue(getNethunterModels().getValue());
             }
         });
-        nethunterAsynctask.execute(new ArrayList<>(nethunterModelListFull));
+        nethunterAsynctask.execute(getInitCopyOfNethunterModelListFull());
     }
 
     public void deleteData(ArrayList<Integer> selectedPositionsIndex, ArrayList<Integer> selectedTargetIds, NethunterSQL nethunterSQL){
@@ -137,7 +138,7 @@ public class NethunterData {
                 getNethunterModels().postValue(getNethunterModels().getValue());
             }
         });
-        nethunterAsynctask.execute(new ArrayList<>(nethunterModelListFull));
+        nethunterAsynctask.execute(getInitCopyOfNethunterModelListFull());
     }
 
     public void moveData(int originalPositionIndex, int targetPositionIndex, NethunterSQL nethunterSQL){
@@ -155,15 +156,16 @@ public class NethunterData {
                 getNethunterModels().postValue(getNethunterModels().getValue());
             }
         });
-        nethunterAsynctask.execute(new ArrayList<>(nethunterModelListFull));
+        nethunterAsynctask.execute(getInitCopyOfNethunterModelListFull());
     }
 
-    public void backupData(NethunterSQL nethunterSQL, String storedDBpath){
-        nethunterSQL.backupData(storedDBpath);
+    public String backupData(NethunterSQL nethunterSQL, String storedDBpath){
+        return nethunterSQL.backupData(storedDBpath);
     }
 
-    public void restoreData(NethunterSQL nethunterSQL, String storedDBpath){
-        if (nethunterSQL.restoreData(storedDBpath)){
+    public String restoreData(NethunterSQL nethunterSQL, String storedDBpath){
+        String returnedResult = nethunterSQL.restoreData(storedDBpath);
+        if (returnedResult == null){
             NethunterAsynctask nethunterAsynctask = new NethunterAsynctask(NethunterAsynctask.RESTOREDATA, nethunterSQL);
             nethunterAsynctask.setListener(new NethunterAsynctask.NethunterAsynctaskListener() {
                 @Override
@@ -179,7 +181,10 @@ public class NethunterData {
                     refreshData();
                 }
             });
-            nethunterAsynctask.execute(new ArrayList<>(nethunterModelListFull));
+            nethunterAsynctask.execute(getInitCopyOfNethunterModelListFull());
+            return null;
+        } else {
+            return returnedResult;
         }
     }
 
@@ -200,12 +205,18 @@ public class NethunterData {
                 refreshData();
             }
         });
-        nethunterAsynctask.execute(new ArrayList<>(nethunterModelListFull));
+        nethunterAsynctask.execute(getInitCopyOfNethunterModelListFull());
     }
 
     public void updateNethunterModelListFull(List<NethunterModel> copyOfNethunterModelList){
         nethunterModelListFull.clear();
         nethunterModelListFull.addAll(copyOfNethunterModelList);
+    }
+
+    private List<NethunterModel> getInitCopyOfNethunterModelListFull(){
+        copyOfNethunterModelListFull.clear();
+        copyOfNethunterModelListFull.addAll(nethunterModelListFull);
+        return copyOfNethunterModelListFull;
     }
 
 }

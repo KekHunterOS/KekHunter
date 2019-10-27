@@ -48,7 +48,6 @@ public class NetHunterFragment extends Fragment {
     private RecyclerView itemRecyclerView;
     private NethunterRecyclerViewAdapter nethunterRecyclerViewAdapter;
     private NethunterViewModel nethunterViewModel;
-    private NethunterSQL nethunterSQL;
     private Button refreshButton;
     private Button addButton;
     private Button deleteButton;
@@ -62,14 +61,14 @@ public class NetHunterFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
-
-
+    
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         this.context = getContext();
         this.activity = getActivity();
+        NethunterSQL.getInstance(context.getApplicationContext());
     }
 
     @Nullable
@@ -80,7 +79,6 @@ public class NetHunterFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        nethunterSQL = new NethunterSQL(context);
         nethunterViewModel = ViewModelProviders.of(this).get(NethunterViewModel.class);
         nethunterViewModel.init(context);
         nethunterViewModel.getLiveDataNethunterModelList().observe(this, nethunterModelList -> {
@@ -144,7 +142,13 @@ public class NetHunterFragment extends Fragment {
                 adBackup.setOnShowListener(dialog -> {
                     final Button buttonOK = adBackup.getButton(DialogInterface.BUTTON_POSITIVE);
                     buttonOK.setOnClickListener(v -> {
-                        NethunterData.getInstance().backupData(nethunterSQL, storedpathEditText.getText().toString());
+                        String returnedResult = NethunterData.getInstance().backupData(NethunterSQL.getInstance(context), storedpathEditText.getText().toString());
+                        if (returnedResult == null){
+                            NhPaths.showMessage(context, "db is successfully backup to " + storedpathEditText.getText().toString());
+                        } else {
+                            dialog.dismiss();
+                            new AlertDialog.Builder(context).setTitle("Failed to backup the DB.").setMessage(returnedResult).create().show();
+                        }
                         dialog.dismiss();
                     });
                 });
@@ -161,14 +165,20 @@ public class NetHunterFragment extends Fragment {
                 adRestore.setOnShowListener(dialog -> {
                     final Button buttonOK = adRestore.getButton(DialogInterface.BUTTON_POSITIVE);
                     buttonOK.setOnClickListener(v -> {
-                        NethunterData.getInstance().restoreData(nethunterSQL, storedpathEditText.getText().toString());
+                        String returnedResult = NethunterData.getInstance().restoreData(NethunterSQL.getInstance(context), storedpathEditText.getText().toString());
+                        if (returnedResult == null) {
+                            NhPaths.showMessage(context, "db is successfully restored to " + storedpathEditText.getText().toString());
+                        } else {
+                            dialog.dismiss();
+                            new AlertDialog.Builder(context).setTitle("Failed to restore the DB.").setMessage(returnedResult).create().show();
+                        }
                         dialog.dismiss();
                     });
                 });
                 adRestore.show();
                 break;
             case R.id.f_nethunter_menu_ResetToDefault:
-                NethunterData.getInstance().resetData(nethunterSQL);
+                NethunterData.getInstance().resetData(NethunterSQL.getInstance(context));
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -309,7 +319,7 @@ public class NetHunterFragment extends Fragment {
                         dataArrayList.add(cmdEditText.getText().toString());
                         dataArrayList.add(delimiterEditText.getText().toString());
                         dataArrayList.add(runOnCreateCheckbox.isChecked() ? "1" : "0");
-                        NethunterData.getInstance().addData(targetPositionId, dataArrayList, nethunterSQL);
+                        NethunterData.getInstance().addData(targetPositionId, dataArrayList, NethunterSQL.getInstance(context));
                         ad.dismiss();
                     }
                 });
@@ -355,7 +365,7 @@ public class NetHunterFragment extends Fragment {
                         }
                     }
                     if (selectedPosition.size() != 0) {
-                        NethunterData.getInstance().deleteData(selectedPosition, selectedTargetIds, nethunterSQL);
+                        NethunterData.getInstance().deleteData(selectedPosition, selectedTargetIds, NethunterSQL.getInstance(context));
                         NhPaths.showMessage(context, "Successfully deleted " + selectedPosition.size() + " items.");
                         adDelete.dismiss();
                     } else NhPaths.showMessage(context, "Nothing to be deleted.");
@@ -401,7 +411,7 @@ public class NetHunterFragment extends Fragment {
                         NhPaths.showMessage(context, "You are moving the item to the same position, nothing to be moved.");
                     } else {
                         if (actions.getSelectedItemPosition() == 1) targetPositionIndex += 1;
-                        NethunterData.getInstance().moveData(originalPositionIndex, targetPositionIndex, nethunterSQL);
+                        NethunterData.getInstance().moveData(originalPositionIndex, targetPositionIndex, NethunterSQL.getInstance(context));
                         NhPaths.showMessage(context, "Successfully moved item.");
                         adMove.dismiss();
                     }

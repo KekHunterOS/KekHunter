@@ -24,10 +24,10 @@ import java.util.ArrayList;
  */
 public class NethunterSQL extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "NethunterFragment";
-    private Context context;
+    private static NethunterSQL instance;
     private static final String TAG = "NethunterSQL";
     private static final String TABLE_NAME = DATABASE_NAME;
-    private final ArrayList<String> COLUMNS = new ArrayList<>();
+    private static ArrayList<String> COLUMNS = new ArrayList<>();
     private static final String[][] nethunterData = {
             {"1", "Kernel Version", "uname -a", "\\n", "1"},
             {"2", "Busybox Version", "." + NhPaths.BUSYBOX + " | head -n1", "\\n", "1"},
@@ -38,11 +38,16 @@ public class NethunterSQL extends SQLiteOpenHelper {
             {"7", "External IP", "curl ifconfig.co", "\\n", "0"}
     };
 
+    public synchronized static NethunterSQL getInstance(Context context){
+        if (instance == null) {
+            instance = new NethunterSQL(context.getApplicationContext());
+        }
+        return instance;
+    }
 
-    public NethunterSQL(Context context) {
+    private NethunterSQL(Context context) {
         super(context, DATABASE_NAME, null, 1);
         // Add your default column here;
-        this.context = context;
         COLUMNS.add("id");
         COLUMNS.add("TitleName");
         COLUMNS.add("CommandforResult");
@@ -161,7 +166,7 @@ public class NethunterSQL extends SQLiteOpenHelper {
         db.close();
     }
 
-    public boolean backupData(String storedDBpath) {
+    public String backupData(String storedDBpath) {
         try {
             String currentDBPath = Environment.getDataDirectory() + "/data/" + BuildConfig.APPLICATION_ID + "/databases/" + getDatabaseName();
             if (Environment.getExternalStorageDirectory().canWrite()) {
@@ -174,24 +179,25 @@ public class NethunterSQL extends SQLiteOpenHelper {
                     src.close();
                     dst.close();
                 }
-                NhPaths.showMessage(context, "db is successfully backup to " + storedDBpath);
+                //return "db is successfully backup to " + storedDBpath;
+                //NhPaths.showMessage(context, "db is successfully backup to " + storedDBpath);
             }
         } catch (Exception e) {
-            new AlertDialog.Builder(context).setTitle("Failed to backup the DB.").setMessage(e.getMessage()).create().show();
+            //new AlertDialog.Builder(context).setTitle("Failed to backup the DB.").setMessage(e.getMessage()).create().show();
             e.printStackTrace();
-            return false;
+            return e.toString();
         }
-        return true;
+        return null;
     }
 
-    public boolean restoreData(String storedDBpath) {
+    public String restoreData(String storedDBpath) {
         if (!new File(storedDBpath).exists()){
-            new AlertDialog.Builder(context).setTitle("Failed to restore the DB.").setMessage("db file not found.").create().show();
-            return false;
+            //new AlertDialog.Builder(context).setTitle("Failed to restore the DB.").setMessage("db file not found.").create().show();
+            return "db file not found.";
         }
         if (!verifyDB(storedDBpath)) {
-            new AlertDialog.Builder(context).setTitle("Failed to restore the DB.").setMessage("invalid columns format.").create().show();
-            return false;
+            //new AlertDialog.Builder(context).setTitle("Failed to restore the DB.").setMessage("invalid columns format.").create().show();
+            return "invalid columns format.";
         }
         try {
             String currentDBPath = Environment.getDataDirectory() + "/data/" + BuildConfig.APPLICATION_ID + "/databases/" + getDatabaseName();
@@ -204,14 +210,15 @@ public class NethunterSQL extends SQLiteOpenHelper {
                     dst.transferFrom(src, 0, src.size());
                     src.close();
                     dst.close();
-                    NhPaths.showMessage(context, "db is successfully restored to " + currentDBPath);
+                    //NhPaths.showMessage(context, "db is successfully restored to " + currentDBPath);
+                    //return "db is successfully restored to " + currentDBPath;
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return e.toString();
         }
-        return true;
+        return null;
     }
 
     private boolean verifyDB(String storedDBpath){
