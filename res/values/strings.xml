@@ -11,6 +11,9 @@
     <string name="nethunter_busybox_detect">Busybox Version</string>
     <string name="nethunter_kernelver_detect">Kernel Version</string>
     <string name="nethunter_terminal_detect">Nethunter Terminal Status</string>
+    <string name="nethunter_howtouse_cmd">Put your own command string here, it will be run in Android environment to get the output displayed.</string>
+    <string name="nethunter_howtouse_delimiter">Put your desired delimiter string if you want to split the output into lines, default is "\\n".</string>
+    <string name="nethunter_howtouse_runoncreate">To get the output upon the fragment is created, check this option. Otherwise you have to click RUN button manually to get the output.</string>
 
     <string name="hid_powersploit_description">The Powersploit payload provides you a choice of reverse meterpreter HTTP/S payloads. "URL to payload" should be a URL accessible to the victim machine where the larger payload is downloaded to.</string>
     <string name="hid_windows_cmd_description">This Windows CMD payload allows you to enter raw commands to a Windows command prompt. Hitting the list menu will allow you to choose keyboard layout or UAC bypass options. </string>
