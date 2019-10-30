@@ -116,6 +116,7 @@
     <string name="TwoMACDigits">XX</string>
     <string name="macSeparator">:</string>
     <string name="changeMAC">Change MAC</string>
+    <string name="resetMAC">Reset MAC</string>
     <string name="reloadMAC">Reload MAC</string>
     <string name="randomMAC">Random MAC</string>
     <string name="customMAC">Custom MAC</string>

@@ -20,6 +20,7 @@ public class NhPaths implements SharedPreferences.OnSharedPreferenceChangeListen
     public static String APP_PATH;
     public static String APP_INITD_PATH;
     public static String APP_SCRIPTS_PATH;
+    public static String APP_SCRIPTS_BIN_PATH;
     public static String NH_SD_FOLDER_NAME;
     public static String SD_PATH;
     public static String APP_SD_FILES_PATH;
@@ -38,6 +39,7 @@ public class NhPaths implements SharedPreferences.OnSharedPreferenceChangeListen
         APP_PATH                        = context.getApplicationContext().getFilesDir().getPath();
         APP_INITD_PATH                  = APP_PATH + "/etc/init.d";
         APP_SCRIPTS_PATH                = APP_PATH + "/scripts";
+        APP_SCRIPTS_BIN_PATH            = APP_SCRIPTS_PATH + "/bin";
         SD_PATH                         = getSdcardPath();
         NH_SD_FOLDER_NAME               = "nh_files";
         APP_SD_FILES_PATH               = SD_PATH + "/" + NH_SD_FOLDER_NAME;
