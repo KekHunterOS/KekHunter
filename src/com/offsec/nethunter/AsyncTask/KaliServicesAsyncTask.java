@@ -1,25 +1,73 @@
 package com.offsec.nethunter.AsyncTask;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.offsec.nethunter.ChrootManagerFragment;
-import com.offsec.nethunter.RecyclerViewData.KaliServicesData;
 import com.offsec.nethunter.SQL.KaliServicesSQL;
+import com.offsec.nethunter.models.KaliServicesModel;
+import com.offsec.nethunter.utils.NhPaths;
+import com.offsec.nethunter.utils.ShellExecuter;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-public class KaliServicesAsyncTask extends AsyncTask<Object, Void, Void> {
-	private KaliServiceTaskListener listener;
+public class KaliServicesAsyncTask extends AsyncTask<List<KaliServicesModel>, Void, List<KaliServicesModel>> {
+	private KaliServicesAsyncTaskListener listener;
 	private int actionCode;
-	public static final int CHECK_SERVICE = 0;
-	public static final int START_SERVICE = 1;
-	public static final int STOP_SERVICE = 2;
-	public static final int ADD_SERVICE = 3;
-	public static final int RESET_SERVICE = 4;
-	public static final int UPDATE_RUNONCHROOTSTART = 5;
+	private int position;
+	private int originalPositionIndex;
+	private int targetPositionIndex;
+	private ArrayList<Integer> selectedPositionsIndex;
+	private ArrayList<Integer> selectedTargetIds;
+	private ArrayList<String> dataArrayList;
+	private KaliServicesSQL kaliServicesSQL;
+	public static final int GETITEMSTATUS = 0;
+	public static final int START_SERVICE_FOR_ITEM = 1;
+	public static final int STOP_SERVICE_FOR_ITEM = 2;
+	public static final int EDITDATA = 3;
+	public static final int ADDDATA = 4;
+	public static final int DELETEDATA = 5;
+	public static final int MOVEDATA = 6;
+	public static final int BACKUPDATA = 7;
+	public static final int RESTOREDATA = 8;
+	public static final int RESETDATA = 9;
+	public static final int UPDATE_RUNONCHROOTSTART_SCRIPTS = 10;
 
-	public KaliServicesAsyncTask(Integer ActionCode){
-		this.actionCode = ActionCode;
+	public KaliServicesAsyncTask (int actionCode){
+		this.actionCode = actionCode;
+	}
+
+	public KaliServicesAsyncTask (int actionCode, int position){
+		this.actionCode = actionCode;
+		this.position = position;
+	}
+
+	public KaliServicesAsyncTask (int actionCode, int position, ArrayList<String> dataArrayList, KaliServicesSQL kaliServicesSQL){
+		this.actionCode = actionCode;
+		this.position = position;
+		this.dataArrayList = dataArrayList;
+		this.kaliServicesSQL = kaliServicesSQL;
+	}
+
+	public KaliServicesAsyncTask (int actionCode, ArrayList<Integer> selectedPositionsIndex, ArrayList<Integer> selectedTargetIds, KaliServicesSQL kaliServicesSQL){
+		this.actionCode = actionCode;
+		this.selectedPositionsIndex = selectedPositionsIndex;
+		this.selectedTargetIds = selectedTargetIds;
+		this.kaliServicesSQL = kaliServicesSQL;
+	}
+
+	public KaliServicesAsyncTask (int actionCode, int originalPositionIndex, int targetPositionIndex, KaliServicesSQL kaliServicesSQL){
+		this.actionCode = actionCode;
+		this.originalPositionIndex = originalPositionIndex;
+		this.targetPositionIndex = targetPositionIndex;
+		this.kaliServicesSQL = kaliServicesSQL;
+	}
+
+	public KaliServicesAsyncTask (int actionCode, KaliServicesSQL kaliServicesSQL){
+		this.actionCode = actionCode;
+		this.kaliServicesSQL = kaliServicesSQL;
 	}
 
 	@Override
@@ -32,58 +80,140 @@ public class KaliServicesAsyncTask extends AsyncTask<Object, Void, Void> {
 	}
 
 	@Override
-	protected Void doInBackground(Object... objects) {
+	protected List<KaliServicesModel> doInBackground(List<KaliServicesModel>... copyOfkaliServicesModelList) {
+		List<KaliServicesModel> kaliServicesModelList;
 		switch (actionCode) {
-			case CHECK_SERVICE: {
-				((KaliServicesData) objects[0]).updateAllStatus();
+			case GETITEMSTATUS:
+				kaliServicesModelList = copyOfkaliServicesModelList[0];
+				if (kaliServicesModelList != null){
+					for (int i = 0; i < kaliServicesModelList.size(); i++) {
+						kaliServicesModelList.get(i).setStatus(new ShellExecuter().RunAsRootReturnValue(NhPaths.BUSYBOX + " ps -o pid,comm | grep '" + kaliServicesModelList.get(i).getCommandforCheckServiceStatus() + "'") == 0?"[+] Service is running":"[-] Service is NOT running");
+					}
+				}
 				break;
-			}
-			case START_SERVICE: {
-				((KaliServicesData) objects[0]).startService(((int) objects[1]));
-				((KaliServicesData) objects[0]).updateAllStatus();
+			case START_SERVICE_FOR_ITEM:
+				kaliServicesModelList = copyOfkaliServicesModelList[0];
+				if (kaliServicesModelList != null){
+					kaliServicesModelList.get(position).setStatus(new ShellExecuter().RunAsChrootReturnValue(kaliServicesModelList.get(position).getCommandforStartService()) == 0?"[+] Service is running":"[-] Service is NOT running");
+				}
 				break;
-			}
-			case STOP_SERVICE: {
-				((KaliServicesData) objects[0]).stopService(((int) objects[1]));
-				((KaliServicesData) objects[0]).updateAllStatus();
+			case STOP_SERVICE_FOR_ITEM:
+				kaliServicesModelList = copyOfkaliServicesModelList[0];
+				if (kaliServicesModelList != null){
+					kaliServicesModelList.get(position).setStatus(new ShellExecuter().RunAsChrootReturnValue(kaliServicesModelList.get(position).getCommandforStopService()) == 0?"[-] Service is NOT running":"[+] Service is running");
+				}
 				break;
-			}
-			case ADD_SERVICE: {
-				((KaliServicesData) objects[0]).addService(((int) objects[1]), ((ArrayList<String>) objects[2]));
-				((KaliServicesData) objects[0]).updateAllStatus();
+			case EDITDATA:
+				kaliServicesModelList = copyOfkaliServicesModelList[0];
+				if (kaliServicesModelList != null){
+					kaliServicesModelList.get(position).setServiceName(dataArrayList.get(0));
+					kaliServicesModelList.get(position).setCommandforStartService(dataArrayList.get(1));
+					kaliServicesModelList.get(position).setCommandforStopService(dataArrayList.get(2));
+					kaliServicesModelList.get(position).setCommandforCheckServiceStatus(dataArrayList.get(3));
+					kaliServicesModelList.get(position).setRunOnChrootStart(dataArrayList.get(4));
+					updateRunOnChrootStartScripts(kaliServicesModelList);
+					kaliServicesSQL.editData(position, dataArrayList);
+				}
 				break;
-			}
-			case RESET_SERVICE:{
-				((KaliServicesSQL) objects[1]).resetData();
-				((KaliServicesData) objects[0]).resetService(((KaliServicesSQL) objects[1]).getData());
-				((KaliServicesData) objects[0]).updateAllStatus();
+			case ADDDATA:
+				kaliServicesModelList = copyOfkaliServicesModelList[0];
+				if (kaliServicesModelList != null){
+
+					kaliServicesModelList.add(position - 1, new KaliServicesModel(
+							dataArrayList.get(0),
+							dataArrayList.get(1),
+							dataArrayList.get(2),
+							dataArrayList.get(3),
+							dataArrayList.get(4),
+							""));
+					if (dataArrayList.get(4).equals("1")){
+						updateRunOnChrootStartScripts(kaliServicesModelList);
+					}
+					kaliServicesSQL.addData(position, dataArrayList);
+				}
 				break;
-			}
-			case UPDATE_RUNONCHROOTSTART: {
-				((KaliServicesData) objects[0]).updateRunOnBootService();
+			case DELETEDATA:
+				kaliServicesModelList = copyOfkaliServicesModelList[0];
+				if (kaliServicesModelList != null){
+					Collections.sort(selectedPositionsIndex, Collections.<Integer>reverseOrder());
+					for (Integer selectedPosition: selectedPositionsIndex) {
+						int i = selectedPosition;
+						kaliServicesModelList.remove(i);
+					}
+					kaliServicesSQL.deleteData(selectedTargetIds);
+				}
 				break;
-			}
-			default:
+			case MOVEDATA:
+				kaliServicesModelList = copyOfkaliServicesModelList[0];
+				if (kaliServicesModelList != null){
+					KaliServicesModel tempKaliServicesModel = new KaliServicesModel(
+							kaliServicesModelList.get(originalPositionIndex).getServiceName(),
+							kaliServicesModelList.get(originalPositionIndex).getCommandforStartService(),
+							kaliServicesModelList.get(originalPositionIndex).getCommandforStopService(),
+							kaliServicesModelList.get(originalPositionIndex).getCommandforCheckServiceStatus(),
+							kaliServicesModelList.get(originalPositionIndex).getRunOnChrootStart(),
+							kaliServicesModelList.get(originalPositionIndex).getStatus()
+					);
+					kaliServicesModelList.remove(originalPositionIndex);
+					if (originalPositionIndex < targetPositionIndex) {
+						targetPositionIndex = targetPositionIndex - 1;
+					}
+					kaliServicesModelList.add(targetPositionIndex, tempKaliServicesModel);
+					kaliServicesSQL.moveData(originalPositionIndex, targetPositionIndex);
+				}
+				break;
+			case BACKUPDATA:
+				break;
+			case RESTOREDATA:
+				kaliServicesModelList = copyOfkaliServicesModelList[0];
+				if (kaliServicesModelList != null) {
+					kaliServicesModelList.clear();
+					kaliServicesModelList = kaliServicesSQL.bindData((ArrayList<KaliServicesModel>)kaliServicesModelList);
+				}
+				break;
+			case RESETDATA:
+				break;
+			case UPDATE_RUNONCHROOTSTART_SCRIPTS:
+				kaliServicesModelList = copyOfkaliServicesModelList[0];
+				if (kaliServicesModelList != null){
+					kaliServicesModelList.get(position).setServiceName(dataArrayList.get(0));
+					kaliServicesModelList.get(position).setCommandforStartService(dataArrayList.get(1));
+					kaliServicesModelList.get(position).setCommandforStopService(dataArrayList.get(2));
+					kaliServicesModelList.get(position).setCommandforCheckServiceStatus(dataArrayList.get(3));
+					kaliServicesModelList.get(position).setRunOnChrootStart(dataArrayList.get(4));
+					kaliServicesSQL.editData(position, dataArrayList);
+					updateRunOnChrootStartScripts(kaliServicesModelList);
+				}
 				break;
 		}
-		return null;
+		return copyOfkaliServicesModelList[0];
 	}
 
 	@Override
-	protected void onPostExecute(Void voids) {
-		super.onPostExecute(voids);
+	protected void onPostExecute(List<KaliServicesModel> kaliServicesModelList) {
+		super.onPostExecute(kaliServicesModelList);
 		if (listener != null) {
-			listener.onAsyncTaskFinished();
+			listener.onAsyncTaskFinished(kaliServicesModelList);
 		}
 		ChrootManagerFragment.isAsyncTaskRunning = false;
 	}
 
-	public void setListener(KaliServiceTaskListener listener) {
+	public void setListener(KaliServicesAsyncTaskListener listener) {
 		this.listener = listener;
 	}
 
-	public interface KaliServiceTaskListener {
+	public interface KaliServicesAsyncTaskListener {
 		void onAsyncTaskPrepare();
-		void onAsyncTaskFinished();
+		void onAsyncTaskFinished(List<KaliServicesModel> kaliServicesModelList);
+	}
+
+	private void updateRunOnChrootStartScripts (List<KaliServicesModel> kaliServicesModelList) {
+		StringBuilder tmpStringBuilder = new StringBuilder();
+		for (int i = 0; i < kaliServicesModelList.size(); i++) {
+			if (kaliServicesModelList.get(i).getRunOnChrootStart().equals("1")) {
+				tmpStringBuilder.append(kaliServicesModelList.get(i).getCommandforStartService() + "\\n");
+			}
+		}
+		new ShellExecuter().RunAsRootOutput("echo \"" + tmpStringBuilder.toString() + "\" > " + NhPaths.APP_SCRIPTS_PATH + "/kaliservices");
 	}
 }

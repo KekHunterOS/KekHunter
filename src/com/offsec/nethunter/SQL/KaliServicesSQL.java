@@ -1,6 +1,5 @@
 package com.offsec.nethunter.SQL;
 
-import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -9,7 +8,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
 import android.text.TextUtils;
 
-import com.offsec.nethunter.utils.NhPaths;
+import com.offsec.nethunter.BuildConfig;
+import com.offsec.nethunter.models.KaliServicesModel;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,11 +18,11 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 
 public class KaliServicesSQL extends SQLiteOpenHelper {
-	private Context context;
-	private static final String DATABASE_NAME = "FragmentKaliService";
+	private static KaliServicesSQL instance;
+	private static final String DATABASE_NAME = "KaliServicesFragment";
 	private static final String TAG = "KaliServicesSQL";
-	private static final String TABLE_NAME = "FragmentKaliService";
-	private final ArrayList<String> COLUMNS = new ArrayList<>();
+	private static final String TABLE_NAME = DATABASE_NAME;
+	private static ArrayList<String> COLUMNS = new ArrayList<>();
 	private static final String[][] kaliserviceData = {
 			{"1", "SSH", "service ssh start", "service ssh stop", "sshd", "0"},
 			{"2", "APACHE2", "service apache2 start", "service apache2 stop", "apache2", "0"},
@@ -30,10 +30,16 @@ public class KaliServicesSQL extends SQLiteOpenHelper {
 			{"4", "DNSMASQ", "service dnsmasq start", "service dnsmasq stop", "dnsmasq", "0"}
 	};
 
-	public KaliServicesSQL(Context context) {
+	public synchronized static KaliServicesSQL getInstance(Context context){
+		if (instance == null) {
+			instance = new KaliServicesSQL(context.getApplicationContext());
+		}
+		return instance;
+	}
+
+	private KaliServicesSQL(Context context) {
 		super(context, DATABASE_NAME, null, 1);
-		// Add your default column here;f
-		this.context = context;
+		// Add your default column here;
 		COLUMNS.add("id");
 		COLUMNS.add("ServiceName");
 		COLUMNS.add("CommandforStartService");
@@ -49,6 +55,7 @@ public class KaliServicesSQL extends SQLiteOpenHelper {
 				COLUMNS.get(3) + " TEXT, " + COLUMNS.get(4) + " TEXT, " +
 				COLUMNS.get(5) + " INTEGER)");
 		ContentValues initialValues = new ContentValues();
+		db.beginTransaction();
 		for (String[] data: kaliserviceData){
 			initialValues.put(COLUMNS.get(0), data[0]);
 			initialValues.put(COLUMNS.get(1), data[1]);
@@ -58,6 +65,8 @@ public class KaliServicesSQL extends SQLiteOpenHelper {
 			initialValues.put(COLUMNS.get(5), data[5]);
 			db.insert(TABLE_NAME, null, initialValues);
 		}
+		db.setTransactionSuccessful();
+		db.endTransaction();
 	}
 
 	@Override
@@ -66,46 +75,38 @@ public class KaliServicesSQL extends SQLiteOpenHelper {
 		this.onCreate(db);
 	}
 
-	public ArrayList<ArrayList<String>> getData() {
-		ArrayList<ArrayList<String>> Data = new ArrayList<>();
-		ArrayList<String> Id = new ArrayList<>();
-		ArrayList<String> ServiceName = new ArrayList<>();
-		ArrayList<String> CommandforStartService = new ArrayList<>();
-		ArrayList<String> CommandforStopService = new ArrayList<>();
-		ArrayList<String> CommandforCheckServiceStatus = new ArrayList<>();
-		ArrayList<String> RunOnChrootStart = new ArrayList<>();
-		SQLiteDatabase db = this.getWritableDatabase();
+	public ArrayList<KaliServicesModel> bindData(ArrayList<KaliServicesModel> kaliServicesModelArrayList) {
+		SQLiteDatabase db = getWritableDatabase();
 		Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " ORDER BY " + COLUMNS.get(0) + ";", null);
 		while (cursor.moveToNext()) {
-			Id.add(cursor.getString(cursor.getColumnIndex(COLUMNS.get(0))));
-			ServiceName.add(cursor.getString(cursor.getColumnIndex(COLUMNS.get(1))));
-			CommandforStartService.add(cursor.getString(cursor.getColumnIndex(COLUMNS.get(2))));
-			CommandforStopService.add(cursor.getString(cursor.getColumnIndex(COLUMNS.get(3))));
-			CommandforCheckServiceStatus.add(cursor.getString(cursor.getColumnIndex(COLUMNS.get(4))));
-			RunOnChrootStart.add(cursor.getString(cursor.getColumnIndex(COLUMNS.get(5))));
+			kaliServicesModelArrayList.add(new KaliServicesModel(
+					cursor.getString(cursor.getColumnIndex(COLUMNS.get(1))),
+					cursor.getString(cursor.getColumnIndex(COLUMNS.get(2))),
+					cursor.getString(cursor.getColumnIndex(COLUMNS.get(3))),
+					cursor.getString(cursor.getColumnIndex(COLUMNS.get(4))),
+					cursor.getString(cursor.getColumnIndex(COLUMNS.get(5))),
+					"[-] Service is NOT running"
+			));
 		}
-		Data.add(Id);
-		Data.add(ServiceName);
-		Data.add(CommandforStartService);
-		Data.add(CommandforStopService);
-		Data.add(CommandforCheckServiceStatus);
-		Data.add(RunOnChrootStart);
 		cursor.close();
 		db.close();
-		return Data;
+		return kaliServicesModelArrayList;
 	}
 
 	public void addData(int targetPositionId, ArrayList<String> Data){
 		SQLiteDatabase db = this.getWritableDatabase();
 		ContentValues initialValues = new ContentValues();
 		db.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(0) + " = " + COLUMNS.get(0) + " + 1 WHERE " + COLUMNS.get(0) + " >= " + targetPositionId + ";");
-		initialValues.put(COLUMNS.get(0), Data.get(0));
-		initialValues.put(COLUMNS.get(1), Data.get(1));
-		initialValues.put(COLUMNS.get(2), Data.get(2));
-		initialValues.put(COLUMNS.get(3), Data.get(3));
-		initialValues.put(COLUMNS.get(4), Data.get(4));
-		initialValues.put(COLUMNS.get(5), Data.get(5));
+		initialValues.put(COLUMNS.get(0), targetPositionId);
+		initialValues.put(COLUMNS.get(1), Data.get(0));
+		initialValues.put(COLUMNS.get(2), Data.get(1));
+		initialValues.put(COLUMNS.get(3), Data.get(2));
+		initialValues.put(COLUMNS.get(4), Data.get(3));
+		initialValues.put(COLUMNS.get(5), Data.get(4));
+		db.beginTransaction();
 		db.insert(TABLE_NAME, null, initialValues);
+		db.setTransactionSuccessful();
+		db.endTransaction();
 		db.close();
 	}
 
@@ -126,8 +127,8 @@ public class KaliServicesSQL extends SQLiteOpenHelper {
 		db.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(0) + " = 0 - 1 WHERE " + COLUMNS.get(0) + " = " + (originalPosition + 1) + ";");
 		if (originalPosition < targetPosition){
 			db.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(0) + " = " + COLUMNS.get(0) + " - 1 WHERE " + COLUMNS.get(0) + " > " +
-					(originalPosition + 1)  + " AND " + COLUMNS.get(0) + " < " + (targetPosition + 1) + ";");
-			db.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(0) + " = " + (targetPosition) + " WHERE " + COLUMNS.get(0) + " = -1;");
+					(originalPosition + 1)  + " AND " + COLUMNS.get(0) + " < " + (targetPosition + 2) + ";");
+			db.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(0) + " = " + (targetPosition + 1) + " WHERE " + COLUMNS.get(0) + " = -1;");
 		} else {
 			db.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(0) + " = " + COLUMNS.get(0) + " + 1 WHERE " + COLUMNS.get(0) + " > " +
 					targetPosition  + " AND " + COLUMNS.get(0) + " < " + (originalPosition + 1) + ";");
@@ -155,6 +156,7 @@ public class KaliServicesSQL extends SQLiteOpenHelper {
 				COLUMNS.get(1) + " TEXT, " + COLUMNS.get(2) + " TEXT, " + COLUMNS.get(3) + " TEXT, " +
 				COLUMNS.get(4) + " TEXT, " + COLUMNS.get(5) + " INTEGER)");
 		ContentValues initialValues = new ContentValues();
+		db.beginTransaction();
 		for (String[] data: kaliserviceData){
 			initialValues.put(COLUMNS.get(0), data[0]);
 			initialValues.put(COLUMNS.get(1), data[1]);
@@ -164,12 +166,14 @@ public class KaliServicesSQL extends SQLiteOpenHelper {
 			initialValues.put(COLUMNS.get(5), data[5]);
 			db.insert(TABLE_NAME, null, initialValues);
 		}
+		db.setTransactionSuccessful();
+		db.endTransaction();
 		db.close();
 	}
 
-	public boolean backupData(String storedDBpath) {
+	public String backupData(String storedDBpath) {
 		try {
-			String currentDBPath = Environment.getDataDirectory() + "/data/" + context.getPackageName() + "/databases/" + getDatabaseName();
+			String currentDBPath = Environment.getDataDirectory() + "/data/" + BuildConfig.APPLICATION_ID + "/databases/" + getDatabaseName();
 			if (Environment.getExternalStorageDirectory().canWrite()) {
 				File currentDB = new File(currentDBPath);
 				File backupDB = new File(storedDBpath);
@@ -180,27 +184,23 @@ public class KaliServicesSQL extends SQLiteOpenHelper {
 					src.close();
 					dst.close();
 				}
-				NhPaths.showMessage(context, "db is successfully backup to " + storedDBpath);
 			}
 		} catch (Exception e) {
-			new AlertDialog.Builder(context).setTitle("Failed to backup the DB.").setMessage(e.getMessage()).create().show();
 			e.printStackTrace();
-			return false;
+			return e.toString();
 		}
-		return true;
+		return null;
 	}
 
-	public boolean restoreData(String storedDBpath) {
+	public String restoreData(String storedDBpath) {
 		if (!new File(storedDBpath).exists()){
-			new AlertDialog.Builder(context).setTitle("Failed to restore the DB.").setMessage("db file not found.").create().show();
-			return false;
+			return "db file not found.";
 		}
 		if (!verifyDB(storedDBpath)) {
-			new AlertDialog.Builder(context).setTitle("Failed to restore the DB.").setMessage("invalid columns format.").create().show();
-			return false;
+			return "invalid columns format.";
 		}
 		try {
-			String currentDBPath = Environment.getDataDirectory() + "/data/" + context.getPackageName() + "/databases/" + getDatabaseName();
+			String currentDBPath = Environment.getDataDirectory() + "/data/" + BuildConfig.APPLICATION_ID + "/databases/" + getDatabaseName();
 			if (Environment.getExternalStorageDirectory().canWrite()) {
 				File currentDB = new File(currentDBPath);
 				File backupDB = new File(storedDBpath);
@@ -210,14 +210,13 @@ public class KaliServicesSQL extends SQLiteOpenHelper {
 					dst.transferFrom(src, 0, src.size());
 					src.close();
 					dst.close();
-					NhPaths.showMessage(context, "db is successfully restored to " + currentDBPath);
 				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			return false;
+			return e.toString();
 		}
-		return true;
+		return null;
 	}
 
 	private boolean verifyDB(String storedDBpath){

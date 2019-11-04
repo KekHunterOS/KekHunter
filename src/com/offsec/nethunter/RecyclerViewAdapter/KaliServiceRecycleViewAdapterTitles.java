@@ -12,276 +12,176 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.offsec.nethunter.AsyncTask.KaliServicesAsyncTask;
 import com.offsec.nethunter.R;
 import com.offsec.nethunter.RecyclerViewData.KaliServicesData;
 import com.offsec.nethunter.SQL.KaliServicesSQL;
+import com.offsec.nethunter.models.KaliServicesModel;
 import com.offsec.nethunter.utils.NhPaths;
 
 import java.util.ArrayList;
+import java.util.List;
 
-//Define recycleView adapter for listing different textView content.
-public class KaliServiceRecycleViewAdapterTitles extends RecyclerView.Adapter<KaliServiceRecycleViewAdapterTitles.ItemViewHolder>{
+public class KaliServiceRecycleViewAdapterTitles extends RecyclerView.Adapter<KaliServiceRecycleViewAdapterTitles.ItemViewHolder> implements Filterable {
 	private static final String TAG = "KaliServiceRecycleView";
 	private Context context;
-	private KaliServicesData kaliServicesData;
-	private KaliServicesSQL kaliServicesSQL;
-	private KaliServicesAsyncTask kaliServicesAsyncTask;
+	private List<KaliServicesModel> kaliServicesModelList;
 
-	public KaliServiceRecycleViewAdapterTitles(Context context, KaliServicesData kaliServicesData){
+	public KaliServiceRecycleViewAdapterTitles(Context context, List<KaliServicesModel> kaliServicesModelList){
 		this.context = context;
-		this.kaliServicesData = kaliServicesData;
-		this.kaliServicesSQL = new KaliServicesSQL(context);
+		this.kaliServicesModelList = kaliServicesModelList;
 	}
 
 	@NonNull
 	@Override
 	public KaliServiceRecycleViewAdapterTitles.ItemViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
 		View view = LayoutInflater.from(context).inflate(R.layout.kaliservices_recycleview_servicetitle, viewGroup, false);
-
 		return new KaliServiceRecycleViewAdapterTitles.ItemViewHolder(view);
 	}
 
 	@Override
-	public void onBindViewHolder(@NonNull final ItemViewHolder itemViewHolder, int i) {
-		final int position = i;
-		final String tempStatus = kaliServicesData.Status.get(i);
-		final Spannable tempStatusTextView = new SpannableString(tempStatus);
-		tempStatusTextView.setSpan(new ForegroundColorSpan(tempStatus.startsWith("[!]")?Color.CYAN:tempStatus.startsWith("[+]")?Color.GREEN:tempStatus.startsWith("[-]")?Color.parseColor("#D81B60"):Color.LTGRAY),0, tempStatus.length(),0);
-		itemViewHolder.nametextView.setText(kaliServicesData.ServiceName.get(i));
+	public void onBindViewHolder(@NonNull final ItemViewHolder itemViewHolder, int position) {
+		Spannable tempStatusTextView = new SpannableString(kaliServicesModelList.get(position).getStatus());
+		tempStatusTextView.setSpan(new ForegroundColorSpan(kaliServicesModelList.get(position).getStatus().startsWith("[+]")?Color.GREEN:Color.parseColor("#D81B60")),0, kaliServicesModelList.get(position).getStatus().length(),0);
+		itemViewHolder.nametextView.setText(kaliServicesModelList.get(position).getServiceName());
+		itemViewHolder.runOnChrootStartCheckbox.setChecked(kaliServicesModelList.get(position).getRunOnChrootStart().equals("1"));
+		itemViewHolder.mSwitch.setChecked(kaliServicesModelList.get(position).getStatus().startsWith("[+]"));
 		itemViewHolder.statustextView.setText(tempStatusTextView);
-		itemViewHolder.runOnBootCheckbox.setChecked(kaliServicesData.RunOnChrootStart.get(i).equals("1"));
-		itemViewHolder.mSwitch.setChecked(kaliServicesData.isChecked.get(i));
-		itemViewHolder.editbutton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				final LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-				final View promptViewEdit = mInflater.inflate(R.layout.kaliservices_edit_dialog_view, null);
-				final EditText titleEditText = promptViewEdit.findViewById(R.id.f_kaliservices_edit_adb_et_title);
-				final EditText startCmdEditText = promptViewEdit.findViewById(R.id.f_kaliservices_edit_adb_et_startcommand);
-				final EditText stopCmdEditText = promptViewEdit.findViewById(R.id.f_kaliservices_edit_adb_et_stopcommand);
-				final EditText checkstatusEditText = promptViewEdit.findViewById(R.id.f_kaliservices_edit_adb_et_checkstatuscommand);
-				final CheckBox runOnBootCheckbox = promptViewEdit.findViewById(R.id.f_kaliservices_edit_adb_checkbox_runonboot);
-				final FloatingActionButton readmeButton1 = promptViewEdit.findViewById(R.id.f_kaliservices_edit_btn_info_fab1);
-				final FloatingActionButton readmeButton2 = promptViewEdit.findViewById(R.id.f_kaliservices_edit_btn_info_fab2);
-				final FloatingActionButton readmeButton3 = promptViewEdit.findViewById(R.id.f_kaliservices_edit_btn_info_fab3);
-				final FloatingActionButton readmeButton4 = promptViewEdit.findViewById(R.id.f_kaliservices_edit_btn_info_fab4);
+		itemViewHolder.editbutton.setOnClickListener(v -> {
+			final LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			final View promptViewEdit = mInflater.inflate(R.layout.kaliservices_edit_dialog_view, null);
+			final EditText titleEditText = promptViewEdit.findViewById(R.id.f_kaliservices_edit_adb_et_title);
+			final EditText startCmdEditText = promptViewEdit.findViewById(R.id.f_kaliservices_edit_adb_et_startcommand);
+			final EditText stopCmdEditText = promptViewEdit.findViewById(R.id.f_kaliservices_edit_adb_et_stopcommand);
+			final EditText checkstatusCmdEditText = promptViewEdit.findViewById(R.id.f_kaliservices_edit_adb_et_checkstatuscommand);
+			final CheckBox runOnChrootStartCheckbox = promptViewEdit.findViewById(R.id.f_kaliservices_edit_adb_checkbox_runonboot);
+			final FloatingActionButton readmeButton1 = promptViewEdit.findViewById(R.id.f_kaliservices_edit_btn_info_fab1);
+			final FloatingActionButton readmeButton2 = promptViewEdit.findViewById(R.id.f_kaliservices_edit_btn_info_fab2);
+			final FloatingActionButton readmeButton3 = promptViewEdit.findViewById(R.id.f_kaliservices_edit_btn_info_fab3);
+			final FloatingActionButton readmeButton4 = promptViewEdit.findViewById(R.id.f_kaliservices_edit_btn_info_fab4);
 
-				readmeButton1.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View view) {
-						androidx.appcompat.app.AlertDialog.Builder adb = new androidx.appcompat.app.AlertDialog.Builder(context);
-						adb.setTitle("HOW TO USE:")
-								.setMessage(context.getString(R.string.kaliservices_howto_startservice))
-								.setNegativeButton("Close", new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialogInterface, int i) {
-										dialogInterface.dismiss();
-									}
-								});
-						androidx.appcompat.app.AlertDialog ad = adb.create();
-						ad.setCancelable(true);
-						ad.show();
+			readmeButton1.setOnClickListener(view -> {
+				androidx.appcompat.app.AlertDialog.Builder adb = new androidx.appcompat.app.AlertDialog.Builder(context);
+				adb.setTitle("HOW TO USE:")
+						.setMessage(context.getString(R.string.kaliservices_howto_startservice))
+						.setNegativeButton("Close", (dialogInterface, i) -> dialogInterface.dismiss());
+				androidx.appcompat.app.AlertDialog ad = adb.create();
+				ad.setCancelable(true);
+				ad.show();
+			});
+
+			readmeButton2.setOnClickListener(view -> {
+				androidx.appcompat.app.AlertDialog.Builder adb = new androidx.appcompat.app.AlertDialog.Builder(context);
+				adb.setTitle("HOW TO USE:")
+						.setMessage(context.getString(R.string.kaliservices_howto_stopservice))
+						.setNegativeButton("Close", (dialogInterface, i) -> dialogInterface.dismiss());
+				androidx.appcompat.app.AlertDialog ad = adb.create();
+				ad.setCancelable(true);
+				ad.show();
+			});
+
+			readmeButton3.setOnClickListener(view -> {
+				androidx.appcompat.app.AlertDialog.Builder adb = new androidx.appcompat.app.AlertDialog.Builder(context);
+				adb.setTitle("HOW TO USE:")
+						.setMessage(context.getString(R.string.kaliservices_howto_checkservice))
+						.setNegativeButton("Close", (dialogInterface, i) -> dialogInterface.dismiss());
+				androidx.appcompat.app.AlertDialog ad = adb.create();
+				ad.setCancelable(true);
+				ad.show();
+			});
+
+			readmeButton4.setOnClickListener(view -> {
+				androidx.appcompat.app.AlertDialog.Builder adb = new androidx.appcompat.app.AlertDialog.Builder(context);
+				adb.setTitle("HOW TO USE:")
+						.setMessage(context.getString(R.string.kaliservices_howto_runServiceOnBoot))
+						.setNegativeButton("Close", (dialogInterface, i) -> dialogInterface.dismiss());
+				androidx.appcompat.app.AlertDialog ad = adb.create();
+				ad.setCancelable(true);
+				ad.show();
+			});
+
+			titleEditText.setText(KaliServicesData.getInstance().kaliServicesModelListFull.get(
+					KaliServicesData.getInstance().kaliServicesModelListFull.indexOf(
+							kaliServicesModelList.get(position))).getServiceName());
+			startCmdEditText.setText(KaliServicesData.getInstance().kaliServicesModelListFull.get(
+					KaliServicesData.getInstance().kaliServicesModelListFull.indexOf(
+							kaliServicesModelList.get(position))).getCommandforStartService());
+			stopCmdEditText.setText(KaliServicesData.getInstance().kaliServicesModelListFull.get(
+					KaliServicesData.getInstance().kaliServicesModelListFull.indexOf(
+							kaliServicesModelList.get(position))).getCommandforStopService());
+			checkstatusCmdEditText.setText(KaliServicesData.getInstance().kaliServicesModelListFull.get(
+					KaliServicesData.getInstance().kaliServicesModelListFull.indexOf(
+							kaliServicesModelList.get(position))).getCommandforCheckServiceStatus());
+			runOnChrootStartCheckbox.setChecked(KaliServicesData.getInstance().kaliServicesModelListFull.get(
+					KaliServicesData.getInstance().kaliServicesModelListFull.indexOf(
+							kaliServicesModelList.get(position))).getRunOnChrootStart().equals("1"));
+			final AlertDialog.Builder adbEdit = new AlertDialog.Builder(context);
+			adbEdit.setView(promptViewEdit);
+			adbEdit.setCancelable(true);
+			adbEdit.setPositiveButton("OK", (dialog, which) -> { });
+			final AlertDialog adEdit = adbEdit.create();
+			adEdit.setOnShowListener(dialog -> {
+				final Button buttonEdit = adEdit.getButton(DialogInterface.BUTTON_POSITIVE);
+				buttonEdit.setOnClickListener(v1 -> {
+					if (titleEditText.getText().toString().isEmpty()){
+						NhPaths.showMessage(context, "Title cannot be empty");
+					} else if (startCmdEditText.getText().toString().isEmpty()){
+						NhPaths.showMessage(context, "Start Command cannot be empty");
+					} else if (stopCmdEditText.getText().toString().isEmpty()){
+						NhPaths.showMessage(context, "Stop Command cannot be empty");
+					} else if (checkstatusCmdEditText.getText().toString().isEmpty()){
+						NhPaths.showMessage(context, "String cannot be empty");
+					}else {
+						ArrayList<String> dataArrayList = new ArrayList<>();
+						dataArrayList.add(titleEditText.getText().toString());
+						dataArrayList.add(startCmdEditText.getText().toString());
+						dataArrayList.add(stopCmdEditText.getText().toString());
+						dataArrayList.add(checkstatusCmdEditText.getText().toString());
+						dataArrayList.add(runOnChrootStartCheckbox.isChecked()?"1":"0");
+						KaliServicesData.getInstance().editData(KaliServicesData.getInstance().kaliServicesModelListFull.indexOf(
+								kaliServicesModelList.get(position)), dataArrayList, KaliServicesSQL.getInstance(context));
+						adEdit.dismiss();
 					}
 				});
-
-				readmeButton2.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View view) {
-						androidx.appcompat.app.AlertDialog.Builder adb = new androidx.appcompat.app.AlertDialog.Builder(context);
-						adb.setTitle("HOW TO USE:")
-								.setMessage(context.getString(R.string.kaliservices_howto_stopservice))
-								.setNegativeButton("Close", new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialogInterface, int i) {
-										dialogInterface.dismiss();
-									}
-								});
-						androidx.appcompat.app.AlertDialog ad = adb.create();
-						ad.setCancelable(true);
-						ad.show();
-					}
-				});
-
-				readmeButton3.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View view) {
-						androidx.appcompat.app.AlertDialog.Builder adb = new androidx.appcompat.app.AlertDialog.Builder(context);
-						adb.setTitle("HOW TO USE:")
-								.setMessage(context.getString(R.string.kaliservices_howto_checkservice))
-								.setNegativeButton("Close", new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialogInterface, int i) {
-										dialogInterface.dismiss();
-									}
-								});
-						androidx.appcompat.app.AlertDialog ad = adb.create();
-						ad.setCancelable(true);
-						ad.show();
-					}
-				});
-
-				readmeButton4.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View view) {
-						androidx.appcompat.app.AlertDialog.Builder adb = new androidx.appcompat.app.AlertDialog.Builder(context);
-						adb.setTitle("HOW TO USE:")
-								.setMessage(context.getString(R.string.kaliservices_howto_runServiceOnBoot))
-								.setNegativeButton("Close", new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialogInterface, int i) {
-										dialogInterface.dismiss();
-									}
-								});
-						androidx.appcompat.app.AlertDialog ad = adb.create();
-						ad.setCancelable(true);
-						ad.show();
-					}
-				});
-
-				titleEditText.setText(kaliServicesData.ServiceName.get(position));
-				startCmdEditText.setText(kaliServicesData.CommandforStartService.get(position));
-				stopCmdEditText.setText(kaliServicesData.CommandforStopService.get(position));
-				checkstatusEditText.setText(kaliServicesData.CommandforCheckServiceStatus.get(position));
-				runOnBootCheckbox.setChecked(kaliServicesData.RunOnChrootStart.get(position).equals("1"));
-				final AlertDialog.Builder adbEdit = new AlertDialog.Builder(context);
-				adbEdit.setView(promptViewEdit);
-				adbEdit.setCancelable(false);
-				adbEdit.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.cancel();
-					}
-				});
-				adbEdit.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-
-					}
-				});
-				final AlertDialog adEdit = adbEdit.create();
-				adEdit.setOnShowListener(new DialogInterface.OnShowListener() {
-					@Override
-					public void onShow(DialogInterface dialog) {
-						final Button buttonEdit = adEdit.getButton(DialogInterface.BUTTON_POSITIVE);
-						final ArrayList<String> tempData = new ArrayList<>();
-						buttonEdit.setOnClickListener(new View.OnClickListener() {
-							@Override
-							public void onClick(View v) {
-								if (titleEditText.getText().toString().isEmpty()){
-									NhPaths.showMessage(context, "Title cannot be empty");
-								} else if (startCmdEditText.getText().toString().isEmpty()){
-									NhPaths.showMessage(context, "Start Command cannot be empty");
-								} else if (stopCmdEditText.getText().toString().isEmpty()){
-									NhPaths.showMessage(context, "Stop Command cannot be empty");
-								} else if (checkstatusEditText.getText().toString().isEmpty()){
-									NhPaths.showMessage(context, "Check Status Command cannot be empty");
-								}else {
-									kaliServicesAsyncTask = new KaliServicesAsyncTask(KaliServicesAsyncTask.CHECK_SERVICE);
-									kaliServicesAsyncTask.setListener(new KaliServicesAsyncTask.KaliServiceTaskListener() {
-										@Override
-										public void onAsyncTaskPrepare() {
-											tempData.add(titleEditText.getText().toString());
-											tempData.add(startCmdEditText.getText().toString());
-											tempData.add(stopCmdEditText.getText().toString());
-											tempData.add(checkstatusEditText.getText().toString());
-											tempData.add(runOnBootCheckbox.isChecked()?"1":"0");
-											kaliServicesSQL.editData(position, tempData);
-											kaliServicesData.editResult(position, tempData);
-										}
-
-										@Override
-										public void onAsyncTaskFinished() {
-											notifyDataSetChanged();
-											NhPaths.showMessage(context, "Successfully edited.");
-											adEdit.dismiss();
-										}
-									});
-									kaliServicesAsyncTask.execute(kaliServicesData);
-								}
-							}
-						});
-					}
-				});
-				adEdit.show();
-
-			}
+			});
+			adEdit.show();
 		});
 
-		itemViewHolder.runOnBootCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-			@Override
-			public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-				kaliServicesAsyncTask = new KaliServicesAsyncTask(KaliServicesAsyncTask.UPDATE_RUNONCHROOTSTART);
-				kaliServicesAsyncTask.setListener(new KaliServicesAsyncTask.KaliServiceTaskListener() {
-					@Override
-					public void onAsyncTaskPrepare() {
-						kaliServicesData.RunOnChrootStart.set(position,(isChecked)?"1":"0");
-						kaliServicesSQL.editData(position, kaliServicesData.dataToStringArray(position));
-					}
-
-					@Override
-					public void onAsyncTaskFinished() {
-						notifyDataSetChanged();
-					}
-				});
-				kaliServicesAsyncTask.execute(kaliServicesData);
+		itemViewHolder.runOnChrootStartCheckbox.setOnCheckedChangeListener((compoundButton, isChecked) -> {
+			ArrayList<String> dataArrayList = new ArrayList<>();
+			dataArrayList.add(kaliServicesModelList.get(position).getServiceName());
+			dataArrayList.add(kaliServicesModelList.get(position).getCommandforStartService());
+			dataArrayList.add(kaliServicesModelList.get(position).getCommandforStopService());
+			dataArrayList.add(kaliServicesModelList.get(position).getCommandforCheckServiceStatus());
+			if (isChecked) {
+				dataArrayList.add("1");
+			} else {
+				dataArrayList.add("0");
 			}
+			KaliServicesData.getInstance().updateRunOnChrootStartServices(position, dataArrayList, KaliServicesSQL.getInstance(context));
 		});
 
-		itemViewHolder.mSwitch.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if (itemViewHolder.mSwitch.isChecked()){
-					kaliServicesAsyncTask = new KaliServicesAsyncTask(KaliServicesAsyncTask.START_SERVICE);
-					kaliServicesAsyncTask.setListener(new KaliServicesAsyncTask.KaliServiceTaskListener() {
-
-						@Override
-						public void onAsyncTaskPrepare() {
-							itemViewHolder.mSwitch.setEnabled(false);
-						}
-
-						@Override
-						public void onAsyncTaskFinished() {
-							notifyDataSetChanged();
-							itemViewHolder.mSwitch.setEnabled(true);
-						}
-					});
-					kaliServicesAsyncTask.execute(kaliServicesData, position);
-				} else {
-					kaliServicesAsyncTask = new KaliServicesAsyncTask(KaliServicesAsyncTask.STOP_SERVICE);
-					kaliServicesAsyncTask.setListener(new KaliServicesAsyncTask.KaliServiceTaskListener() {
-
-						@Override
-						public void onAsyncTaskPrepare() {
-							itemViewHolder.mSwitch.setEnabled(false);
-						}
-
-						@Override
-						public void onAsyncTaskFinished() {
-							notifyDataSetChanged();
-							itemViewHolder.mSwitch.setEnabled(true);
-						}
-					});
-					kaliServicesAsyncTask.execute(kaliServicesData, position);
-				}
+		itemViewHolder.mSwitch.setOnClickListener(v -> {
+			if (itemViewHolder.mSwitch.isChecked()){
+				KaliServicesData.getInstance().startServiceforItem(position, itemViewHolder.mSwitch, context);
+			} else {
+				KaliServicesData.getInstance().stopServiceforItem(position, itemViewHolder.mSwitch, context);
 			}
 		});
-
 	}
 
 	@Override
 	public int getItemCount() {
-		return kaliServicesData.ServiceName.size();
+		return kaliServicesModelList.size();
 	}
 
 	@Override
@@ -289,18 +189,51 @@ public class KaliServiceRecycleViewAdapterTitles extends RecyclerView.Adapter<Ka
 		return super.getItemId(position);
 	}
 
+	@Override
+	public Filter getFilter() {
+		return KaliServicesModelListFilter;
+	}
+
+	private Filter KaliServicesModelListFilter = new Filter() {
+
+		@Override
+		protected FilterResults performFiltering(CharSequence constraint) {
+			FilterResults results = new FilterResults();
+			if (constraint == null || constraint.length() == 0){
+				results.values = new ArrayList<>(KaliServicesData.getInstance().kaliServicesModelListFull);
+			} else {
+				String filterPattern = constraint.toString().toLowerCase().trim();
+				List<KaliServicesModel> tempKaliServicesModelList = new ArrayList<>();
+				for (KaliServicesModel kaliServicesModel: KaliServicesData.getInstance().kaliServicesModelListFull){
+					if (kaliServicesModel.getServiceName().toLowerCase().contains(filterPattern)){
+						tempKaliServicesModelList.add(kaliServicesModel);
+					}
+				}
+				results.values = tempKaliServicesModelList;
+			}
+			return results;
+		}
+
+		@Override
+		protected void publishResults(CharSequence constraint, FilterResults results) {
+			KaliServicesData.getInstance().getKaliServicesModels().getValue().clear();
+			KaliServicesData.getInstance().getKaliServicesModels().getValue().addAll((List<KaliServicesModel>) results.values);
+			KaliServicesData.getInstance().getKaliServicesModels().postValue(KaliServicesData.getInstance().getKaliServicesModels().getValue());
+		}
+	};
+
 	class ItemViewHolder extends RecyclerView.ViewHolder{
 		private TextView nametextView;
 		private Button editbutton;
 		private Switch mSwitch;
-		private CheckBox runOnBootCheckbox;
+		private CheckBox runOnChrootStartCheckbox;
 		private TextView statustextView;
 
 		private ItemViewHolder(View view){
 			super(view);
 			nametextView = view.findViewById(R.id.f_kaliservices_recycleview_servicetitle_tv);
 			editbutton = view.findViewById(R.id.f_kaliservices_recycleview_edit_btn);
-			runOnBootCheckbox = view.findViewById(R.id.f_kaliservices_recycleview_runonboot_checkbox);
+			runOnChrootStartCheckbox = view.findViewById(R.id.f_kaliservices_recycleview_runonchrootstart_checkbox);
 			mSwitch = view.findViewById(R.id.f_kaliservices_recycleview_switch_toggle);
 			statustextView = view.findViewById(R.id.f_kaliservices_recycleview_serviceresult_tv);
 		}

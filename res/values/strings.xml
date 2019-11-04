@@ -19,9 +19,9 @@
     <string name="hid_windows_cmd_description">This Windows CMD payload allows you to enter raw commands to a Windows command prompt. Hitting the list menu will allow you to choose keyboard layout or UAC bypass options. </string>
 
     <!-- KaliServices -->
-    <string name="kali_services_description">Various Kali network services can be started and stopped via the buttons in this part of the interface.</string>
-    <string name="kaliservices_howto_startservice">To START a service in kali, a command will be run INSIDE KaliChroot that looks like this:\n\nbusybox chroot &lt;chroot_folder> /bin/bash -c \'&lt;command_to_start_service>\'\n\nService is considered STARTED if the return value is 0 and vice versa.</string>
-    <string name="kaliservices_howto_stopservice">To STOP a service in kali, a command will be run INSIDE KaliChroot that looks like this:\n\nbusybox chroot &lt;chroot_folder> /bin/bash -c \'&lt;command_to_stop_service>\'\n\nService is considered STOPPED if the return value is 0 and vice versa.</string>
+    <string name="kali_services_description">Kali Chroot services can be started and stopped via the switch toggle buttons, you can also ADD, DELETE, MOVE, EDIT, SEARCH, BACKUP, RESTORE and RESET your own service item</string>
+    <string name="kaliservices_howto_startservice">To START a service in kali, a command will be run INSIDE KaliChroot that looks like this:\n\nbusybox chroot &lt;chroot_folder> /usr/bin/sudo &lt;command_to_start_service>\n\nService is considered STARTED if the return value is 0 and vice versa.</string>
+    <string name="kaliservices_howto_stopservice">To STOP a service in kali, a command will be run INSIDE KaliChroot that looks like this:\n\nbusybox chroot &lt;chroot_folder> /usr/bin/sudo &lt;command_to_stop_service>\n\nService is considered STOPPED if the return value is 0 and vice versa.</string>
     <string name="kaliservices_howto_checkservice">To Check if a service in kali is up or not, a command will be run OUTSIDE KaliChroot that looks like this:\n\nbusybox ps -o pid,comm | grep \'&lt;service_name>\'\n\nService is considered UP if the return value is 0 and vice versa.</string>
     <string name="kaliservices_howto_runServiceOnBoot">To automacticailly start the service after Kali Chroot is up, check this option.</string>
 

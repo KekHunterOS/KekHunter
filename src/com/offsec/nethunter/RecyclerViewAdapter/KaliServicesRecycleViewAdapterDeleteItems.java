@@ -10,19 +10,19 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.offsec.nethunter.R;
-import com.offsec.nethunter.RecyclerViewData.KaliServicesData;
+import com.offsec.nethunter.models.KaliServicesModel;
 
+import java.util.List;
 
-//Define recycleView adapter for listing different textView content.
 public class KaliServicesRecycleViewAdapterDeleteItems extends RecyclerView.Adapter<KaliServicesRecycleViewAdapterDeleteItems.ItemViewHolder>{
 
 	private static final String TAG = "KaliServiceRecycleViewChild";
 	private Context context;
-	private KaliServicesData kaliServicesData;
+	private List<KaliServicesModel> kaliServicesModelList;
 
-	public KaliServicesRecycleViewAdapterDeleteItems(Context context, KaliServicesData kaliServicesData){
+	public KaliServicesRecycleViewAdapterDeleteItems(Context context, List<KaliServicesModel> kaliServicesModelList){
 		this.context = context;
-		this.kaliServicesData = kaliServicesData;
+		this.kaliServicesModelList = kaliServicesModelList;
 	}
 
 	@NonNull
@@ -34,19 +34,19 @@ public class KaliServicesRecycleViewAdapterDeleteItems extends RecyclerView.Adap
 
 	@Override
 	public void onBindViewHolder(@NonNull final ItemViewHolder itemViewHolder, int i) {
-		itemViewHolder.checkBox.setText(kaliServicesData.ServiceName.get(i));
+		itemViewHolder.runOnChrootStartCheckBox.setText(kaliServicesModelList.get(i).getServiceName());
 	}
 
 	@Override
 	public int getItemCount() {
-		return kaliServicesData.ServiceName.size();
+		return kaliServicesModelList.size();
 	}
 
 	class ItemViewHolder extends RecyclerView.ViewHolder{
-		private CheckBox checkBox;
+		private CheckBox runOnChrootStartCheckBox;
 		private ItemViewHolder(View view){
 			super(view);
-			checkBox = view.findViewById(R.id.f_kaliservices_recycleview_dialog_chkbox);
+			runOnChrootStartCheckBox = view.findViewById(R.id.f_kaliservices_recycleview_dialog_chkbox);
 		}
 	}
 
