@@ -24,6 +24,7 @@ import com.offsec.nethunter.R;
 import com.offsec.nethunter.RecyclerViewData.NethunterData;
 import com.offsec.nethunter.SQL.NethunterSQL;
 import com.offsec.nethunter.models.NethunterModel;
+import com.offsec.nethunter.utils.NhPaths;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -106,17 +107,30 @@ public class NethunterRecyclerViewAdapter extends RecyclerView.Adapter<Nethunter
                             nethunterModelList.get(position))).getRunOnCreate().equals("1"));
 
             AlertDialog.Builder adb = new AlertDialog.Builder(context);
+            adb.setPositiveButton("Apply", (dialog, which) -> { });
             AlertDialog ad = adb.create();
             ad.setView(promptViewEdit);
             ad.setCancelable(true);
-            ad.setButton(Dialog.BUTTON_POSITIVE, "Apply", (dialog, which) -> {
-                ArrayList<String> dataArrayList = new ArrayList<>();
-                dataArrayList.add(titleEditText.getText().toString());
-                dataArrayList.add(cmdEditText.getText().toString());
-                dataArrayList.add(delimiterEditText.getText().toString());
-                dataArrayList.add(runOnCreateCheckbox.isChecked()?"1":"0");
-                NethunterData.getInstance().editData(NethunterData.getInstance().nethunterModelListFull.indexOf(
-                        nethunterModelList.get(position)), dataArrayList, NethunterSQL.getInstance(context));
+            ad.setOnShowListener(dialog -> {
+                final Button buttonEdit = ad.getButton(DialogInterface.BUTTON_POSITIVE);
+                buttonEdit.setOnClickListener(v1 -> {
+                    if (titleEditText.getText().toString().isEmpty()){
+                        NhPaths.showMessage(context, "Title cannot be empty");
+                    } else if (cmdEditText.getText().toString().isEmpty()){
+                        NhPaths.showMessage(context, "Command cannot be empty");
+                    } else if (delimiterEditText.getText().toString().isEmpty()){
+                        NhPaths.showMessage(context, "Delimiter cannot be empty");
+                    } else {
+                        ArrayList<String> dataArrayList = new ArrayList<>();
+                        dataArrayList.add(titleEditText.getText().toString());
+                        dataArrayList.add(cmdEditText.getText().toString());
+                        dataArrayList.add(delimiterEditText.getText().toString());
+                        dataArrayList.add(runOnCreateCheckbox.isChecked()?"1":"0");
+                        NethunterData.getInstance().editData(NethunterData.getInstance().nethunterModelListFull.indexOf(
+                                nethunterModelList.get(position)), dataArrayList, NethunterSQL.getInstance(context));
+                        ad.dismiss();
+                    }
+                });
             });
             ad.show();
         });

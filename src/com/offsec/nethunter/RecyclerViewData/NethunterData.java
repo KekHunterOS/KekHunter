@@ -97,6 +97,7 @@ public class NethunterData {
 
             @Override
             public void onAsyncTaskFinished(List<NethunterModel> nethunterModelList) {
+                updateNethunterModelListFull(nethunterModelList);
                 getNethunterModels().getValue().clear();
                 getNethunterModels().getValue().addAll(nethunterModelList);
                 getNethunterModels().postValue(getNethunterModels().getValue());
@@ -115,6 +116,7 @@ public class NethunterData {
 
             @Override
             public void onAsyncTaskFinished(List<NethunterModel> nethunterModelList) {
+                updateNethunterModelListFull(nethunterModelList);
                 getNethunterModels().getValue().clear();
                 getNethunterModels().getValue().addAll(nethunterModelList);
                 getNethunterModels().postValue(getNethunterModels().getValue());
@@ -133,6 +135,7 @@ public class NethunterData {
 
             @Override
             public void onAsyncTaskFinished(List<NethunterModel> nethunterModelList) {
+                updateNethunterModelListFull(nethunterModelList);
                 getNethunterModels().getValue().clear();
                 getNethunterModels().getValue().addAll(nethunterModelList);
                 getNethunterModels().postValue(getNethunterModels().getValue());
@@ -151,6 +154,7 @@ public class NethunterData {
 
             @Override
             public void onAsyncTaskFinished(List<NethunterModel> nethunterModelList) {
+                updateNethunterModelListFull(nethunterModelList);
                 getNethunterModels().getValue().clear();
                 getNethunterModels().getValue().addAll(nethunterModelList);
                 getNethunterModels().postValue(getNethunterModels().getValue());
@@ -175,6 +179,7 @@ public class NethunterData {
 
                 @Override
                 public void onAsyncTaskFinished(List<NethunterModel> nethunterModelList) {
+                    updateNethunterModelListFull(nethunterModelList);
                     getNethunterModels().getValue().clear();
                     getNethunterModels().getValue().addAll(nethunterModelList);
                     getNethunterModels().postValue(getNethunterModels().getValue());
@@ -199,6 +204,7 @@ public class NethunterData {
 
             @Override
             public void onAsyncTaskFinished(List<NethunterModel> nethunterModelList) {
+                updateNethunterModelListFull(nethunterModelList);
                 getNethunterModels().getValue().clear();
                 getNethunterModels().getValue().addAll(nethunterModelList);
                 getNethunterModels().postValue(getNethunterModels().getValue());

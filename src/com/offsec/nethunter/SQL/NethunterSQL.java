@@ -60,6 +60,7 @@ public class NethunterSQL extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE " + TABLE_NAME + " (" + COLUMNS.get(0) + " INTEGER, " +
                 COLUMNS.get(1) + " TEXT, " + COLUMNS.get(2) +  " TEXT, " + COLUMNS.get(3) + " INTEGER, " + COLUMNS.get(4) + " TEXT)");
         ContentValues initialValues = new ContentValues();
+        db.beginTransaction();
         for (String[] data: nethunterData){
             initialValues.put(COLUMNS.get(0), data[0]);
             initialValues.put(COLUMNS.get(1), data[1]);
@@ -68,6 +69,8 @@ public class NethunterSQL extends SQLiteOpenHelper {
             initialValues.put(COLUMNS.get(4), data[4]);
             db.insert(TABLE_NAME, null, initialValues);
         }
+        db.setTransactionSuccessful();
+        db.endTransaction();
     }
 
     @Override
@@ -242,6 +245,7 @@ public class NethunterSQL extends SQLiteOpenHelper {
             tempDB.close();
             return true;
         }
+        tempDB.close();
         return false;
     }
 }

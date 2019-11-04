@@ -83,8 +83,8 @@ public class NethunterAsynctask extends AsyncTask<List<NethunterModel>, Void, Li
             case GETITEMRESULTS:
                 nethunterModelList = copyOfnethunterModelList[0];
                 if (nethunterModelList != null){
-                    for (NethunterModel nethunterModel: nethunterModelList){
-                        nethunterModel.setResult(nethunterModel.getRunOnCreate().equals("1")?new ShellExecuter().RunAsRootOutput(nethunterModel.getCommand()).split("\\n"):"Please click RUN button manually.".split("\\n"));
+                    for (int i = 0; i < nethunterModelList.size(); i++){
+                        nethunterModelList.get(i).setResult(nethunterModelList.get(i).getRunOnCreate().equals("1")?new ShellExecuter().RunAsRootOutput(nethunterModelList.get(i).getCommand()).split("\\n"):"Please click RUN button manually.".split("\\n"));
                     }
                 }
                 break;
@@ -105,7 +105,6 @@ public class NethunterAsynctask extends AsyncTask<List<NethunterModel>, Void, Li
                         nethunterModelList.get(position).setResult(new ShellExecuter().RunAsRootOutput(dataArrayList.get(1)).split(dataArrayList.get(2)));
                     }
                     nethunterSQL.editData(position, dataArrayList);
-                    NethunterData.getInstance().updateNethunterModelListFull(nethunterModelList);
                 }
                 break;
             case ADDDATA:
@@ -122,7 +121,6 @@ public class NethunterAsynctask extends AsyncTask<List<NethunterModel>, Void, Li
                         nethunterModelList.get(position - 1).setResult(new ShellExecuter().RunAsRootOutput(dataArrayList.get(1)).split(dataArrayList.get(2)));
                     }
                     nethunterSQL.addData(position, dataArrayList);
-                    NethunterData.getInstance().updateNethunterModelListFull(nethunterModelList);
                 }
                 break;
             case DELETEDATA:
@@ -134,7 +132,6 @@ public class NethunterAsynctask extends AsyncTask<List<NethunterModel>, Void, Li
                         nethunterModelList.remove(i);
                     }
                     nethunterSQL.deleteData(selectedTargetIds);
-                    NethunterData.getInstance().updateNethunterModelListFull(nethunterModelList);
                 }
                 break;
             case MOVEDATA:
@@ -153,7 +150,6 @@ public class NethunterAsynctask extends AsyncTask<List<NethunterModel>, Void, Li
                     }
                     nethunterModelList.add(targetPositionIndex, tempNethunterModel);
                     nethunterSQL.moveData(originalPositionIndex, targetPositionIndex);
-                    NethunterData.getInstance().updateNethunterModelListFull(nethunterModelList);
                 }
                 break;
             case BACKUPDATA:
@@ -163,11 +159,9 @@ public class NethunterAsynctask extends AsyncTask<List<NethunterModel>, Void, Li
                 if (nethunterModelList != null) {
                     nethunterModelList.clear();
                     nethunterModelList = nethunterSQL.bindData((ArrayList<NethunterModel>)nethunterModelList);
-                    NethunterData.getInstance().updateNethunterModelListFull(nethunterModelList);
                 }
                 break;
             case RESETDATA:
-                NethunterData.getInstance().updateNethunterModelListFull(nethunterModelList);
                 break;
         }
         return copyOfnethunterModelList[0];

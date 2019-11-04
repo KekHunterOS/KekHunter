@@ -61,7 +61,7 @@ public class NetHunterFragment extends Fragment {
         fragment.setArguments(args);
         return fragment;
     }
-    
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,6 +79,7 @@ public class NetHunterFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         nethunterViewModel = ViewModelProviders.of(this).get(NethunterViewModel.class);
         nethunterViewModel.init(context);
         nethunterViewModel.getLiveDataNethunterModelList().observe(this, nethunterModelList -> {
@@ -100,7 +101,6 @@ public class NetHunterFragment extends Fragment {
         onAddItemSetup();
         onDeleteItemSetup();
         onMoveItemSetup();
-        super.onViewCreated(view, savedInstanceState);
     }
 
     @Override
@@ -109,6 +109,11 @@ public class NetHunterFragment extends Fragment {
         MenuItem searchItem = menu.findItem(R.id.f_nethunter_action_search);
         SearchView searchView = (SearchView) searchItem.getActionView();
 
+        searchView.setOnSearchClickListener(v -> menu.setGroupVisible(R.id.f_nethunter_menu_group1, false));
+        searchView.setOnCloseListener(() -> {
+            menu.setGroupVisible(R.id.f_nethunter_menu_group1, true);
+            return false;
+        });
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -298,9 +303,7 @@ public class NetHunterFragment extends Fragment {
             });
 
             AlertDialog.Builder adb = new AlertDialog.Builder(context);
-            adb.setPositiveButton("OK", (dialog, which) -> {
-
-            });
+            adb.setPositiveButton("OK", (dialog, which) -> { });
             AlertDialog ad = adb.create();
             ad.setView(promptViewAdd);
             ad.setCancelable(true);
