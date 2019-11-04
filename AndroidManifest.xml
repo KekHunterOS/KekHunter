@@ -14,12 +14,12 @@
     <uses-permission android:name="com.offsec.nhterm.permission.RUN_SCRIPT_NH_LOGIN" />
     <uses-permission android:name="com.offsec.nhvnc.permission.OPEN_VNC_CONN" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE"/>
 
     <supports-screens
         android:anyDensity="true"
@@ -81,8 +81,7 @@
 
         <receiver android:name=".receiver.BootCompletedReceiver"
             android:enabled="true"
-            android:exported="true"
-            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+            android:exported="true">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -106,6 +105,16 @@
             android:name=".service.RunAtBootService"
             android:enabled="true"
             android:exported="false"/>
+        <service
+            android:name=".service.DummyAccessibilityService"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/dummy_accessibility_service"/>
+        </service>
         <service
             android:name=".gps.LocationUpdateService"
             android:enabled="true"

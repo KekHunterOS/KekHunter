@@ -45,19 +45,6 @@ if [ -z "$MNT" ]; then
     exit 2
 fi
 
-## Define chroot shell executable path.
-if [ -x $MNT/usr/bin/bash ]; then
-    CHROOT_EXEC=/usr/bin/bash
-#elif [ -f $MNT/usr/bin/sudo ]; then
-#    CHROOT_EXEC=/usr/bin/sudo
-#elif [ -f $MNT/bin/sudo ]; then
-#    CHROOT_EXEC=/bin/sudo
-else
-    bklog "[-] Your chroot has no \"bash\" installed, please install it manually first."
-    bklog "[-] Also make sure your Kali Chroot is not corrupted."
-    exit 2
-fi
-
 isAllunmounted=0
 unset LD_PRELOAD
 
@@ -98,7 +85,7 @@ f_umount_fs() {
     if $BUSYBOX mountpoint -q $MNT/$1; then
         if $BUSYBOX umount -f $MNT/$1; then
             bklog "[+] umounted $MNT/$1"
-            if [ ! "$1" = "dev/pts" ]; then
+            if [ ! "$1" = "dev/pts" -a ! "$1" = "dev/shm" ]; then
                 if rm -rf $MNT/$1; then
                     bklog "[+] removed $MNT/$1"
                 else
@@ -126,7 +113,6 @@ f_umount_fs() {
 
 ########## umount if chroot directory is NOT a mountpoint(directory method) ##########
 f_dir_umount() {
-    $BUSYBOX chroot $MNT $CHROOT_EXEC -c "sync"
     $BUSYBOX sync
     f_kill_pids
     f_restore_setup

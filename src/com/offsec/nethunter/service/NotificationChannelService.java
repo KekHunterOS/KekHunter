@@ -3,6 +3,7 @@ package com.offsec.nethunter.service;
 import android.app.IntentService;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
@@ -10,7 +11,9 @@ import android.os.IBinder;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.app.TaskStackBuilder;
 
+import com.offsec.nethunter.AppNavHomeActivity;
 import com.offsec.nethunter.BuildConfig;
 import com.offsec.nethunter.R;
 
@@ -18,7 +21,9 @@ import com.offsec.nethunter.R;
 public class NotificationChannelService extends IntentService {
     public static final String CHANNEL_ID = "NethunterNotifyChannel";
     public static final int NOTIFY_ID = 1002;
-
+    public Intent resultIntent = null;
+    public PendingIntent resultPendingIntent = null;
+    public TaskStackBuilder stackBuilder = null;
     public static final String REMINDMOUNTCHROOT = BuildConfig.APPLICATION_ID + ".REMINDMOUNTCHROOT";
     public static final String USENETHUNTER = BuildConfig.APPLICATION_ID + ".USENETHUNTER";
     public static final String DOWNLOADING = BuildConfig.APPLICATION_ID + ".DOWNLOADING";
@@ -53,22 +58,26 @@ public class NotificationChannelService extends IntentService {
                 switch (intent.getAction()){
                     case REMINDMOUNTCHROOT:
                         notificationManagerCompat.cancelAll();
-                        /*Intent resultIntent = new Intent(getApplicationContext(), AppNavHomeActivity.class);
-                        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+                        resultIntent = new Intent();
+                        stackBuilder = TaskStackBuilder.create(this);
                         stackBuilder.addNextIntentWithParentStack(resultIntent);
-                        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);*/
+                        resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
                         builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
                                 .setAutoCancel(true)
                                 .setSmallIcon(R.drawable.ic_stat_ic_nh_notificaiton)
                                 .setStyle(new NotificationCompat.BigTextStyle().bigText("Please open nethunter app and navigate to ChrootManager to setup your KaliChroot."))
                                 .setContentTitle("KaliChroot is not up or installed")
                                 .setContentText("Please navigate to ChrootManager to setup your KaliChroot.")
-                                .setPriority(NotificationCompat.PRIORITY_MAX);
-                                //.setContentIntent(resultPendingIntent);
+                                .setPriority(NotificationCompat.PRIORITY_MAX)
+                                .setContentIntent(resultPendingIntent);
                         notificationManagerCompat.notify(NOTIFY_ID, builder.build());
                         break;
                     case USENETHUNTER:
                         notificationManagerCompat.cancelAll();
+                        resultIntent = new Intent();
+                        stackBuilder = TaskStackBuilder.create(this);
+                        stackBuilder.addNextIntentWithParentStack(resultIntent);
+                        resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
                         builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
                                 .setAutoCancel(true)
                                 .setSmallIcon(R.drawable.ic_stat_ic_nh_notificaiton)
@@ -76,11 +85,16 @@ public class NotificationChannelService extends IntentService {
                                 .setStyle(new NotificationCompat.BigTextStyle().bigText("Happy hunting!"))
                                 .setContentTitle("KaliChroot is UP!")
                                 .setContentText("Happy hunting!")
-                                .setPriority(NotificationCompat.PRIORITY_MAX);
+                                .setPriority(NotificationCompat.PRIORITY_MAX)
+                                .setContentIntent(resultPendingIntent);
                         notificationManagerCompat.notify(NOTIFY_ID, builder.build());
                         break;
                     case DOWNLOADING:
                         notificationManagerCompat.cancelAll();
+                        resultIntent = new Intent();
+                        stackBuilder = TaskStackBuilder.create(this);
+                        stackBuilder.addNextIntentWithParentStack(resultIntent);
+                        resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
                         builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
                                 .setAutoCancel(true)
                                 .setSmallIcon(R.drawable.ic_stat_ic_nh_notificaiton)
@@ -88,31 +102,42 @@ public class NotificationChannelService extends IntentService {
                                 .setStyle(new NotificationCompat.BigTextStyle().bigText("Please don't kill the app or the download will be cancelled!"))
                                 .setContentTitle("Downloading Chroot!")
                                 .setContentText("Please don't kill the app or the download will be cancelled!")
-                                .setPriority(NotificationCompat.PRIORITY_MAX);
+                                .setPriority(NotificationCompat.PRIORITY_MAX)
+                                .setContentIntent(resultPendingIntent);
                         notificationManagerCompat.notify(NOTIFY_ID, builder.build());
                         break;
                     case INSTALLING:
                         notificationManagerCompat.cancelAll();
+                        resultIntent = new Intent();
+                        stackBuilder = TaskStackBuilder.create(this);
+                        stackBuilder.addNextIntentWithParentStack(resultIntent);
+                        resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
                         builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
                                 .setAutoCancel(true)
                                 .setSmallIcon(R.drawable.ic_stat_ic_nh_notificaiton)
                                 .setTimeoutAfter(15000)
-                                .setStyle(new NotificationCompat.BigTextStyle().bigText("Please don't kill the app as it will still keep running on the background"))
+                                .setStyle(new NotificationCompat.BigTextStyle().bigText("Please don't kill the app as it will still keep running on the background! Otherwise you'll need to kill the tar process by yourself."))
                                 .setContentTitle("Installing Chroot")
-                                .setContentText("Please don't kill the app as it will still keep running on the background")
-                                .setPriority(NotificationCompat.PRIORITY_MAX);
+                                .setContentText("Please don't kill the app as it will still keep running on the background! Otherwise you'll need to kill the tar process by yourself.")
+                                .setPriority(NotificationCompat.PRIORITY_MAX)
+                                .setContentIntent(resultPendingIntent);
                         notificationManagerCompat.notify(NOTIFY_ID, builder.build());
                         break;
                     case BACKINGUP:
                         notificationManagerCompat.cancelAll();
+                        resultIntent = new Intent();
+                        stackBuilder = TaskStackBuilder.create(this);
+                        stackBuilder.addNextIntentWithParentStack(resultIntent);
+                        resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
                         builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
                                 .setAutoCancel(true)
                                 .setSmallIcon(R.drawable.ic_stat_ic_nh_notificaiton)
                                 .setTimeoutAfter(15000)
-                                .setStyle(new NotificationCompat.BigTextStyle().bigText("Please don't kill the app as it will still keep running on the background"))
+                                .setStyle(new NotificationCompat.BigTextStyle().bigText("Please don't kill the app as it will still keep running on the background! Otherwise you'll need to kill the tar process by yourself."))
                                 .setContentTitle("Creating KaliChroot backup to local storage.")
-                                .setContentText("Please don't kill the app as it will still keep running on the background")
-                                .setPriority(NotificationCompat.PRIORITY_MAX);
+                                .setContentText("Please don't kill the app as it will still keep running on the background! Otherwise you'll need to kill the tar process by yourself.")
+                                .setPriority(NotificationCompat.PRIORITY_MAX)
+                                .setContentIntent(resultPendingIntent);
                         notificationManagerCompat.notify(NOTIFY_ID, builder.build());
                         break;
                 }

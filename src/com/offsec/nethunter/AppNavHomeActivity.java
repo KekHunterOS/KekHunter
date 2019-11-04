@@ -1,8 +1,6 @@
 package com.offsec.nethunter;
 
 import android.app.Activity;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -12,13 +10,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.PowerManager;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -36,10 +30,8 @@ import com.offsec.nethunter.utils.CheckForRoot;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.PermissionCheck;
 import com.offsec.nethunter.utils.SharePrefTag;
-import com.offsec.nethunter.utils.ShellExecuter;
 import com.winsontan520.wversionmanager.library.WVersionManager;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.Stack;
@@ -54,7 +46,6 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 
 public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpdates.Provider {
@@ -72,7 +63,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     private CharSequence mTitle = "NetHunter";
     private final Stack<String> titles = new Stack<>();
     private static SharedPreferences prefs;
-    private MenuItem lastSelected;
+    public static MenuItem lastSelectedMenuItem;
     public Context context;
     public Activity activity;
     private Integer permsCurrent = 1;
@@ -243,11 +234,11 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
             while (i < mSize) {
                 if (menuNav.getItem(i).getTitle() == mTitle) {
                     MenuItem _current = menuNav.getItem(i);
-                    if (lastSelected != _current) {
+                    if (lastSelectedMenuItem != _current) {
                         //remove last
-                        lastSelected.setChecked(false);
+                        lastSelectedMenuItem.setChecked(false);
                         // udpate for the next
-                        lastSelected = _current;
+                        lastSelectedMenuItem = _current;
                     }
                     //set checked
                     _current.setChecked(true);
@@ -344,9 +335,9 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
             ed.apply();
         }
 
-        if (lastSelected == null) { // only in the 1st create
-            lastSelected = navigationView.getMenu().getItem(0);
-            lastSelected.setChecked(true);
+        if (lastSelectedMenuItem == null) { // only in the 1st create
+            lastSelectedMenuItem = navigationView.getMenu().getItem(0);
+            lastSelectedMenuItem.setChecked(true);
         }
         mDrawerToggle = new ActionBarDrawerToggle(activity, mDrawerLayout, R.string.drawer_opened, R.string.drawer_closed);
         mDrawerLayout.setDrawerListener(mDrawerToggle);
@@ -383,11 +374,11 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         navigationView.setNavigationItemSelectedListener(
                 menuItem -> {
                     // only change it if is not the same as the last one
-                    if (lastSelected != menuItem) {
+                    if (lastSelectedMenuItem != menuItem) {
                         //remove last
-                        lastSelected.setChecked(false);
+                        lastSelectedMenuItem.setChecked(false);
                         // update for the next
-                        lastSelected = menuItem;
+                        lastSelectedMenuItem = menuItem;
                     }
                     //set checked
                     menuItem.setChecked(true);

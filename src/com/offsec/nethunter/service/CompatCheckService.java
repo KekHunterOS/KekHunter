@@ -1,15 +1,20 @@
 package com.offsec.nethunter.service;
 
 import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.IBinder;
+import android.provider.Settings;
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
 
 import com.offsec.nethunter.AppNavHomeActivity;
 import com.offsec.nethunter.BuildConfig;
+import com.offsec.nethunter.R;
 import com.offsec.nethunter.utils.CheckForRoot;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.SharePrefTag;
@@ -18,6 +23,7 @@ import com.offsec.nethunter.utils.ShellExecuter;
 // IntentService class for keep checking the campatibaility every time user switch back to the app.
 public class CompatCheckService extends IntentService {
 
+    private static final String TAG = "CompatCheckService";
     private static String message = "";
     private int RESULTCODE = -1;
     private SharedPreferences sharedPreferences;
@@ -79,13 +85,16 @@ public class CompatCheckService extends IntentService {
             return false;
         }
 
-        // All of code below will always be executed every time this service is started.
-        // Check if selinux is in permissive mode.
+        // All of the code start from here will always be executed every time this service is started.
+        // And remember no any return true or false except the last line of this function.
+        /* Other compat checks start from here */
+
+        // Check if selinux is in permissive mode, if not, set it to permissive mode.
         new ShellExecuter().RunAsRootOutput("[ ! \"$(getenforce | grep Permissive)\" ] && setenforce 0");
 
-        // Check only for the first installation, find out the possible chroot folder and point the chroot path to it.
-        String[] chrootDirs = new ShellExecuter().RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/chrootmgr -c \"findchroot\"").split("\\n");
+        // Check only for the first installation, find out the possible chroot folder and point it to the chroot path.
         if (sharedPreferences.getString(SharePrefTag.CHROOT_ARCH_SHAREPREF_TAG, null) == null) {
+            String[] chrootDirs = new ShellExecuter().RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/chrootmgr -c \"findchroot\"").split("\\n");
             // if findchroot returns empty string then default the chroot arch to kali-arm64, else default to the first valid chroot arch.
             if (chrootDirs[0].equals("")) {
                 sharedPreferences.edit().putString(SharePrefTag.CHROOT_ARCH_SHAREPREF_TAG, "kali-arm64").apply();
@@ -97,29 +106,49 @@ public class CompatCheckService extends IntentService {
         }
 
         // Check chroot status, push notification to user and disable all the fragments if chroot is not yet up.
+        // if intent is NOT sent by chrootmanager, run the check asynctask again.
         if (RESULTCODE == -1){
-            if ((new ShellExecuter().RunAsRootReturnValue(NhPaths.APP_SCRIPTS_PATH + "/chrootmgr -c \"status\" -p " + NhPaths.CHROOT_PATH()) != 0)){
-                startService(new Intent(getApplicationContext(), NotificationChannelService.class).setAction(NotificationChannelService.REMINDMOUNTCHROOT));
-                getApplicationContext().sendBroadcast(new Intent()
-                        .putExtra("ENABLEFRAGMENT", false)
-                        .setAction(AppNavHomeActivity.NethunterReceiver.CHECKCHROOT));
+            if ((new ShellExecuter().RunAsRootReturnValue(NhPaths.APP_SCRIPTS_PATH + "/chrootmgr -c \"status\" -p " + NhPaths.CHROOT_PATH()) != 0)) {
+                if (AppNavHomeActivity.lastSelectedMenuItem.getItemId() != R.id.createchroot_item) {
+                    startService(new Intent(getApplicationContext(), NotificationChannelService.class).setAction(NotificationChannelService.REMINDMOUNTCHROOT));
+                    getApplicationContext().sendBroadcast(new Intent()
+                            .putExtra("ENABLEFRAGMENT", false)
+                            .setAction(AppNavHomeActivity.NethunterReceiver.CHECKCHROOT));
+                } else {
+                    sendBroadcast(new Intent().putExtra("ENABLEFRAGMENT", false).setAction(AppNavHomeActivity.NethunterReceiver.CHECKCHROOT));
+                }
             } else {
                 getApplicationContext().sendBroadcast(new Intent()
                         .putExtra("ENABLEFRAGMENT", true)
                         .setAction(AppNavHomeActivity.NethunterReceiver.CHECKCHROOT));
             }
         } else {
+            // if intent is sent by chrootmanager, no need to run the check asynctask again.
             if (RESULTCODE != 0) {
-                startService(new Intent(getApplicationContext(), NotificationChannelService.class).setAction(NotificationChannelService.REMINDMOUNTCHROOT));
-                getApplicationContext().sendBroadcast(new Intent()
-                        .putExtra("ENABLEFRAGMENT", false)
-                        .setAction(AppNavHomeActivity.NethunterReceiver.CHECKCHROOT));
+                if (AppNavHomeActivity.lastSelectedMenuItem.getItemId() != R.id.createchroot_item) {
+                    startService(new Intent(getApplicationContext(), NotificationChannelService.class).setAction(NotificationChannelService.REMINDMOUNTCHROOT));
+                    getApplicationContext().sendBroadcast(new Intent()
+                            .putExtra("ENABLEFRAGMENT", false)
+                            .setAction(AppNavHomeActivity.NethunterReceiver.CHECKCHROOT));
+                } else {
+                    sendBroadcast(new Intent().putExtra("ENABLEFRAGMENT", false).setAction(AppNavHomeActivity.NethunterReceiver.CHECKCHROOT));
+                }
             } else {
                 getApplicationContext().sendBroadcast(new Intent()
                         .putExtra("ENABLEFRAGMENT", true)
                         .setAction(AppNavHomeActivity.NethunterReceiver.CHECKCHROOT));
             }
         }
+
+        // If devices are "^oneplus.*|^miui.*",
+        // then they must have accessibility service enabled to make sure the BOOT_COMPLETED action intent is actually received by the nethunter app.
+        if ((Build.MODEL.toLowerCase().matches("^oneplus.*|^miui.*"))){
+            if (!new ShellExecuter().RunAsRootOutput("settings get secure enabled_accessibility_services").matches("com\\.offsec\\.nethunter")){
+                Log.d(TAG, "The accessibility service is not enabled for nethunter, enabling it now..");
+                new ShellExecuter().RunAsRootOutput("settings put secure enabled_accessibility_services com.offsec.nethunter/.service.DummyAccessibilityService");
+            }
+        }
+        /* End of the other compat checks */
 
         return true;
     }

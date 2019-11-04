@@ -20,6 +20,7 @@ public class NhPaths implements SharedPreferences.OnSharedPreferenceChangeListen
     public static String APP_PATH;
     public static String APP_INITD_PATH;
     public static String APP_SCRIPTS_PATH;
+    public static String APP_SCRIPTS_BIN_PATH;
     public static String NH_SD_FOLDER_NAME;
     public static String SD_PATH;
     public static String APP_SD_FILES_PATH;
@@ -27,6 +28,8 @@ public class NhPaths implements SharedPreferences.OnSharedPreferenceChangeListen
     public static String NH_SYSTEM_PATH;
     public static String ARCH_FOLDER;
     public static String CHROOT_SD_PATH;
+    public static String CHROOT_SUDO;
+    public static String CHROOT_INITD_SCRIPT_PATH;
     public static String APP_SD_SQLBACKUP_PATH;
     public static String BUSYBOX;
 
@@ -36,6 +39,7 @@ public class NhPaths implements SharedPreferences.OnSharedPreferenceChangeListen
         APP_PATH                        = context.getApplicationContext().getFilesDir().getPath();
         APP_INITD_PATH                  = APP_PATH + "/etc/init.d";
         APP_SCRIPTS_PATH                = APP_PATH + "/scripts";
+        APP_SCRIPTS_BIN_PATH            = APP_SCRIPTS_PATH + "/bin";
         SD_PATH                         = getSdcardPath();
         NH_SD_FOLDER_NAME               = "nh_files";
         APP_SD_FILES_PATH               = SD_PATH + "/" + NH_SD_FOLDER_NAME;
@@ -43,6 +47,8 @@ public class NhPaths implements SharedPreferences.OnSharedPreferenceChangeListen
         BASE_PATH                       = "/data/local";
         NH_SYSTEM_PATH                  = BASE_PATH + "/nhsystem";
         ARCH_FOLDER                     = sharedPreferences.getString(SharePrefTag.CHROOT_ARCH_SHAREPREF_TAG, "kali-arm64");
+        CHROOT_SUDO                     = "/usr/bin/sudo";
+        CHROOT_INITD_SCRIPT_PATH        = APP_INITD_PATH + "/80postservices";
         CHROOT_SD_PATH                  = "/sdcard";
         BUSYBOX                         = getBusyboxPath();
     }

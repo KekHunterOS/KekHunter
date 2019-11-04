@@ -44,14 +44,10 @@ if [ -z "$MNT" ]; then
 fi
 
 ## Define chroot shell executable path.
-if [ -x $MNT/usr/bin/bash ]; then
-    CHROOT_EXEC=/usr/bin/bash
-#elif [ -f $MNT/usr/bin/sudo ]; then
-#    CHROOT_EXEC=/usr/bin/sudo
-#elif [ -f $MNT/bin/sudo ]; then
-#    CHROOT_EXEC=/bin/sudo
+if [ -x $MNT/usr/bin/sudo ]; then
+    CHROOT_EXEC=/usr/bin/sudo
 else
-    bklog "[-] Your chroot has no \"bash\" installed, please install it manually first."
+    bklog "[-] Your chroot has no \"sudo\" installed, please install it manually first."
     bklog "[-] Also make sure your Kali Chroot is not corrupted."
     exit 2
 fi
@@ -59,6 +55,4 @@ fi
 
 . ${SCRIPT_PATH%/*}/bootkali_env
 
-#$BUSYBOX chroot $MNT $CHROOT_EXEC -i -u root
-$BUSYBOX chroot $MNT $CHROOT_EXEC -i
-#$BUSYBOX chroot $MNT /usr/bin/login -f root
+$BUSYBOX chroot $MNT $CHROOT_EXEC -i -u root

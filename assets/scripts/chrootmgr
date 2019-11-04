@@ -172,16 +172,19 @@ if [ ! $# -eq 0 ]; then
                     if [ "$($BUSYBOX chroot $MNT /bin/uname -n)" ]; then
                         bklog "[+] seems you have kali chroot installed already!"
                         ## Define chroot shell executable path.
-                        if [ -x $MNT/usr/bin/bash ]; then
-                            CHROOT_EXEC=/usr/bin/bash
-                        #elif [ -f $MNT/usr/bin/sudo ]; then
-                        #    CHROOT_EXEC=/usr/bin/sudo
-                        #elif [ -f $MNT/bin/sudo ]; then
-                        #    CHROOT_EXEC=/bin/sudo
+                        if [ -x $MNT/usr/bin/sudo ]; then
+                            CHROOT_EXEC=/usr/bin/sudo
                         else
-                            bklog "[-] Your chroot has no \"bash\" installed, please install it manually first."
-                            bklog "[-] Also make sure your Kali Chroot is not corrupted."
-                            exit 2
+                            bklog "[-] Your chroot has no \"sudo\" installed, installing now."
+                            sh ${SCRIPT_PATH%/*}/bootkali_init
+                            source ${SCRIPT_PATH%/*}/bootkali_env && $BUSYBOX chroot $MNT /bin/bash -c 'apt update && apt install sudo -y'
+                            if [ -x $MNT/usr/bin/sudo ]; then
+                                CHROOT_EXEC=/usr/bin/sudo
+                            else
+                                bklog "[-] Seems the sudo is not installed successfully."
+                                bklog "[-] Make sure your Kali Chroot is not corrupted."
+                                exit 2
+                            fi
                         fi
                         ISALLREADY=0
                         fs=(proc sys dev dev/pts sdcard)
@@ -394,13 +397,18 @@ if [ ! $# -eq 0 ]; then
             shift 1
             case $# in
                 2)
+                    # official link for chroot image -> https://images.offensive-security.com/nethunter/
+                    # kalifs-arm64-full.tar.xz | kalifs-arm64-minimal.tar.xz
+                    # kalifs-armhf-full.tar.xz | kalifs-armhf-minimal.tar.xz
                     local SHAFILE_URL_LINK=$1
                     local TARGET_FILE=$2
                     local CORRECT_SHA
                     local COMPUTED_SHA
                     bklog "[!] Now checking the sha256 for $TARGET_FILE.."
                     CORRECT_SHA="$($BUSYBOX wget $SHAFILE_URL_LINK -q -O -)"
+                    bklog "$CORRECT_SHA"
                     COMPUTED_SHA="$($BUSYBOX sha256sum $TARGET_FILE | sed 's/ .*\//  /g')"
+                    bklog "$COMPUTED_SHA"
                     if [ "$CORRECT_SHA" = "$COMPUTED_SHA" ]; then
                         bklog "[+] Checksum matches!"
                         return 0
