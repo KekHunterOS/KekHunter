@@ -18,13 +18,12 @@ import java.util.List;
  */
 public class NethunterViewModel extends ViewModel {
     private MutableLiveData<List<NethunterModel>> mutableLiveDataNethunterModelList;
-    private NethunterData nethunterData;
 
     public void init(Context context){
         if (mutableLiveDataNethunterModelList != null){
             return;
         }
-        nethunterData = NethunterData.getInstance();
+        NethunterData nethunterData = NethunterData.getInstance();
         if (NethunterData.isDataInitiated) {
             mutableLiveDataNethunterModelList = nethunterData.getNethunterModels();
         } else {

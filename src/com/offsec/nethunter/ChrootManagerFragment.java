@@ -5,14 +5,12 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +27,6 @@ import com.offsec.nethunter.service.CompatCheckService;
 import com.offsec.nethunter.service.NotificationChannelService;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.SharePrefTag;
-import com.offsec.nethunter.utils.ShellExecuter;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -49,7 +46,6 @@ public class ChrootManagerFragment extends Fragment {
     private static final String IMAGE_SERVER = "images.offensive-security.com";
     private static String ARCH = "";
     private static String MINORFULL = "";
-    private final ShellExecuter x = new ShellExecuter();
     private TextView mountStatsTextView;
     private TextView baseChrootPathTextView;
     private TextView resultViewerLoggerTextView;
@@ -134,10 +130,30 @@ public class ChrootManagerFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mountStatsTextView = null;
+        baseChrootPathTextView = null;
+        resultViewerLoggerTextView = null;
+        kaliFolderTextView = null;
+        kaliFolderEditButton = null;
+        mountChrootButton = null;
+        unmountChrootButton = null;
+        installChrootButton = null;
+        addMetaPkgButton = null;
+        removeChrootButton = null;
+        backupChrootButton = null;
+        sharedPreferences = null;
+        chrootManagerAsynctask = null;
+        context = null;
+        activity = null;
+    }
+
     private void setEditButton(){
         kaliFolderEditButton.setOnClickListener(view -> {
             AlertDialog.Builder adb = new AlertDialog.Builder(activity);
-            AlertDialog ad = adb.create();
+            final AlertDialog ad = adb.create();
             LinearLayout ll = new LinearLayout(activity);
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             ll.setOrientation(LinearLayout.VERTICAL);
@@ -243,7 +259,7 @@ public class ChrootManagerFragment extends Fragment {
     private void setInstallChrootButton(){
         installChrootButton.setOnClickListener(view -> {
             AlertDialog.Builder adb = new AlertDialog.Builder(activity);
-            AlertDialog ad = adb.create();
+            final AlertDialog ad = adb.create();
             LinearLayout ll = new LinearLayout(activity);
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
             ll.setOrientation(LinearLayout.VERTICAL);
@@ -263,10 +279,10 @@ public class ChrootManagerFragment extends Fragment {
             downloadButton1.setOnClickListener(view1 -> {
                 ad.dismiss();
                 AlertDialog.Builder adb1 = new AlertDialog.Builder(activity);
-                View promtDownloadView = getLayoutInflater().inflate(R.layout.chroot_manager_download_diaglog, null);
-                EditText storepathEditText = promtDownloadView.findViewById(R.id.f_chrootmanager_storepath_et);
-                Spinner archSpinner = promtDownloadView.findViewById(R.id.f_chrootmanager_arch_adb_spr);
-                Spinner minorfullSpinner = promtDownloadView.findViewById(R.id.f_chrootmanager_minorfull_adb_spr);
+                final View promtDownloadView = getLayoutInflater().inflate(R.layout.chroot_manager_download_diaglog, null);
+                final EditText storepathEditText = promtDownloadView.findViewById(R.id.f_chrootmanager_storepath_et);
+                final Spinner archSpinner = promtDownloadView.findViewById(R.id.f_chrootmanager_arch_adb_spr);
+                final Spinner minorfullSpinner = promtDownloadView.findViewById(R.id.f_chrootmanager_minorfull_adb_spr);
                 storepathEditText.setText(sharedPreferences.getString(SharePrefTag.CHROOT_DEFAULT_STORE_DOWNLOAD_SHAREPREF_TAG, NhPaths.SD_PATH + "/Download"));
                 adb1.setView(promtDownloadView);
                 adb1.setMessage("Select the options below:");
@@ -345,7 +361,7 @@ public class ChrootManagerFragment extends Fragment {
                     });
                     chrootManagerAsynctask.execute(resultViewerLoggerTextView, chrootTarFileEditText.getText().toString(), NhPaths.CHROOT_PATH());
                 });
-                AlertDialog ad2 = adb2.create();
+                final AlertDialog ad2 = adb2.create();
                 ad2.show();
                 ad.cancel();
             });
@@ -389,9 +405,7 @@ public class ChrootManagerFragment extends Fragment {
                             });
                         adb1.create().show();
                     })
-                    .setNegativeButton("Forget it.", (dialogInterface, i) -> {
-
-                    });
+                    .setNegativeButton("Forget it.", (dialogInterface, i) -> { });
             adb.create().show();
         });
     }
@@ -465,7 +479,7 @@ public class ChrootManagerFragment extends Fragment {
             LayoutInflater inflater = activity.getLayoutInflater();
             @SuppressLint("InflateParams") final ScrollView sv = (ScrollView) inflater.inflate(R.layout.metapackagechooser, null);
             adb.setView(sv);
-            Button metapackageButton = sv.findViewById(R.id.metapackagesWeb);
+            final Button metapackageButton = sv.findViewById(R.id.metapackagesWeb);
             metapackageButton.setOnClickListener(v -> {
                 String metapackagesURL = "http://tools.kali.org/kali-metapackages";
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(metapackagesURL));
@@ -476,8 +490,8 @@ public class ChrootManagerFragment extends Fragment {
                 CheckBox cb;
                 // now grab all the checkboxes in the dialog and check their status
                 // thanks to "user2" for a 2-line sample of how to get the dialog's view:  http://stackoverflow.com/a/13959585/3035127
-                AlertDialog d = (AlertDialog) dialog;
-                LinearLayout ll = d.findViewById(R.id.metapackageLinearLayout);
+                final AlertDialog d = (AlertDialog) dialog;
+                final LinearLayout ll = d.findViewById(R.id.metapackageLinearLayout);
                 int children = Objects.requireNonNull(ll).getChildCount();
                 for (int cnt = 0; cnt < children; cnt++) {
                     if (ll.getChildAt(cnt) instanceof CheckBox) {

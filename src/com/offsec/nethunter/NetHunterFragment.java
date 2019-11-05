@@ -45,14 +45,12 @@ public class NetHunterFragment extends Fragment {
     private static final String ARG_SECTION_NUMBER = "section_number";
     private Context context;
     private Activity activity;
-    private RecyclerView itemRecyclerView;
     private NethunterRecyclerViewAdapter nethunterRecyclerViewAdapter;
-    private NethunterViewModel nethunterViewModel;
     private Button refreshButton;
     private Button addButton;
     private Button deleteButton;
     private Button moveButton;
-    private int targetPositionId;
+    private static int targetPositionId;
 
     public static NetHunterFragment newInstance(int sectionNumber) {
         NetHunterFragment fragment = new NetHunterFragment();
@@ -80,13 +78,12 @@ public class NetHunterFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        nethunterViewModel = ViewModelProviders.of(this).get(NethunterViewModel.class);
+        NethunterViewModel nethunterViewModel = ViewModelProviders.of(this).get(NethunterViewModel.class);
         nethunterViewModel.init(context);
         nethunterViewModel.getLiveDataNethunterModelList().observe(this, nethunterModelList -> {
             nethunterRecyclerViewAdapter.notifyDataSetChanged();
         });
-
-        itemRecyclerView = view.findViewById(R.id.f_nethunter_recyclerview);
+        RecyclerView itemRecyclerView = view.findViewById(R.id.f_nethunter_recyclerview);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
         itemRecyclerView.setLayoutManager(linearLayoutManager);
         nethunterRecyclerViewAdapter = new NethunterRecyclerViewAdapter(context, nethunterViewModel.getLiveDataNethunterModelList().getValue());
@@ -105,10 +102,10 @@ public class NetHunterFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.nethunter, menu);
-        MenuItem searchItem = menu.findItem(R.id.f_nethunter_action_search);
-        SearchView searchView = (SearchView) searchItem.getActionView();
-
+        final MenuItem searchItem = menu.findItem(R.id.f_nethunter_action_search);
+        final SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setOnSearchClickListener(v -> menu.setGroupVisible(R.id.f_nethunter_menu_group1, false));
         searchView.setOnCloseListener(() -> {
             menu.setGroupVisible(R.id.f_nethunter_menu_group1, true);
@@ -126,20 +123,20 @@ public class NetHunterFragment extends Fragment {
                 return false;
             }
         });
-        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        final ViewGroup nullParent = null;
         final LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View promptView = inflater.inflate(R.layout.nethunter_custom_dialog_view, null);
+        final View promptView = inflater.inflate(R.layout.nethunter_custom_dialog_view, nullParent);
         final TextView titleTextView = promptView.findViewById(R.id.f_nethunter_adb_tv_title1);
         final EditText storedpathEditText = promptView.findViewById(R.id.f_nethunter_adb_et_storedpath);
         switch (item.getItemId()) {
             case R.id.f_nethunter_menu_backupDB:
                 titleTextView.setText("Full path to where you want to save the database:");
                 storedpathEditText.setText(NhPaths.APP_SD_SQLBACKUP_PATH + "/FragmentNethunter");
-                final AlertDialog.Builder adbBackup = new AlertDialog.Builder(activity);
+                AlertDialog.Builder adbBackup = new AlertDialog.Builder(activity);
                 adbBackup.setView(promptView);
                 adbBackup.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
                 adbBackup.setPositiveButton("OK", (dialog, which) -> { });
@@ -162,7 +159,7 @@ public class NetHunterFragment extends Fragment {
             case R.id.f_nethunter_menu_restoreDB:
                 titleTextView.setText("Full path of the db file from where you want to restore:");
                 storedpathEditText.setText(NhPaths.APP_SD_SQLBACKUP_PATH + "/FragmentNethunter");
-                final AlertDialog.Builder adbRestore = new AlertDialog.Builder(activity);
+                AlertDialog.Builder adbRestore = new AlertDialog.Builder(activity);
                 adbRestore.setView(promptView);
                 adbRestore.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
                 adbRestore.setPositiveButton("OK", (dialog, which) -> { });
@@ -195,16 +192,29 @@ public class NetHunterFragment extends Fragment {
         NethunterData.getInstance().refreshData();
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        context = null;
+        activity = null;
+        refreshButton = null;
+        addButton = null;
+        deleteButton = null;
+        moveButton = null;
+        nethunterRecyclerViewAdapter = null;
+    }
+
     private void onRefreshItemSetup(){
         refreshButton.setOnClickListener(v -> NethunterData.getInstance().refreshData());
     }
 
     private void onAddItemSetup(){
         addButton.setOnClickListener(v -> {
-            final List<NethunterModel> nethunterModelList = NethunterData.getInstance().nethunterModelListFull;
+            final ViewGroup nullParent = null;
+            List<NethunterModel> nethunterModelList = NethunterData.getInstance().nethunterModelListFull;
             if (nethunterModelList == null) return;
             final LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            final View promptViewAdd = mInflater.inflate(R.layout.nethunter_add_dialog_view, null);
+            final View promptViewAdd = mInflater.inflate(R.layout.nethunter_add_dialog_view, nullParent);
             final EditText titleEditText = promptViewAdd.findViewById(R.id.f_nethunter_add_adb_et_title);
             final EditText cmdEditText = promptViewAdd.findViewById(R.id.f_nethunter_add_adb_et_command);
             final EditText delimiterEditText = promptViewAdd.findViewById(R.id.f_nethunter_add_adb_et_delimiter);
@@ -215,7 +225,7 @@ public class NetHunterFragment extends Fragment {
             for (NethunterModel nethunterModel: nethunterModelList){
                 titleArrayList.add(nethunterModel.getTitle());
             }
-            final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, titleArrayList);
+            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, titleArrayList);
             arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
             final FloatingActionButton readmeButton1 = promptViewAdd.findViewById(R.id.f_nethunter_add_btn_info_fab1);
@@ -227,7 +237,7 @@ public class NetHunterFragment extends Fragment {
                 adb.setTitle("HOW TO USE:")
                         .setMessage(context.getString(R.string.nethunter_howtouse_cmd))
                         .setNegativeButton("Close", (dialogInterface, i) -> dialogInterface.dismiss());
-                AlertDialog ad = adb.create();
+                final AlertDialog ad = adb.create();
                 ad.setCancelable(true);
                 ad.show();
             });
@@ -237,7 +247,7 @@ public class NetHunterFragment extends Fragment {
                 adb.setTitle("HOW TO USE:")
                         .setMessage(context.getString(R.string.nethunter_howtouse_delimiter))
                         .setNegativeButton("Close", (dialogInterface, i) -> dialogInterface.dismiss());
-                AlertDialog ad = adb.create();
+                final AlertDialog ad = adb.create();
                 ad.setCancelable(true);
                 ad.show();
             });
@@ -247,7 +257,7 @@ public class NetHunterFragment extends Fragment {
                 adb.setTitle("HOW TO USE:")
                         .setMessage(context.getString(R.string.nethunter_howtouse_runoncreate))
                         .setNegativeButton("Close", (dialogInterface, i) -> dialogInterface.dismiss());
-                AlertDialog ad = adb.create();
+                final AlertDialog ad = adb.create();
                 ad.setCancelable(true);
                 ad.show();
             });
@@ -303,8 +313,9 @@ public class NetHunterFragment extends Fragment {
             });
 
             AlertDialog.Builder adb = new AlertDialog.Builder(context);
+            adb.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
             adb.setPositiveButton("OK", (dialog, which) -> { });
-            AlertDialog ad = adb.create();
+            final AlertDialog ad = adb.create();
             ad.setView(promptViewAdd);
             ad.setCancelable(true);
             ad.setOnShowListener(dialog -> {
@@ -333,18 +344,18 @@ public class NetHunterFragment extends Fragment {
 
     private void onDeleteItemSetup(){
         deleteButton.setOnClickListener(v -> {
-            final List<NethunterModel> nethunterModelList = NethunterData.getInstance().nethunterModelListFull;
+            final ViewGroup nullParent = null;
+            List<NethunterModel> nethunterModelList = NethunterData.getInstance().nethunterModelListFull;
             if (nethunterModelList == null) return;
             final LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            final View promptViewDelete = inflater.inflate(R.layout.nethunter_delete_dialog_view, null, false);
+            final View promptViewDelete = inflater.inflate(R.layout.nethunter_delete_dialog_view, nullParent, false);
             final RecyclerView recyclerViewDeleteItem = promptViewDelete.findViewById(R.id.f_nethunter_delete_recyclerview);
-            final NethunterRecyclerViewAdapterDeleteItems nethunterRecyclerViewAdapterDeleteItems = new NethunterRecyclerViewAdapterDeleteItems(context, nethunterModelList);
-
+            NethunterRecyclerViewAdapterDeleteItems nethunterRecyclerViewAdapterDeleteItems = new NethunterRecyclerViewAdapterDeleteItems(context, nethunterModelList);
             LinearLayoutManager linearLayoutManagerDelete = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
             recyclerViewDeleteItem.setLayoutManager(linearLayoutManagerDelete);
             recyclerViewDeleteItem.setAdapter(nethunterRecyclerViewAdapterDeleteItems);
 
-            final AlertDialog.Builder adbDelete = new AlertDialog.Builder(activity);
+            AlertDialog.Builder adbDelete = new AlertDialog.Builder(activity);
             adbDelete.setView(promptViewDelete);
             adbDelete.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
             adbDelete.setPositiveButton("Delete", (dialog, which) -> { });
@@ -380,10 +391,11 @@ public class NetHunterFragment extends Fragment {
 
     private void onMoveItemSetup() {
         moveButton.setOnClickListener(v -> {
-            final List<NethunterModel> nethunterModelList = NethunterData.getInstance().nethunterModelListFull;
+            final ViewGroup nullParent = null;
+            List<NethunterModel> nethunterModelList = NethunterData.getInstance().nethunterModelListFull;
             if (nethunterModelList == null) return;
             final LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            final View promptViewMove = inflater.inflate(R.layout.nethunter_move_dialog_view, null, false);
+            final View promptViewMove = inflater.inflate(R.layout.nethunter_move_dialog_view, nullParent, false);
             final Spinner titlesBefore = promptViewMove.findViewById(R.id.f_nethunter_move_adb_spr_titlesbefore);
             final Spinner titlesAfter = promptViewMove.findViewById(R.id.f_nethunter_move_adb_spr_titlesafter);
             final Spinner actions = promptViewMove.findViewById(R.id.f_nethunter_move_adb_spr_actions);
@@ -391,12 +403,12 @@ public class NetHunterFragment extends Fragment {
             for (NethunterModel nethunterModel: nethunterModelList){
                 titleArrayList.add(nethunterModel.getTitle());
             }
-            final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, titleArrayList);
+            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, titleArrayList);
             arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             titlesBefore.setAdapter(arrayAdapter);
             titlesAfter.setAdapter(arrayAdapter);
 
-            final AlertDialog.Builder adbMove = new AlertDialog.Builder(activity);
+            AlertDialog.Builder adbMove = new AlertDialog.Builder(activity);
             adbMove.setView(promptViewMove);
             adbMove.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
             adbMove.setPositiveButton("Move", (dialog, which) -> {

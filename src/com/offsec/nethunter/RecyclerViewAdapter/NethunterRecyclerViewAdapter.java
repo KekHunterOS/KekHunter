@@ -1,10 +1,8 @@
 package com.offsec.nethunter.RecyclerViewAdapter;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,8 +53,9 @@ public class NethunterRecyclerViewAdapter extends RecyclerView.Adapter<Nethunter
         holder.resultRecyclerView.setAdapter(new NethunterRecyclerViewAdapterResult(context, nethunterModelList.get(position).getResult()));
         holder.runButton.setOnClickListener(v -> NethunterData.getInstance().runCommandforItem(position));
         holder.editButton.setOnClickListener(v -> {
+            final ViewGroup nullParent = null;
             final LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            final View promptViewEdit = mInflater.inflate(R.layout.nethunter_edit_dialog_view, null);
+            final View promptViewEdit = mInflater.inflate(R.layout.nethunter_edit_dialog_view, nullParent);
             final EditText titleEditText = promptViewEdit.findViewById(R.id.f_nethunter_edit_adb_et_title);
             final EditText cmdEditText = promptViewEdit.findViewById(R.id.f_nethunter_edit_adb_et_command);
             final EditText delimiterEditText = promptViewEdit.findViewById(R.id.f_nethunter_edit_adb_et_delimiter);
@@ -69,7 +68,7 @@ public class NethunterRecyclerViewAdapter extends RecyclerView.Adapter<Nethunter
                 adb.setTitle("HOW TO USE:")
                         .setMessage(context.getString(R.string.nethunter_howtouse_cmd))
                         .setNegativeButton("Close", (dialogInterface, i) -> dialogInterface.dismiss());
-                androidx.appcompat.app.AlertDialog ad = adb.create();
+                final androidx.appcompat.app.AlertDialog ad = adb.create();
                 ad.setCancelable(true);
                 ad.show();
             });
@@ -79,7 +78,7 @@ public class NethunterRecyclerViewAdapter extends RecyclerView.Adapter<Nethunter
                 adb.setTitle("HOW TO USE:")
                         .setMessage(context.getString(R.string.nethunter_howtouse_delimiter))
                         .setNegativeButton("Close", (dialogInterface, i) -> dialogInterface.dismiss());
-                androidx.appcompat.app.AlertDialog ad = adb.create();
+                final androidx.appcompat.app.AlertDialog ad = adb.create();
                 ad.setCancelable(true);
                 ad.show();
             });
@@ -89,7 +88,7 @@ public class NethunterRecyclerViewAdapter extends RecyclerView.Adapter<Nethunter
                 adb.setTitle("HOW TO USE:")
                         .setMessage(context.getString(R.string.nethunter_howtouse_runoncreate))
                         .setNegativeButton("Close", (dialogInterface, i) -> dialogInterface.dismiss());
-                androidx.appcompat.app.AlertDialog ad = adb.create();
+                final androidx.appcompat.app.AlertDialog ad = adb.create();
                 ad.setCancelable(true);
                 ad.show();
             });
@@ -108,7 +107,7 @@ public class NethunterRecyclerViewAdapter extends RecyclerView.Adapter<Nethunter
 
             AlertDialog.Builder adb = new AlertDialog.Builder(context);
             adb.setPositiveButton("Apply", (dialog, which) -> { });
-            AlertDialog ad = adb.create();
+            final AlertDialog ad = adb.create();
             ad.setView(promptViewEdit);
             ad.setCancelable(true);
             ad.setOnShowListener(dialog -> {

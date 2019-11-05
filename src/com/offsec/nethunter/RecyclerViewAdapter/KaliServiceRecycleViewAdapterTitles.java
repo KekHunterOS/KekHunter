@@ -57,8 +57,9 @@ public class KaliServiceRecycleViewAdapterTitles extends RecyclerView.Adapter<Ka
 		itemViewHolder.mSwitch.setChecked(kaliServicesModelList.get(position).getStatus().startsWith("[+]"));
 		itemViewHolder.statustextView.setText(tempStatusTextView);
 		itemViewHolder.editbutton.setOnClickListener(v -> {
+			final ViewGroup nullParent = null;
 			final LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			final View promptViewEdit = mInflater.inflate(R.layout.kaliservices_edit_dialog_view, null);
+			final View promptViewEdit = mInflater.inflate(R.layout.kaliservices_edit_dialog_view, nullParent);
 			final EditText titleEditText = promptViewEdit.findViewById(R.id.f_kaliservices_edit_adb_et_title);
 			final EditText startCmdEditText = promptViewEdit.findViewById(R.id.f_kaliservices_edit_adb_et_startcommand);
 			final EditText stopCmdEditText = promptViewEdit.findViewById(R.id.f_kaliservices_edit_adb_et_stopcommand);
@@ -74,7 +75,7 @@ public class KaliServiceRecycleViewAdapterTitles extends RecyclerView.Adapter<Ka
 				adb.setTitle("HOW TO USE:")
 						.setMessage(context.getString(R.string.kaliservices_howto_startservice))
 						.setNegativeButton("Close", (dialogInterface, i) -> dialogInterface.dismiss());
-				androidx.appcompat.app.AlertDialog ad = adb.create();
+				final androidx.appcompat.app.AlertDialog ad = adb.create();
 				ad.setCancelable(true);
 				ad.show();
 			});
@@ -84,7 +85,7 @@ public class KaliServiceRecycleViewAdapterTitles extends RecyclerView.Adapter<Ka
 				adb.setTitle("HOW TO USE:")
 						.setMessage(context.getString(R.string.kaliservices_howto_stopservice))
 						.setNegativeButton("Close", (dialogInterface, i) -> dialogInterface.dismiss());
-				androidx.appcompat.app.AlertDialog ad = adb.create();
+				final androidx.appcompat.app.AlertDialog ad = adb.create();
 				ad.setCancelable(true);
 				ad.show();
 			});
@@ -94,7 +95,7 @@ public class KaliServiceRecycleViewAdapterTitles extends RecyclerView.Adapter<Ka
 				adb.setTitle("HOW TO USE:")
 						.setMessage(context.getString(R.string.kaliservices_howto_checkservice))
 						.setNegativeButton("Close", (dialogInterface, i) -> dialogInterface.dismiss());
-				androidx.appcompat.app.AlertDialog ad = adb.create();
+				final androidx.appcompat.app.AlertDialog ad = adb.create();
 				ad.setCancelable(true);
 				ad.show();
 			});
@@ -104,7 +105,7 @@ public class KaliServiceRecycleViewAdapterTitles extends RecyclerView.Adapter<Ka
 				adb.setTitle("HOW TO USE:")
 						.setMessage(context.getString(R.string.kaliservices_howto_runServiceOnBoot))
 						.setNegativeButton("Close", (dialogInterface, i) -> dialogInterface.dismiss());
-				androidx.appcompat.app.AlertDialog ad = adb.create();
+				final androidx.appcompat.app.AlertDialog ad = adb.create();
 				ad.setCancelable(true);
 				ad.show();
 			});
@@ -124,7 +125,7 @@ public class KaliServiceRecycleViewAdapterTitles extends RecyclerView.Adapter<Ka
 			runOnChrootStartCheckbox.setChecked(KaliServicesData.getInstance().kaliServicesModelListFull.get(
 					KaliServicesData.getInstance().kaliServicesModelListFull.indexOf(
 							kaliServicesModelList.get(position))).getRunOnChrootStart().equals("1"));
-			final AlertDialog.Builder adbEdit = new AlertDialog.Builder(context);
+			AlertDialog.Builder adbEdit = new AlertDialog.Builder(context);
 			adbEdit.setView(promptViewEdit);
 			adbEdit.setCancelable(true);
 			adbEdit.setPositiveButton("OK", (dialog, which) -> { });

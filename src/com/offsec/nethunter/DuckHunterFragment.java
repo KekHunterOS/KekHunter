@@ -31,20 +31,17 @@ import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 public class DuckHunterFragment extends Fragment {
-
-    private ViewPager mViewPager;
     private static SharedPreferences sharedpreferences;
-
     // Language vars
     private static HashMap<String, String> map = new HashMap<>();
     public static String lang = "us"; // Set US as default language
     private static String[] keyboardLayoutString;
     private static final String ARG_SECTION_NUMBER = "section_number";
     private static final String TAG = "DuckHunterFragment";
-    private DuckHuntAsyncTask duckHuntAsyncTask;
     private Context context;
     private Activity activity;
     private Menu menu;
+    private ViewPager mViewPager;
     private String duckyInputFile ;
     private String duckyOutputFile;
     private boolean isReceiverRegistered;
@@ -131,6 +128,7 @@ public class DuckHunterFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
+        DuckHuntAsyncTask duckHuntAsyncTask;
         switch (item.getItemId()) {
             case R.id.duckConvertAttack:
                 duckHuntAsyncTask = new DuckHuntAsyncTask(DuckHuntAsyncTask.ATTACK);
@@ -173,6 +171,15 @@ public class DuckHunterFragment extends Fragment {
             activity.unregisterReceiver(duckHuntBroadcastReceiver);
             isReceiverRegistered = false;
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        menu = null;
+        mViewPager = null;
+        context = null;
+        activity = null;
     }
 
     private static void setLang() {

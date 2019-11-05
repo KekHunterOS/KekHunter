@@ -177,20 +177,12 @@ public class ShellExecuter {
                 final Spannable timestamp = new SpannableString("[ " + timeStamp.format(new Date()) + " ]  ");
                 timestamp.setSpan(new ForegroundColorSpan(Color.parseColor("#FFD561")),0,timestamp.length(),0);
                 tempText.setSpan(new ForegroundColorSpan(line.startsWith("[!]")?Color.CYAN:line.startsWith("[+]")?Color.GREEN:line.startsWith("[-]")?Color.parseColor("#D81B60"):Color.WHITE),0,tempText.length(),0);
-                viewLogger.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        viewLogger.append(timestamp);
-                        viewLogger.append(tempText);
-                    }
+                viewLogger.post(() -> {
+                    viewLogger.append(timestamp);
+                    viewLogger.append(tempText);
                 });
             }
-            viewLogger.post(new Runnable() {
-                @Override
-                public void run() {
-                    viewLogger.append("[ " + timeStamp.format(new Date()) + " ]  <<<< End of Script >>>>\n");
-                }
-            });
+            viewLogger.post(() -> viewLogger.append("[ " + timeStamp.format(new Date()) + " ]  <<<< End of Script >>>>\n"));
             br.close();
             br = new BufferedReader(new InputStreamReader(stderr));
             while ((line = br.readLine()) != null) {

@@ -61,12 +61,11 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     private ActionBarDrawerToggle mDrawerToggle;
     private NavigationView navigationView;
     private CharSequence mTitle = "NetHunter";
-    private final Stack<String> titles = new Stack<>();
+    private Stack<String> titles = new Stack<>();
     private static SharedPreferences prefs;
     public static MenuItem lastSelectedMenuItem;
     public Context context;
     public Activity activity;
-    private Integer permsCurrent = 1;
     private boolean locationUpdatesRequested = false;
     private KaliGPSUpdates.Receiver locationUpdateReceiver;
     private NhPaths nhPaths;
@@ -266,6 +265,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        lastSelectedMenuItem = null;
         if (nethunterReceiver != null) {
             unregisterReceiver(nethunterReceiver);
         }

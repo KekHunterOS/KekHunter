@@ -125,6 +125,30 @@ public class MacchangerFragment extends Fragment {
         inflater.inflate(R.menu.macchanger, menu);
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        interfaceSpinner = null;
+        macModeSpinner = null;
+        changeMacButton = null;
+        setHostNameButton = null;
+        resetMacButton = null;
+        regenerateMacButton = null;
+        clearMacButton = null;
+        netHostNameEditText = null;
+        mac1 = null;
+        mac2 = null;
+        mac3 = null;
+        mac4 = null;
+        mac5 = null;
+        mac6 = null;
+        currentMacTextView = null;
+        currentHostNameTextView = null;
+        reloadImageButton = null;
+        context = null;
+        activity = null;
+    }
+
     private void genRandomMACAddress() {
         SecureRandom random = new SecureRandom();
         byte[] macAddr = new byte[6];
@@ -292,15 +316,15 @@ public class MacchangerFragment extends Fragment {
 
                 @Override
                 public void onAsyncTaskFinished(Object result) {
-                    final AlertDialog.Builder adb = new AlertDialog.Builder(activity);
+                    AlertDialog.Builder adb = new AlertDialog.Builder(activity);
                     final AlertDialog ad = adb.create();
-                    final String originalMac = result.toString();
+                    String originalMac = result.toString();
                     ad.setTitle("Warning!");
                     ad.setMessage("Are you sure to change the " + interfaceSpinner.getSelectedItem().toString().toLowerCase() +
                             "'s MAC address back to the original MAC address: " + originalMac + " ?");
                     ad.setButton(Dialog.BUTTON_POSITIVE, "YES", (dialog, which) -> {
                         ad.dismiss();
-                        final AlertDialog.Builder adb1 = new AlertDialog.Builder(activity);
+                        AlertDialog.Builder adb1 = new AlertDialog.Builder(activity);
                         final AlertDialog ad1 = adb1.create();
                         ad1.setCancelable(false);
                         ad1.setMessage("Changing MAC address on " + interfaceSpinner.getSelectedItem().toString().toLowerCase() + ". Please wait..");
@@ -342,7 +366,7 @@ public class MacchangerFragment extends Fragment {
                     mac5.getText().toString().toLowerCase() + ":" +
                     mac6.getText().toString().toLowerCase();
 
-            final AlertDialog.Builder adb = new AlertDialog.Builder(activity);
+            AlertDialog.Builder adb = new AlertDialog.Builder(activity);
             final AlertDialog ad = adb.create();
             ad.setCancelable(false);
             ad.setMessage("Changing MAC address on " + interfaceSpinner.getSelectedItem().toString().toLowerCase() + ". Please wait..");
@@ -361,7 +385,7 @@ public class MacchangerFragment extends Fragment {
                         NhPaths.showMessage(context, "The MAC address of " + interfaceSpinner.getSelectedItem().toString().toLowerCase() +
                                 " has been successfully changed to " + macAddress);
                     } else {
-                        final AlertDialog.Builder adb = new AlertDialog.Builder(activity);
+                        AlertDialog.Builder adb = new AlertDialog.Builder(activity);
                         final AlertDialog ad = adb.create();
                         ad.setTitle("Failed changing the MAC address on " + interfaceSpinner.getSelectedItem().toString().toLowerCase());
                         ad.setMessage("Please try to change to other MAC address as not all MAC address is valid to your system.");
