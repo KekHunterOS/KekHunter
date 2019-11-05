@@ -61,12 +61,11 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     private ActionBarDrawerToggle mDrawerToggle;
     private NavigationView navigationView;
     private CharSequence mTitle = "NetHunter";
-    private final Stack<String> titles = new Stack<>();
+    private Stack<String> titles = new Stack<>();
     private static SharedPreferences prefs;
     public static MenuItem lastSelectedMenuItem;
     public Context context;
     public Activity activity;
-    private Integer permsCurrent = 1;
     private boolean locationUpdatesRequested = false;
     private KaliGPSUpdates.Receiver locationUpdateReceiver;
     private NhPaths nhPaths;
@@ -266,6 +265,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        lastSelectedMenuItem = null;
         if (nethunterReceiver != null) {
             unregisterReceiver(nethunterReceiver);
         }
@@ -438,7 +438,6 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                             if (context.getPackageManager().getLaunchIntentForPackage("com.offsec.nhvnc") == null) {
                                 showWarningDialog("", "Nethunter VNC is not installed yet.", false);
                             } else {
-                                PermissionCheck permissionCheck = new PermissionCheck(activity, context);
                                 if (!permissionCheck.isAllPermitted(PermissionCheck.NH_VNC_PERMISSIONS)) {
                                     permissionCheck.checkPermissions(PermissionCheck.NH_VNC_PERMISSIONS, PermissionCheck.NH_VNC_PERMISSIONS_ONFRAGMENTCLICK_RQCODE);
                                 } else {
@@ -523,13 +522,10 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         warningAD.setCancelable(false);
         warningAD.setTitle(title);
         warningAD.setMessage(message);
-        warningAD.setPositiveButton("CLOSE", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                if (NeedToExit)
-                    System.exit(1);
-            }
+        warningAD.setPositiveButton("CLOSE", (dialog, which) -> {
+            dialog.dismiss();
+            if (NeedToExit)
+                System.exit(1);
         });
         warningAD.create().show();
     }
@@ -563,8 +559,6 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                                 navigationView.getMenu().setGroupEnabled(R.id.chrootDependentGroup, true);
                             } else {
                                 navigationView.getMenu().setGroupEnabled(R.id.chrootDependentGroup, false);
-                                //FragmentManager fragmentManager = getSupportFragmentManager();
-                                //changeFragment(fragmentManager, NetHunterFragment.newInstance(R.id.nethunter_item));
                             }
                         } catch (Exception e) {
                             Log.e(AppNavHomeActivity.TAG, e.getMessage());

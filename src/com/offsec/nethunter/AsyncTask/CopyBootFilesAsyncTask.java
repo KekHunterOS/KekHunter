@@ -40,11 +40,9 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
     private String result = "";
     private SharedPreferences prefs;
     private final WeakReference<Context> context;
-    private final WeakReference<Activity> activity;
 
     public CopyBootFilesAsyncTask(Context context, Activity activity, ProgressDialog progressDialog){
         this.context = new WeakReference<>(context);
-        this.activity = new WeakReference<>(activity);
         this.progressDialogRef = new WeakReference<>(progressDialog);
         this.sdCardDir = new File(NhPaths.APP_SD_FILES_PATH);
         this.scriptsDir = new File(NhPaths.APP_SCRIPTS_PATH);

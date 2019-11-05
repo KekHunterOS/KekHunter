@@ -66,9 +66,7 @@ public class DuckHunterConvertFragment extends Fragment implements View.OnClickL
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         View rootView = inflater.inflate(R.layout.duck_hunter_convert, container, false);
-
         TextView t2 = rootView.findViewById(R.id.reference_text);
         t2.setMovementMethod(LinkMovementMethod.getInstance());
 
@@ -96,8 +94,8 @@ public class DuckHunterConvertFragment extends Fragment implements View.OnClickL
 
         // Duckhunter preset spinner templates
         String[] duckyscript_file = getDuckyScriptFiles();
-        Spinner duckyscriptSpinner = (Spinner) rootView.findViewById(R.id.duckhunter_preset_spinner);
-        ArrayAdapter<String> duckyscriptAdapter = new ArrayAdapter<String>(activity, android.R.layout.simple_spinner_item, duckyscript_file);
+        Spinner duckyscriptSpinner = rootView.findViewById(R.id.duckhunter_preset_spinner);
+        ArrayAdapter<String> duckyscriptAdapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_item, duckyscript_file);
         duckyscriptAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         duckyscriptSpinner.setAdapter(duckyscriptAdapter);
         duckyscriptSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -134,6 +132,13 @@ public class DuckHunterConvertFragment extends Fragment implements View.OnClickL
         }
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        editsource = null;
+        context = null;
+        activity = null;
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

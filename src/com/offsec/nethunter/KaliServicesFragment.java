@@ -49,14 +49,12 @@ public class KaliServicesFragment extends Fragment {
     private static final String ARG_SECTION_NUMBER = "section_number";
     private Activity activity;
     private Context context;
-    private RecyclerView recyclerViewServiceTitle;
     private Button refreshButton;
     private Button addButton;
     private Button deleteButton;
     private Button moveButton;
-    private KaliServicesViewModel kaliServicesViewModel;
     private KaliServiceRecycleViewAdapterTitles kaliServiceRecycleViewAdapterTitles;
-    private int targetPositionId;
+    private static int targetPositionId;
 
     public static KaliServicesFragment newInstance(int sectionNumber) {
         KaliServicesFragment fragment = new KaliServicesFragment();
@@ -84,13 +82,11 @@ public class KaliServicesFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        kaliServicesViewModel = ViewModelProviders.of(this).get(KaliServicesViewModel.class);
+        KaliServicesViewModel kaliServicesViewModel = ViewModelProviders.of(this).get(KaliServicesViewModel.class);
         kaliServicesViewModel.init(context);
-        kaliServicesViewModel.getLiveDataKaliServicesModelList().observe(this, kaliServicesModelList -> {
-            kaliServiceRecycleViewAdapterTitles.notifyDataSetChanged();
-        });
+        kaliServicesViewModel.getLiveDataKaliServicesModelList().observe(this, kaliServicesModelList -> kaliServiceRecycleViewAdapterTitles.notifyDataSetChanged());
 
-        recyclerViewServiceTitle = view.findViewById(R.id.f_kaliservices_recycleviewServiceTitle);
+        RecyclerView recyclerViewServiceTitle = view.findViewById(R.id.f_kaliservices_recycleviewServiceTitle);
         kaliServiceRecycleViewAdapterTitles = new KaliServiceRecycleViewAdapterTitles(context, kaliServicesViewModel.getLiveDataKaliServicesModelList().getValue());
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
         recyclerViewServiceTitle.setLayoutManager(linearLayoutManager);
@@ -110,8 +106,8 @@ public class KaliServicesFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.kaliservices, menu);
-        MenuItem searchItem = menu.findItem(R.id.f_kaliservices_action_search);
-        SearchView searchView = (SearchView) searchItem.getActionView();
+        final MenuItem searchItem = menu.findItem(R.id.f_kaliservices_action_search);
+        final SearchView searchView = (SearchView) searchItem.getActionView();
 
         searchView.setOnSearchClickListener(v -> menu.setGroupVisible(R.id.f_kaliservices_menu_group1, false));
         searchView.setOnCloseListener(() -> {
@@ -135,8 +131,9 @@ public class KaliServicesFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        final ViewGroup nullParent = null;
         final LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View promptView = inflater.inflate(R.layout.kaliservices_custom_dialog_view, null);
+        final View promptView = inflater.inflate(R.layout.kaliservices_custom_dialog_view, nullParent);
         final TextView titleTextView = promptView.findViewById(R.id.f_kaliservices_adb_tv_title1);
         final EditText storedpathEditText = promptView.findViewById(R.id.f_kaliservices_adb_et_storedpath);
 
@@ -144,7 +141,7 @@ public class KaliServicesFragment extends Fragment {
             case R.id.f_kaliservices_menu_backupDB:
                 titleTextView.setText("Full path to where you want to save the database:");
                 storedpathEditText.setText(NhPaths.APP_SD_SQLBACKUP_PATH + "/FragmentKaliServices");
-                final AlertDialog.Builder adbBackup = new AlertDialog.Builder(activity);
+                AlertDialog.Builder adbBackup = new AlertDialog.Builder(activity);
                 adbBackup.setView(promptView);
                 adbBackup.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
                 adbBackup.setPositiveButton("OK", (dialog, which) -> { });
@@ -167,7 +164,7 @@ public class KaliServicesFragment extends Fragment {
             case R.id.f_kaliservices_menu_restoreDB:
                 titleTextView.setText("Full path of the db file from where you want to restore:");
                 storedpathEditText.setText(NhPaths.APP_SD_SQLBACKUP_PATH + "/FragmentKaliServices");
-                final AlertDialog.Builder adbRestore = new AlertDialog.Builder(activity);
+                AlertDialog.Builder adbRestore = new AlertDialog.Builder(activity);
                 adbRestore.setView(promptView);
                 adbRestore.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
                 adbRestore.setPositiveButton("OK", (dialog, which) -> { });
@@ -200,16 +197,29 @@ public class KaliServicesFragment extends Fragment {
         KaliServicesData.getInstance().refreshData();
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        activity = null;
+        context = null;
+        refreshButton = null;
+        addButton = null;
+        deleteButton = null;
+        moveButton = null;
+        kaliServiceRecycleViewAdapterTitles = null;
+    }
+
     private void onRefreshItemSetup(){
         refreshButton.setOnClickListener(v -> KaliServicesData.getInstance().refreshData());
     }
 
     private void onAddItemSetup(){
         addButton.setOnClickListener(v -> {
-            final List<KaliServicesModel> kaliServicesModelList = KaliServicesData.getInstance().kaliServicesModelListFull;
+            final ViewGroup nullParent = null;
+            List<KaliServicesModel> kaliServicesModelList = KaliServicesData.getInstance().kaliServicesModelListFull;
             if (kaliServicesModelList == null) return;
             final LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            final View promptViewAdd = inflater.inflate(R.layout.kaliservices_add_dialog_view, null);
+            final View promptViewAdd = inflater.inflate(R.layout.kaliservices_add_dialog_view, nullParent);
             final EditText titleEditText = promptViewAdd.findViewById(R.id.f_kaliservices_add_adb_et_title);
             final EditText startCmdEditText = promptViewAdd.findViewById(R.id.f_kaliservices_add_adb_et_startcommand);
             final EditText stopCmdEditText = promptViewAdd.findViewById(R.id.f_kaliservices_add_adb_et_stopcommand);
@@ -227,7 +237,7 @@ public class KaliServicesFragment extends Fragment {
                 serviceNameArrayList.add(kaliServicesModel.getServiceName());
             }
 
-            final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, serviceNameArrayList);
+            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, serviceNameArrayList);
             arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
             startCmdEditText.setText("service <servicename> start");
@@ -239,7 +249,7 @@ public class KaliServicesFragment extends Fragment {
                 adb.setTitle("HOW TO USE:")
                         .setMessage(getString(R.string.kaliservices_howto_startservice))
                         .setNegativeButton("Close", (dialogInterface, i) -> dialogInterface.dismiss());
-                AlertDialog ad = adb.create();
+                final AlertDialog ad = adb.create();
                 ad.setCancelable(true);
                 ad.show();
             });
@@ -249,7 +259,7 @@ public class KaliServicesFragment extends Fragment {
                 adb.setTitle("HOW TO USE:")
                         .setMessage(getString(R.string.kaliservices_howto_stopservice))
                         .setNegativeButton("Close", (dialogInterface, i) -> dialogInterface.dismiss());
-                AlertDialog ad = adb.create();
+                final AlertDialog ad = adb.create();
                 ad.setCancelable(true);
                 ad.show();
             });
@@ -259,7 +269,7 @@ public class KaliServicesFragment extends Fragment {
                 adb.setTitle("HOW TO USE:")
                         .setMessage(getString(R.string.kaliservices_howto_checkservice))
                         .setNegativeButton("Close", (dialogInterface, i) -> dialogInterface.dismiss());
-                AlertDialog ad = adb.create();
+                final AlertDialog ad = adb.create();
                 ad.setCancelable(true);
                 ad.show();
             });
@@ -269,12 +279,13 @@ public class KaliServicesFragment extends Fragment {
                 adb.setTitle("HOW TO USE:")
                         .setMessage(getString(R.string.kaliservices_howto_runServiceOnBoot))
                         .setNegativeButton("Close", (dialogInterface, i) -> dialogInterface.dismiss());
-                AlertDialog ad = adb.create();
+                final AlertDialog ad = adb.create();
                 ad.setCancelable(true);
                 ad.show();
             });
 
             insertPositions.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                     //if Insert to Top
@@ -323,7 +334,7 @@ public class KaliServicesFragment extends Fragment {
 
             AlertDialog.Builder adbAdd = new AlertDialog.Builder(activity);
             adbAdd.setPositiveButton("OK", (dialog, which) -> { });
-            AlertDialog adAdd = adbAdd.create();
+            final AlertDialog adAdd = adbAdd.create();
             adAdd.setView(promptViewAdd);
             adAdd.setCancelable(true);
             //If you want the dialog to stay open after clicking OK, you need to do it this way...
@@ -356,25 +367,26 @@ public class KaliServicesFragment extends Fragment {
 
     private void onDeleteItemSetup(){
         deleteButton.setOnClickListener(v -> {
-            final List<KaliServicesModel> kaliServicesModelList = KaliServicesData.getInstance().kaliServicesModelListFull;
+            final ViewGroup nullParent = null;
+            List<KaliServicesModel> kaliServicesModelList = KaliServicesData.getInstance().kaliServicesModelListFull;
             if (kaliServicesModelList == null) return;
             final LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            final View promptViewDelete = inflater.inflate(R.layout.kaliservices_delete_dialog_view, null, false);
+            final View promptViewDelete = inflater.inflate(R.layout.kaliservices_delete_dialog_view, nullParent, false);
             final RecyclerView recyclerViewDeleteItem = promptViewDelete.findViewById(R.id.f_kaliservices_delete_recycleview);
-            final KaliServicesRecycleViewAdapterDeleteItems kaliServicesRecycleViewAdapterDeleteItems = new KaliServicesRecycleViewAdapterDeleteItems(context, kaliServicesModelList);
+            KaliServicesRecycleViewAdapterDeleteItems kaliServicesRecycleViewAdapterDeleteItems = new KaliServicesRecycleViewAdapterDeleteItems(context, kaliServicesModelList);
 
             LinearLayoutManager linearLayoutManagerDelete = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
             recyclerViewDeleteItem.setLayoutManager(linearLayoutManagerDelete);
             recyclerViewDeleteItem.setAdapter(kaliServicesRecycleViewAdapterDeleteItems);
 
-            final AlertDialog.Builder adbDelete = new AlertDialog.Builder(activity);
-            adbDelete.setMessage("Select the service you want to remove: ");
-            adbDelete.setView(promptViewDelete);
-            adbDelete.setCancelable(true);
+            AlertDialog.Builder adbDelete = new AlertDialog.Builder(activity);
             adbDelete.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
             adbDelete.setPositiveButton("Delete", (dialog, which) -> { });
-            //If you want the dialog to stay open after clicking OK, you need to do it this way...
             final AlertDialog adDelete = adbDelete.create();
+            adDelete.setMessage("Select the service you want to remove: ");
+            adDelete.setView(promptViewDelete);
+            adDelete.setCancelable(true);
+            //If you want the dialog to stay open after clicking OK, you need to do it this way...
             adDelete.setOnShowListener(dialog -> {
                 final Button buttonDelete = adDelete.getButton(DialogInterface.BUTTON_POSITIVE);
                 buttonDelete.setOnClickListener(v1 -> {
@@ -395,7 +407,9 @@ public class KaliServicesFragment extends Fragment {
                         KaliServicesData.getInstance().deleteData(selectedPosition, selectedTargetIds, KaliServicesSQL.getInstance(context));
                         NhPaths.showMessage(context, "Successfully deleted " + selectedPosition.size() + " items.");
                         adDelete.dismiss();
-                    } else NhPaths.showMessage(context, "Nothing to be deleted.");
+                    } else {
+                        NhPaths.showMessage(context, "Nothing to be deleted.");
+                    }
                 });
             });
             adDelete.show();
@@ -404,10 +418,11 @@ public class KaliServicesFragment extends Fragment {
 
     private void onMoveItemSetup(){
         moveButton.setOnClickListener(v -> {
-            final List<KaliServicesModel> kaliServicesModelList = KaliServicesData.getInstance().kaliServicesModelListFull;
+            final ViewGroup nullParent = null;
+            List<KaliServicesModel> kaliServicesModelList = KaliServicesData.getInstance().kaliServicesModelListFull;
             if (kaliServicesModelList == null) return;
             final LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            final View promptViewMove = inflater.inflate(R.layout.kaliservices_move_dialog_view, null, false);
+            final View promptViewMove = inflater.inflate(R.layout.kaliservices_move_dialog_view, nullParent, false);
             final Spinner titlesBefore = promptViewMove.findViewById(R.id.f_kaliservices_move_adb_spr_titlesbefore);
             final Spinner titlesAfter = promptViewMove.findViewById(R.id.f_kaliservices_move_adb_spr_titlesafter);
             final Spinner actions = promptViewMove.findViewById(R.id.f_kaliservices_move_adb_spr_actions);
@@ -417,19 +432,17 @@ public class KaliServicesFragment extends Fragment {
                 serviceNameArrayList.add(kaliServicesModel.getServiceName());
             }
 
-            final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, serviceNameArrayList);
+            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, serviceNameArrayList);
             arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             titlesBefore.setAdapter(arrayAdapter);
             titlesAfter.setAdapter(arrayAdapter);
 
-            final AlertDialog.Builder adbMove = new AlertDialog.Builder(activity);
-            adbMove.setView(promptViewMove);
-            adbMove.setCancelable(true);
+            AlertDialog.Builder adbMove = new AlertDialog.Builder(activity);
             adbMove.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-            adbMove.setPositiveButton("Move", (dialog, which) -> {
-
-            });
+            adbMove.setPositiveButton("Move", (dialog, which) -> { });
             final AlertDialog adMove = adbMove.create();
+            adMove.setView(promptViewMove);
+            adMove.setCancelable(true);
             adMove.setOnShowListener(dialog -> {
                 final Button buttonMove = adMove.getButton(DialogInterface.BUTTON_POSITIVE);
                 buttonMove.setOnClickListener(v1 -> {

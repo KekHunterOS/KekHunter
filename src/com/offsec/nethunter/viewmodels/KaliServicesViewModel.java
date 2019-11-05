@@ -20,13 +20,12 @@ import java.util.List;
  */
 public class KaliServicesViewModel extends ViewModel {
     private MutableLiveData<List<KaliServicesModel>> mutableLiveDataKaliServicesModelList;
-    private KaliServicesData kaliServicesData;
 
     public void init(Context context){
         if (mutableLiveDataKaliServicesModelList != null){
             return;
         }
-        kaliServicesData = KaliServicesData.getInstance();
+        KaliServicesData kaliServicesData = KaliServicesData.getInstance();
         if (KaliServicesData.isDataInitiated) {
             mutableLiveDataKaliServicesModelList = kaliServicesData.getKaliServicesModels();
         } else {
