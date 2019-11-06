@@ -24,7 +24,7 @@ import com.offsec.nethunter.utils.ShellExecuter;
 public class CompatCheckService extends IntentService {
 
     private static final String TAG = "CompatCheckService";
-    private static String message = "";
+    private String message = "";
     private int RESULTCODE = -1;
     private SharedPreferences sharedPreferences;
     public CompatCheckService(){
@@ -141,15 +141,23 @@ public class CompatCheckService extends IntentService {
         }
 
         // If devices are "^oneplus.*|^miui.*",
-        // then they must have accessibility service enabled to make sure the BOOT_COMPLETED action intent is actually received by the nethunter app.
+        // then they must have accessibility service enabled and battery optimization disabled for com.offsec.nethunter.
+        // Battery Optimization can also ruin the party by preventing the boot service to run properly,
+        // So let's exclude the nethunter-app from battery optimization
+        // just to make sure the BOOT_COMPLETED action intent is actually received by the nethunter app.
+
         if ((Build.MODEL.toLowerCase().matches("^oneplus.*|^miui.*"))){
             if (!new ShellExecuter().RunAsRootOutput("settings get secure enabled_accessibility_services").matches("com\\.offsec\\.nethunter")){
                 Log.d(TAG, "The accessibility service is not enabled for nethunter, enabling it now..");
                 new ShellExecuter().RunAsRootOutput("settings put secure enabled_accessibility_services com.offsec.nethunter/.service.DummyAccessibilityService");
             }
+            if (!new ShellExecuter().RunAsRootOutput("dumpsys deviceidle whitelist").contains(BuildConfig.APPLICATION_ID)){
+                Log.d(TAG, "The battery optimization is not disabled for nethunter, disabling it now..");
+                new ShellExecuter().RunAsRootOutput("dumpsys deviceidle whitelist +" + BuildConfig.APPLICATION_ID);
+            }
         }
-        /* End of the other compat checks */
 
+        /* End of the other compat checks */
         return true;
     }
 }
