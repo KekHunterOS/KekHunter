@@ -142,6 +142,10 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
                 publishProgress("Chroot not Found, install it in Chroot Manager");
             }
 
+            // Battery Optimization can ruin the party by preventing the boot service to run properly
+            // Let's exclude the nethunter-app from battery optimization
+            DisableBatteryOptimization();
+
             // This is required to install the additional apks in Android Oreo and newer
             // We can no longer install user apps through TWRP so we copy them across and install them here
             // Get the list of *.apk files in /sdcard/nh_files/cache/apk and install them using "pm install"
@@ -282,6 +286,12 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
         Log.d(TAG, "Symlinking " + filename);
         Log.d(TAG, "command output: ln -s " + NhPaths.APP_SCRIPTS_PATH + "/" + filename + " /system/bin/" + filename);
         exe.RunAsRoot(new String[]{"ln -s " + NhPaths.APP_SCRIPTS_PATH + "/" + filename + " /system/bin/" + filename});
+    }
+
+    private void DisableBatteryOptimization(){
+        ShellExecuter exe = new ShellExecuter();
+        Log.d(TAG, "Disabling battery optimization for com.offsec.nethunter");
+        exe.RunAsRoot(new String[]{"dumpsys deviceidle whitelist +com.offsec.nethunter"});
     }
 
     // Get a list of files from a directory
