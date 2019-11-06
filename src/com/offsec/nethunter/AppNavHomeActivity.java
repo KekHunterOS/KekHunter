@@ -108,6 +108,9 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
 
             @Override
             public void onAsyncTaskFinished(Object result) {
+
+                // Fetch the busybox path again after the busybox_nh is copied.
+                NhPaths.BUSYBOX = NhPaths.getBusyboxPath();
                 // Setup the default SharePreference value.
                 setDefaultSharePreference();
 
@@ -559,6 +562,11 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                                 navigationView.getMenu().setGroupEnabled(R.id.chrootDependentGroup, true);
                             } else {
                                 navigationView.getMenu().setGroupEnabled(R.id.chrootDependentGroup, false);
+                                if (lastSelectedMenuItem.getItemId() != R.id.nethunter_item &&
+                                        lastSelectedMenuItem.getItemId() != R.id.createchroot_item) {
+                                    FragmentManager fragmentManager = getSupportFragmentManager();
+                                    changeFragment(fragmentManager, NetHunterFragment.newInstance(R.id.nethunter_item));
+                                }
                             }
                         } catch (Exception e) {
                             Log.e(AppNavHomeActivity.TAG, e.getMessage());

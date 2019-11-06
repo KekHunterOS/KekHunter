@@ -78,15 +78,6 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
     protected String doInBackground(String ...strings) {
         // setup
         if(shouldRun){
-            /*List<String> bootkali_list = new ArrayList<>();
-            bootkali_list.add("bootkali");
-            bootkali_list.add("bootkali_init");
-            bootkali_list.add("bootkali_login");
-            bootkali_list.add("bootkali_bash");
-            bootkali_list.add("chrootmgr");
-            bootkali_list.add("duckyconverter");
-            bootkali_list.add("killkali");*/
-
             Log.d(TAG, "COPYING FILES....");
             // 1:1 copy (recursive) of the assets/{scripts, etc, wallpapers} folders to /data/data/...
             publishProgress("Doing app files update. (init.d and filesDir).");
@@ -100,28 +91,6 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
             SharedPreferences.Editor ed = prefs.edit();
             ed.putString(TAG, buildTime);
             ed.apply();
-
-            /*publishProgress("Checking for SYMLINKS to bootkali....");
-            try {
-                MakeSYSWriteable();
-                // Loop over bootkali list (e.g. bootkali | bootkali_bash | bootkali_env)
-                for (String temp : bootkali_list) {
-
-                    String sys_temp = "/system/bin/" + temp;
-
-                    // Define each as a new file
-                    File filePath = new File(sys_temp);
-
-                    // If the symlink is not found, then go create one!
-                    if(!isSymlink(filePath)) {
-                        //publishProgress("Creating symlink for " + temp);
-                        NotFound(temp);
-                    }
-                }
-                MakeSYSReadOnly();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }*/
 
             publishProgress("Checking for chroot....");
             String command = "if [ -d " + NhPaths.CHROOT_PATH() + " ];then echo 1; fi"; //check the dir existence
@@ -141,10 +110,6 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
             } else {
                 publishProgress("Chroot not Found, install it in Chroot Manager");
             }
-
-            // Battery Optimization can ruin the party by preventing the boot service to run properly
-            // Let's exclude the nethunter-app from battery optimization
-            DisableBatteryOptimization();
 
             // This is required to install the additional apks in Android Oreo and newer
             // We can no longer install user apps through TWRP so we copy them across and install them here
@@ -286,12 +251,6 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
         Log.d(TAG, "Symlinking " + filename);
         Log.d(TAG, "command output: ln -s " + NhPaths.APP_SCRIPTS_PATH + "/" + filename + " /system/bin/" + filename);
         exe.RunAsRoot(new String[]{"ln -s " + NhPaths.APP_SCRIPTS_PATH + "/" + filename + " /system/bin/" + filename});
-    }
-
-    private void DisableBatteryOptimization(){
-        ShellExecuter exe = new ShellExecuter();
-        Log.d(TAG, "Disabling battery optimization for com.offsec.nethunter");
-        exe.RunAsRoot(new String[]{"dumpsys deviceidle whitelist +com.offsec.nethunter"});
     }
 
     // Get a list of files from a directory

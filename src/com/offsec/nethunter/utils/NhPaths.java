@@ -50,7 +50,7 @@ public class NhPaths implements SharedPreferences.OnSharedPreferenceChangeListen
         CHROOT_SUDO                     = "/usr/bin/sudo";
         CHROOT_INITD_SCRIPT_PATH        = APP_INITD_PATH + "/80postservices";
         CHROOT_SD_PATH                  = "/sdcard";
-        BUSYBOX                         = getBusyboxPath();
+        BUSYBOX                         = "";
     }
 
     public synchronized static NhPaths getInstance(Context context) {
@@ -75,15 +75,13 @@ public class NhPaths implements SharedPreferences.OnSharedPreferenceChangeListen
         return Environment.getExternalStorageDirectory().toString();
     }
 
-    private static String getBusyboxPath(){
+    public static String getBusyboxPath(){
         String[] BB_PATHS = {
-                "/data/adb/magisk/busybox",
-                "/sbin/.magisk/busybox/busybox",
                 "/system/xbin/busybox_nh",
+                "/system/bin/busybox_nh",
+                APP_SCRIPTS_BIN_PATH + "/busybox_nh",
                 "/sbin/busybox_nh",
-                "/system/bin/busybox",
-                "/data/local/bin/busybox",
-                "/system/xbin/busybox",
+                "/system/xbin/busybox_nh"
         };
         for (String BB_PATH : BB_PATHS) {
             File busybox = new File(BB_PATH);
@@ -91,7 +89,7 @@ public class NhPaths implements SharedPreferences.OnSharedPreferenceChangeListen
                 return BB_PATH;
             }
         }
-        return null;
+        return "";
     }
 
     public static String makeTermTitle(String title) {

@@ -10,19 +10,16 @@
 SCRIPT_PATH=$(readlink -f $0)
 SOURCE_PATH=${SCRIPT_PATH%/*}
 
+. ${SCRIPT_PATH%/*}/bootkali_env
+
 #########################
 #### Define Variables ####
 #########################
 
-## Setup BUSYBOX path.
-BUSYBOX=`which busybox | head -n1`
+## Validate busybox path.
 if [ -z "$BUSYBOX" ]; then
-    if [ -x /sbin/.magisk/busybox/busybox ]; then
-        BUSYBOX=/sbin/.magisk/busybox/busybox
-    else
-        echo "[-] No busybox is installed or busybox is not granted execute permission, if you did have it installed, please symlink it to /system/bin and grant it the permission."
-        exit 1
-    fi
+    bklog "[-] No busybox_nh is installed or busybox_nh is not granted execute permission, if you did have it installed, please symlink it to /system/bin or /system/xbin and grant it the permission."
+    exit 1
 fi
 
 ## Check if hid binary existed.
