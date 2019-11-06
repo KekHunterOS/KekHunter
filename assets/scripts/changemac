@@ -3,28 +3,12 @@
 ######### IMPORT BOOTKALI ENVIRONMENT #########
 SCRIPT_PATH=$(readlink -f $0)
 . ${SCRIPT_PATH%/*}/bootkali_log
+. ${SCRIPT_PATH%/*}/bootkali_env
 
-## Define busybox path.
-BUSYBOX=`which busybox | head -n1`
+## Validate busybox path.
 if [ -z "$BUSYBOX" ]; then
-    if [ -x "/data/adb/magisk/busybox" ]; then
-        BUSYBOX="/data/adb/magisk/busybox"
-    elif [ -x "/sbin/.magisk/busybox/busybox" ]; then
-        BUSYBOX="/sbin/.magisk/busybox/busybox"
-    elif [ -x "/system/xbin/busybox_nh" ]; then
-        BUSYBOX="/system/xbin/busybox_nh"
-    elif [ -x "/sbin/busybox_nh" ]; then
-        BUSYBOX="/sbin/busybox_nh"
-    elif [ -x "/system/bin/busybox" ]; then
-        BUSYBOX="/system/bin/busybox"
-    elif [ -x "/data/local/bin/busybox" ]; then
-        BUSYBOX="/data/local/bin/busybox"
-    elif [ -x "/system/xbin/busybox" ]; then
-        BUSYBOX="/system/xbin/busybox"
-    else
-        bklog "[-] No busybox is installed or busybox is not granted execute permission, if you did have it installed, please symlink it to /system/bin and grant it the permission."
-        exit 1
-    fi
+    bklog "[-] No busybox_nh is installed or busybox is not granted execute permission, if you did have it installed, please symlink it to /system/bin and grant it the permission."
+    exit 1
 fi
 
 function show_usage() {
