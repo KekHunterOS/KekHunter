@@ -79,9 +79,7 @@ public class NhPaths implements SharedPreferences.OnSharedPreferenceChangeListen
         String[] BB_PATHS = {
                 "/system/xbin/busybox_nh",
                 "/system/bin/busybox_nh",
-                APP_SCRIPTS_BIN_PATH + "/busybox_nh",
-                "/sbin/busybox_nh",
-                "/system/xbin/busybox_nh"
+                APP_SCRIPTS_BIN_PATH + "/busybox_nh"
         };
         for (String BB_PATH : BB_PATHS) {
             File busybox = new File(BB_PATH);
