@@ -16,7 +16,7 @@ NHSYSTEM_PATH=/data/local/nhsystem
 CHROOT_EXEC=/usr/bin/sudo
 
 ## Combine android $PATH to kali chroot $PATH
-export PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH
 
 ## Define busybox path.
 BUSYBOX=`which busybox_nh | head -n1`
