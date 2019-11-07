@@ -54,8 +54,9 @@ f_restore_setup() {
     ## set shmmax to 128mb to free memory ##
     $BUSYBOX sysctl -w kernel.shmmax=134217728
 
-    ## remove all the remaining chroot vnc session pids ##
-    rm -rf $MNT/tmp/.X11* > /dev/null 2>&1
+    ## remove all the remaining chroot vnc session pid and log files..##
+    bklog "[!] Removing all the remaining chroot vnc session pid and log files.."
+    rm -rf $MNT/tmp/.X11* $MNT/tmp/.X*-lock $MNT/root/.vnc/*.pid $MNT/root/.vnc/*.log > /dev/null 2>&1
 }
 
 ########## umount the fs one by one ##########
