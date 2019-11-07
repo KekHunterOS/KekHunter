@@ -12,6 +12,7 @@ import android.util.Log;
 import com.offsec.nethunter.AppNavHomeActivity;
 import com.offsec.nethunter.BuildConfig;
 import com.offsec.nethunter.ChrootManagerFragment;
+import com.offsec.nethunter.utils.CheckForRoot;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.ShellExecuter;
 
@@ -78,6 +79,10 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
     protected String doInBackground(String ...strings) {
         // setup
         if(shouldRun){
+            if (!CheckForRoot.isRoot()) {
+                prefs.edit().putBoolean(AppNavHomeActivity.CHROOT_INSTALLED_TAG, false).apply();
+                return "Root permission is required!!";
+            }
             Log.d(TAG, "COPYING FILES....");
             // 1:1 copy (recursive) of the assets/{scripts, etc, wallpapers} folders to /data/data/...
             publishProgress("Doing app files update. (init.d and filesDir).");
