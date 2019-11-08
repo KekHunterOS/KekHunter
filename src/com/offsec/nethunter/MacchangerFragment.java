@@ -1,7 +1,6 @@
 package com.offsec.nethunter;
 
-
-import android.app.Activity;
+import java.lang.String;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -30,22 +29,19 @@ import com.offsec.nethunter.utils.ShellExecuter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
-
 public class MacchangerFragment extends Fragment {
-
-
     private SharedPreferences sharedpreferences;
+    public NhPaths nh;
     private static final String ARG_SECTION_NUMBER = "section_number";
-    private ShellExecuter exe;
-    private Context context;
-    private Activity activity;
-    private NhPaths nh;
+    public ShellExecuter exe;
+
     public MacchangerFragment() {
 
     }
@@ -75,7 +71,6 @@ public class MacchangerFragment extends Fragment {
         String selectedInterface = interfaceSpinner.getSelectedItem().toString();
         String cleanInterface = selectedInterface.split(" ")[0];
         menu.findItem(R.id.reset_mac).setTitle(String.format("Reset %s MAC", cleanInterface));
-
 
     }
 
@@ -144,7 +139,6 @@ public class MacchangerFragment extends Fragment {
         int current_interface = -1;
         int current_mode = -1;
 
-
         // set the last used interface
         for (String cc : getResources().getStringArray(R.array.interface_opts)) {
             current_interface++;
@@ -177,7 +171,6 @@ public class MacchangerFragment extends Fragment {
                 editor.putString("interface_opts", selectedInterface);  // the full text so we can compare later
                 editor.apply();
 
-
                 getCurrentMac(cleanInterface, currMac, setMacButton);  // this gets the current mac of the interface and sets it to the textview
                 // update the button text
 
@@ -189,12 +182,10 @@ public class MacchangerFragment extends Fragment {
                 }
             }
 
-
             @Override
             public void onNothingSelected(AdapterView<?> arg0) {
 
             }
-
 
         });
         setHostname.setOnClickListener(v -> new Thread(() -> {
@@ -247,7 +238,7 @@ public class MacchangerFragment extends Fragment {
                 PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
                 PowerManager.WakeLock mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                         getClass().getName());
-                mWakeLock.acquire();
+                mWakeLock.acquire(10*60*1000L /*10 minutes*/);
                 // Usage: bootkali macchanger <mac address> <interface> || Random: bootkali macchanger random <interface>
                 String command;
                 final String selectedDevice = interfaceSpinner.getSelectedItem().toString().split(" ")[0];
@@ -283,7 +274,7 @@ public class MacchangerFragment extends Fragment {
                                     }, 1000));
                         }).start();
                     } else {
-                        exe.RunAsRootWithException(nh.whichBusybox() + " ifconfig " + selectedDevice + " down");
+                        exe.RunAsRootWithException(nh.whichBusybox() + " ip link set " + selectedDevice + " down");
 
                         command = "bootkali macchanger_random " + selectedDevice;
                         exe.RunAsRootWithException(command);
@@ -291,8 +282,8 @@ public class MacchangerFragment extends Fragment {
 
                         new android.os.Handler().postDelayed(
                                 () -> {
-                                    exe.RunAsRootWithException(nh.whichBusybox() + " ifconfig " + selectedDevice + " up");
-                                    nh.showMessage(context,"Refreshing the current MAC.");
+                                    exe.RunAsRootWithException(nh.whichBusybox() + " ip link set " + selectedDevice + " up");
+                                    nh.showMessage("Refreshing the current MAC.");
                                     refreshMAc();
                                 }, 500);
                     }
@@ -330,15 +321,15 @@ public class MacchangerFragment extends Fragment {
                         }).start();
 
                     } else {
-                        exe.RunAsRootWithException(nh.whichBusybox() + " ifconfig " + selectedDevice + " down");
+                        exe.RunAsRootWithException(nh.whichBusybox() + " ip link set " + selectedDevice + " down");
                         command = "bootkali macchanger_custom " + macsArray + " " + selectedDevice;
                         exe.RunAsRootWithException(command);
                         // macResult.setText();
 
                         new android.os.Handler().postDelayed(
                                 () -> {
-                                    exe.RunAsRootWithException(nh.whichBusybox() + " ifconfig " + selectedDevice + " up");
-                                    nh.showMessage(context,"Refreshing the current MAC.");
+                                    exe.RunAsRootWithException(nh.whichBusybox() + " ip link set " + selectedDevice + " up");
+                                    nh.showMessage("Refreshing the current MAC.");
                                     refreshMAc();
                                 }, 500);
 
@@ -347,20 +338,19 @@ public class MacchangerFragment extends Fragment {
                 mWakeLock.release();
             }
 
-
         });
 
         return rootView;
     }
 
-    private String[] delFromArray(String[] originalArr, int itemid) {
+    private String[] delFromArray(@org.jetbrains.annotations.NotNull String[] originalArr, int itemid) {
         List<String> templist = new ArrayList<>();
         for (int i = 0; i < originalArr.length; i++) {
             if (itemid != i) {
                 templist.add(originalArr[i]);
             }
         }
-        return templist.toArray(new String[templist.size()]);
+        return templist.toArray(new String[0]);
     }
 
     private String getMacValues() {
@@ -398,19 +388,14 @@ public class MacchangerFragment extends Fragment {
         getCurrentMac(cleanInterface, currMac, setMacButton);
     }
 
-
     private void getCurrentMac(final String theDevice, final TextView currMac, final Button setMacButton) {
-        //in the bg
-
         currMac.setText(String.format("Reading %s", theDevice));
 
         new Thread(() -> {
-
             try {
 
                 StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
                 StrictMode.setThreadPolicy(policy);
-
 
                 String fileMac = "/sys/class/net/" + theDevice + "/address";
                 final String _res;
@@ -422,7 +407,7 @@ public class MacchangerFragment extends Fragment {
                         String notFound = "MAC not found";
                         currMac.setText(notFound);
                         setMacButton.setEnabled(false);
-                        setMacButton.setText(String.format("%s not detected", theDevice)); //interface is down| not plugged etc
+                        setMacButton.setText(String.format("%s not detected", theDevice)); // interface is down| not plugged etc
                     } else {
 
                         setMacButton.setEnabled(true);
@@ -489,16 +474,16 @@ public class MacchangerFragment extends Fragment {
                         }, 1000));
             }).start();
         } else {
-            nh.showMessage(context,"Resetting " + cleanInterface + " MAC");
-            exe.RunAsRootWithException(nh.whichBusybox() + " ifconfig " + cleanInterface + " down");
+            nh.showMessage("Resetting " + cleanInterface + " MAC");
+            exe.RunAsRootWithException(nh.whichBusybox() + " ip link set " + cleanInterface + " down");
 
             String resetCmd = "bootkali macchanger_original " + cleanInterface;
             exe.RunAsRootWithException(resetCmd);
 
             new android.os.Handler().postDelayed(
                     () -> {
-                        exe.RunAsRootWithException(nh.whichBusybox() + " ifconfig " + cleanInterface + " up");
-                        nh.showMessage(context,"Refreshing the current MAC.");
+                        exe.RunAsRootWithException(nh.whichBusybox() + " ip link set " + cleanInterface + " up");
+                        nh.showMessage("Refreshing the current MAC.");
                         refreshMAc();
                     }, 500);
 
@@ -524,7 +509,7 @@ public class MacchangerFragment extends Fragment {
 
     public void saveMacDialog() {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        AlertDialog.Builder builder = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
         builder.setTitle("Saving mac:");
         builder.setMessage("Not implemented WIP");
         builder.setPositiveButton("OK", (dialog, which) -> {
