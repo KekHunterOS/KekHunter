@@ -12,6 +12,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -27,6 +28,7 @@ import com.offsec.nethunter.gps.KaliGPSUpdates;
 import com.offsec.nethunter.gps.LocationUpdateService;
 import com.offsec.nethunter.utils.CheckForRoot;
 import com.offsec.nethunter.utils.PermissionCheck;
+import com.offsec.nethunter.utils.ShellExecuter;
 import com.winsontan520.wversionmanager.library.WVersionManager;
 
 import java.text.SimpleDateFormat;
@@ -67,6 +69,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     private Integer permsCurrent = 1;
     private boolean locationUpdatesRequested = false;
     private KaliGPSUpdates.Receiver locationUpdateReceiver;
+    private boolean confirm_res;
 
     //public static Context getAppContext() {
     //   return c;
@@ -81,7 +84,11 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         // ************************************************
         this.context = getApplicationContext();
         this.activity = this;
-
+        SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+     /*   confirm_res = sharedpreferences.getBoolean("confirm_res", false);
+        if (confirm_res) {
+            confirmDialog();
+        }*/
         /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             askMarshmallowPerms(permsCurrent);
         } else {
@@ -242,6 +249,43 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
             }
         });
         copyBootFilesAsyncTask.execute();
+    }
+
+    private void confirmDialog() {
+
+        SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+        final AlertDialog.Builder confirmbuilder = new AlertDialog.Builder(activity);
+        confirmbuilder.setTitle("Do you want to keep the resolution?");
+        confirmbuilder.setMessage("Loading..");
+        confirmbuilder.setPositiveButton("Keep resolution", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                sharedpreferences.edit().putBoolean("confirm_res", false).apply();
+                dialogInterface.cancel();
+            }
+        });
+        final AlertDialog alert = confirmbuilder.create();
+        alert.show();
+        CountDownTimer resetResolution = new CountDownTimer(15000, 1000) {
+            @Override
+            public void onTick(long l) {
+                alert.setMessage("Resetting device resolution in "+ l/1000 + " sec");
+            }
+            @Override
+            public void onFinish() {
+                ShellExecuter exe = new ShellExecuter();
+                exe.RunAsRoot(new String[]{"su -c wm size reset; wm density reset"});
+                sharedpreferences.edit().putBoolean("confirm_res", false).apply();
+            }
+        }.start();
+        alert.setButton(alert.BUTTON_POSITIVE,"Keep resolution",new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                sharedpreferences.edit().putBoolean("confirm_res", false).apply();
+                alert.cancel();
+                resetResolution.cancel();
+            }
+        });
     }
 
     public static void setDrawerOptions() {
@@ -411,21 +455,16 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                                     .commit();
                             break;
                         case R.id.vnc_item:
-                            Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage("com.offsec.nhvnc");
+                            Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage("com.offsec.nethunter.kex");
                             //null pointer check in case package name was not found
                             if (launchIntent != null) {
-                                PermissionCheck permissionCheck = new PermissionCheck(activity, context);
-                                if (!permissionCheck.isAllPermitted(PermissionCheck.NH_VNC_PERMISSIONS)) {
-                                    permissionCheck.checkPermissions(PermissionCheck.NH_VNC_PERMISSIONS, PermissionCheck.NH_VNC_PERMISSIONS_RQCODE);
-                                } else {
-                                    fragmentManager
-                                            .beginTransaction()
-                                            .replace(R.id.container, VNCFragment.newInstance(itemId))
-                                            .addToBackStack(null)
-                                            .commit();
-                                }
+                                fragmentManager
+                                        .beginTransaction()
+                                        .replace(R.id.container, VNCFragment.newInstance(itemId))
+                                        .addToBackStack(null)
+                                        .commit();
                             } else {
-                                new android.app.AlertDialog.Builder(activity).setMessage("Nethunter VNC is not installed yet.").create().show();
+                                new android.app.AlertDialog.Builder(activity).setMessage("Nethunter KeX is not installed yet.").create().show();
                             }
                             break;
 
