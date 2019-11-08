@@ -69,7 +69,6 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     private Integer permsCurrent = 1;
     private boolean locationUpdatesRequested = false;
     private KaliGPSUpdates.Receiver locationUpdateReceiver;
-    private boolean confirm_res;
 
     //public static Context getAppContext() {
     //   return c;
@@ -85,10 +84,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         this.context = getApplicationContext();
         this.activity = this;
         SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-     /*   confirm_res = sharedpreferences.getBoolean("confirm_res", false);
-        if (confirm_res) {
-            confirmDialog();
-        }*/
+
         /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             askMarshmallowPerms(permsCurrent);
         } else {
@@ -249,43 +245,6 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
             }
         });
         copyBootFilesAsyncTask.execute();
-    }
-
-    private void confirmDialog() {
-
-        SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-        final AlertDialog.Builder confirmbuilder = new AlertDialog.Builder(activity);
-        confirmbuilder.setTitle("Do you want to keep the resolution?");
-        confirmbuilder.setMessage("Loading..");
-        confirmbuilder.setPositiveButton("Keep resolution", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                sharedpreferences.edit().putBoolean("confirm_res", false).apply();
-                dialogInterface.cancel();
-            }
-        });
-        final AlertDialog alert = confirmbuilder.create();
-        alert.show();
-        CountDownTimer resetResolution = new CountDownTimer(15000, 1000) {
-            @Override
-            public void onTick(long l) {
-                alert.setMessage("Resetting device resolution in "+ l/1000 + " sec");
-            }
-            @Override
-            public void onFinish() {
-                ShellExecuter exe = new ShellExecuter();
-                exe.RunAsRoot(new String[]{"su -c wm size reset; wm density reset"});
-                sharedpreferences.edit().putBoolean("confirm_res", false).apply();
-            }
-        }.start();
-        alert.setButton(alert.BUTTON_POSITIVE,"Keep resolution",new DialogInterface.OnClickListener(){
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                sharedpreferences.edit().putBoolean("confirm_res", false).apply();
-                alert.cancel();
-                resetResolution.cancel();
-            }
-        });
     }
 
     public static void setDrawerOptions() {
