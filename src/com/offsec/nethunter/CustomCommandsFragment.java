@@ -380,7 +380,7 @@ public class CustomCommandsFragment extends Fragment {
 
     private void setUpInitialCommands() {
         database.addCommand("Update Kali metapackages", nh.makeTermTitle("Updating Kali") + "apt-get update && apt-get upgrade", "INTERACTIVE", "KALI", 0);
-        database.addCommand("Wlan1 Monitor Mode", nh.makeTermTitle("Wlan1 Monitor UP") + "sudo ip link set wlan1 down && sudo iw dev wlan0 set type monitor && sudo ip link set wlan1 up && echo \"wlan1 Monitor mode enabled\" && sleep 3 && exit", "INTERACTIVE", "KALI", 0);
+        database.addCommand("Wlan1 Monitor Mode", nh.makeTermTitle("Wlan1 Monitor UP") + "sudo ifconfig wlan1 down && sudo iwconfig wlan1 mode monitor && sudo ifconfig wlan1 up && echo \"wlan1 Monitor mode enabled\" && sleep 3 && exit", "INTERACTIVE", "KALI", 0);
         database.addCommand("Launch Wifite", nh.makeTermTitle("Wifite") + "wifite", "INTERACTIVE", "KALI", 0);
         database.addCommand("Dump Mifare", nh.makeTermTitle("DumpMifare") + "dumpmifare.sh", "INTERACTIVE", "KALI", 0);
         database.addCommand("Backup Kali Chroot", nh.makeTermTitle("Backup_Kali_Chroot") + "su --mount-master -c 'chroot_backup /data/local/nhsystem/kali-armhf /sdcard/kalifs-backup.tar.gz'",
