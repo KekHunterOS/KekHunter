@@ -1,6 +1,6 @@
 package com.offsec.nethunter;
 
-import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
@@ -53,7 +53,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
-import java.util.Objects;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -135,7 +134,6 @@ ChrootManagerFragment extends Fragment {
         return fragment;
     }
 
-    @SuppressLint("SetTextI18n")
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -155,7 +153,7 @@ ChrootManagerFragment extends Fragment {
         updateButton = rootView.findViewById(R.id.upgradechrootbutton);
         updateButton.setOnClickListener(v -> addMetaPackages());
         updateButton.setVisibility(View.GONE);
-        sharedpreferences = Objects.requireNonNull(getActivity()).getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+        sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
 
         // extract files location
         installLogFile = nh.SD_PATH + "/nh_install_" + new SimpleDateFormat("yyyyMMdd_hhmmss'.log'", Locale.US).format(new Date());
@@ -209,8 +207,8 @@ ChrootManagerFragment extends Fragment {
     private void startMigrateRoot() {
         installButton.setEnabled(false);
         pd = new ProgressDialog(getActivity());
-        pd.setTitle(Objects.requireNonNull(getActivity()).getString(R.string.rebootingdialogtitle));
-        pd.setMessage(getActivity().getString(R.string.rebootingdialogbody));
+        pd.setTitle(context.getString(R.string.rebootingdialogtitle));
+        pd.setMessage(activity.getString(R.string.rebootingdialogbody));
         pd.setCancelable(false);
         pd.show();
         Log.d(TAG, " PREFERENCE SET: " + MIGRATE_CHROOT_TAG);
@@ -273,11 +271,21 @@ ChrootManagerFragment extends Fragment {
             installButton.post(() -> {
                 if (_res.equals("1")) {
                     // the chroot is there.
-                    AlertDialog.Builder adb = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
-                    adb.setTitle(getActivity().getString(R.string.reallyremovechroot));
-                    adb.setMessage(getActivity().getString(R.string.nogoingback));
-                    adb.setPositiveButton(getActivity().getString(R.string.rebootbutton), (dialog, which) -> reallyWipeRoot());
-                    adb.setNegativeButton(getActivity().getString(R.string.chickenoutbutton), (dialog, which) -> installButton.setEnabled(true));
+                    AlertDialog.Builder adb = new AlertDialog.Builder(activity);
+                    adb.setTitle(activity.getString(R.string.reallyremovechroot));
+                    adb.setMessage(activity.getString(R.string.nogoingback));
+                    adb.setPositiveButton(activity.getString(R.string.rebootbutton), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            reallyWipeRoot();
+                        }
+                    });
+                    adb.setNegativeButton(activity.getString(R.string.chickenoutbutton), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            installButton.setEnabled(true);
+                        }
+                    });
                     AlertDialog ad = adb.create();
                     ad.setCancelable(false);
                     ad.show();
@@ -290,12 +298,15 @@ ChrootManagerFragment extends Fragment {
 
     private void downloadOrSdcard() {
 
-        AlertDialog.Builder adb = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
+        AlertDialog.Builder adb = new AlertDialog.Builder(getActivity());
         adb.setTitle("Select chroot install mode:")
                 .setMessage("Download is the preferred mode. Get the latest chroot from the offsec servers.\n\nYou can place a custom\nkalifs-[minimal|full].tar.gz in /sdcard\nand skip the download.\n\nAlso, You can place a back up kalifs-backup.tar.gz in /sdcard to restore your backup chroot.")
-                .setNegativeButton("Restore from SdCard", (dialog, which) -> {
-                    dialog.cancel();
-                    restoreBackup();
+                .setNegativeButton("Restore from SdCard", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                        restoreBackup(false);
+                    }
                 })
                 .setNeutralButton("Use SdCard", (dialog, which) -> {
                     dialog.cancel();
@@ -312,7 +323,7 @@ ChrootManagerFragment extends Fragment {
     }
 
     private void fullOrMinimal(final Boolean shouldDownload) {
-        AlertDialog.Builder adb = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
+        AlertDialog.Builder adb = new AlertDialog.Builder(getActivity());
         adb.setTitle("Select Chroot Download:")
                 .setMessage("We recommend the full chroot, so you can enjoy all the nethunter features.\n\nIf you are installing from the SdCard, choose the type of chroot you copied to the SdCard.\n\nThe minimal is for testing/development")
                 .setNeutralButton("Minimal Chroot", (dialog, which) -> {
@@ -322,7 +333,7 @@ ChrootManagerFragment extends Fragment {
                     if (shouldDownload) {
                         // update value if is minimal
                         isFull = false;
-                        if (startZipDownload(URI_MINIMAL)) {
+                        if (!startZipDownload(URI_MINIMAL)) {
                             installButton.setEnabled(true);
                         }
                     } else {
@@ -337,7 +348,7 @@ ChrootManagerFragment extends Fragment {
                     if (shouldDownload) {
                         // update value if is full
                         isFull = true;
-                        if (startZipDownload(URI_FULL)) {
+                        if (!startZipDownload(URI_FULL)) {
                             installButton.setEnabled(true);
                         }
                     } else {
@@ -350,19 +361,21 @@ ChrootManagerFragment extends Fragment {
         ad.show();
     }
 
-    private void restoreBackup() {
+    private void restoreBackup(final Boolean shouldDownload) {
         zipFilePath = nh.SD_PATH + "/" + FILENAME_BACKUP;
-        UnziptarTask mytask = new UnziptarTask();
-        mytask.execute();
+        if (!shouldDownload) {
+            UnziptarTask mytask = new UnziptarTask();
+            mytask.execute();
+            }
     }
 
     private void addMetaPackages() {
         //for now, we'll hardcode packages in the dialog view.  At some point we'll want to grab them automatically.
 
-        AlertDialog.Builder adb = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
+        AlertDialog.Builder adb = new AlertDialog.Builder(getActivity());
         adb.setTitle("Metapackage Install & Upgrade");
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-        @SuppressLint("InflateParams") final ScrollView sv = (ScrollView) inflater.inflate(R.layout.metapackagechooser, null);
+        LayoutInflater inflater = activity.getLayoutInflater();
+        final ScrollView sv = (ScrollView) inflater.inflate(R.layout.metapackagechooser, null);
         adb.setView(sv);
         Button metapackageButton = sv.findViewById(R.id.metapackagesWeb);
         metapackageButton.setOnClickListener(v -> {
@@ -378,7 +391,7 @@ ChrootManagerFragment extends Fragment {
             // thanks to "user2" for a 2-line sample of how to get the dialog's view:  http://stackoverflow.com/a/13959585/3035127
             AlertDialog d = (AlertDialog) dialog;
             LinearLayout ll = d.findViewById(R.id.metapackageLinearLayout);
-            int children = Objects.requireNonNull(ll).getChildCount();
+            int children = ll.getChildCount();
             for (int cnt = 0; cnt < children; cnt++) {
                 if (ll.getChildAt(cnt) instanceof CheckBox) {
                     cb = (CheckBox) ll.getChildAt(cnt);
@@ -423,8 +436,8 @@ ChrootManagerFragment extends Fragment {
     private void reallyWipeRoot() {
         installButton.setEnabled(false);
         pd = new ProgressDialog(getActivity());
-        pd.setTitle(Objects.requireNonNull(getActivity()).getString(R.string.rebootingdialogtitle));
-        pd.setMessage(getActivity().getString(R.string.rebootingdialogbody));
+        pd.setTitle(activity.getString(R.string.rebootingdialogtitle));
+        pd.setMessage(activity.getString(R.string.rebootingdialogbody));
         pd.setCancelable(false);
         pd.show();
         Log.d(TAG, " PREFERENCE SET: " + DELETE_CHROOT_TAG);
@@ -450,11 +463,13 @@ ChrootManagerFragment extends Fragment {
         if (!filePath.contains("kalifs-backup.tar.gz")){
             if (checkFile.exists()) {
                 statusLog(filePath + " found.");
-                statusLog(Objects.requireNonNull(getActivity()).getString(R.string.deletingforroom));
+                statusLog(activity.getString(R.string.deletingforroom));
                 if (checkFile.delete()) {
                     statusLog("File deleted.");
+                    return;
                 } else {
-                    statusLog(getActivity().getString(R.string.problemdeletingoldfile));
+                    statusLog(activity.getString(R.string.problemdeletingoldfile));
+                    return;
                 }
             }
         }
@@ -462,14 +477,14 @@ ChrootManagerFragment extends Fragment {
 
     private boolean startZipDownload(String _URI) {
         deleteFile(zipFilePath);
-        statusLog(Objects.requireNonNull(getActivity()).getString(R.string.startingdownload));
+        statusLog(activity.getString(R.string.startingdownload));
         if (!isExternalStorageWritable()) {
-            statusLog(getActivity().getString(R.string.unwritablestorageerror));
-            return true;
+            statusLog(activity.getString(R.string.unwritablestorageerror));
+            return false;
         }
         final DownloadChroot downloadTask = new DownloadChroot(getActivity());
         downloadTask.execute(_URI);
-        return false;
+        return true;
     }
 
     private void inflateZip() {
@@ -565,7 +580,7 @@ ChrootManagerFragment extends Fragment {
         }
         // k, now check the sha.  Thanks to discussion regarding formatting at:
         // http://stackoverflow.com/questions/7166129/how-can-i-calculate-the-sha-256-hash-of-a-string-in-android
-        boolean sumpass = newSum.equalsIgnoreCase(SHA512);
+        Boolean sumpass = newSum.equalsIgnoreCase(SHA512);
         if (sumpass) {
             // match
             return new String[]{"1", newSum};
@@ -599,13 +614,12 @@ ChrootManagerFragment extends Fragment {
         }).start();
     }
 
+
     /* --------------------------------------- asynctasks -------------------- */
-    @SuppressLint("StaticFieldLeak")
     public class UnziptarTask extends AsyncTask<Void, String, Boolean> {
 
         // https://developer.android.com/training/scheduling/wakelock.html
-        final PowerManager powerManager = (PowerManager) Objects.requireNonNull(getActivity()).getSystemService(POWER_SERVICE);
-        @SuppressLint("InvalidWakeLockTag")
+        final PowerManager powerManager = (PowerManager) activity.getSystemService(POWER_SERVICE);
         final PowerManager.WakeLock wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                 "com.offsec.nethunter:ChrootWakelockTag");
 
@@ -614,7 +628,7 @@ ChrootManagerFragment extends Fragment {
         @Override
         protected void onPreExecute() {
             pd = new ProgressDialog(getActivity());
-            pd.setTitle(Objects.requireNonNull(getActivity()).getString(R.string.installing_notice));
+            pd.setTitle(activity.getString(R.string.installing_notice));
             pd.show();
             pd.setCancelable(false);
             pd.setCanceledOnTouchOutside(false);
@@ -633,12 +647,11 @@ ChrootManagerFragment extends Fragment {
             isStarted = true;
         }
 
-        @SuppressLint("WakelockTimeout")
         @Override
         protected Boolean doInBackground(Void... Void) {
             try {
-                // Acquire CPU
-                wakeLock.acquire(10*60*1000L /*10 minutes*/);
+                // Accquire CPU
+                wakeLock.acquire();
 
                 String fExists = x.RunAsRootOutput("[ -f " + zipFilePath + " ] && echo \"1\" || echo \"0\"");
                 if (fExists.equals("0")) {
@@ -648,7 +661,7 @@ ChrootManagerFragment extends Fragment {
                     return false;
                 }
                 // Decompress, extract, and deploy the .tar.xz to the chroot destination in one step
-                publishProgress(Objects.requireNonNull(getActivity()).getString(R.string.extract_chroot));
+                publishProgress(activity.getString(R.string.extract_chroot));
                 Log.d(TAG, "Restoring kali chroot from " + zipFilePath + " to " + nh.NH_SYSTEM_PATH);
 
                 if (zipFilePath.contains("tar.gz")) {
@@ -671,7 +684,7 @@ ChrootManagerFragment extends Fragment {
                 // Release CPU
                 wakeLock.release();
 
-                statusLog(Objects.requireNonNull(getActivity()).getString(R.string.unzippinguntarringdone));
+                statusLog(activity.getString(R.string.unzippinguntarringdone));
                 pd.setTitle("Intallation Successful.");
                 pd.setMessage("Wait... loading metapackages");
                 try {
@@ -695,12 +708,11 @@ ChrootManagerFragment extends Fragment {
         }
     }
 
-    @SuppressLint("StaticFieldLeak")
     private class DownloadChroot extends AsyncTask<String, Integer, String> {
 
         final ProgressDialog mProgressDialog;
-        final NotificationManager mNotifyManager = (NotificationManager) Objects.requireNonNull(getActivity()).getSystemService(Context.NOTIFICATION_SERVICE);
-        final NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getActivity());
+        final NotificationManager mNotifyManager = (NotificationManager) activity.getSystemService(Context.NOTIFICATION_SERVICE);
+        final NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(activity);
         private final Context context;
         double last_perc = 0.0;
         double humanSize = 0.0;
@@ -710,7 +722,7 @@ ChrootManagerFragment extends Fragment {
         private PowerManager.WakeLock mWakeLock;
         private boolean isRunning = true;
 
-        DownloadChroot(Context context) {
+        public DownloadChroot(Context context) {
             this.context = context;
             mProgressDialog = new ProgressDialog(context);
             mProgressDialog.setCancelable(false);
@@ -753,7 +765,7 @@ ChrootManagerFragment extends Fragment {
                         SHA512_FULL = "a184e019821e72ea9d3db0b9eaa0ef58eb071302be88057571dc9b07bde34b333c53a984d9325411274f2f2c67245df4e9948d8947659b2b898a11b04899442d";
                         SHA512_MINIMAL = "322a18334a4f848a53513fc1f9f5a62fb587e6051d2f729b60f963af279bfc3cf3f5ae55af67a1a2a438838f0a26064ea80d90234ad829a674b00fab4727bfd8";
                         if (isFull) {
-                            // assign the value so the integrity check works ^^
+                            // asign the value so the integryty check works ^^
                             SHA512 = SHA512_FULL;
                             Log.d(TAG, "IS_FULL");
                             Log.d(TAG, "SHA512_FULL: " + SHA512_FULL);
@@ -780,7 +792,7 @@ ChrootManagerFragment extends Fragment {
                 // download the file
                 input = connection.getInputStream();
                 output = new FileOutputStream(zipFilePath);
-                byte[] data = new byte[50 * 1024];
+                byte data[] = new byte[50 * 1024];
                 long total = 0;
                 int count;
                 while ((count = input.read(data)) != -1 && isRunning) {
@@ -868,9 +880,9 @@ ChrootManagerFragment extends Fragment {
             PowerManager pm = (PowerManager) context.getSystemService(POWER_SERVICE);
             mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
                     getClass().getName());
-            mWakeLock.acquire(10*60*1000L /*10 minutes*/);
+            mWakeLock.acquire();
             mProgressDialog.show();
-            // if the user clicks the notify, bring back the app screen to top.
+            // if the user clicks the notif, bring back the app screen to top.
             // TODO: Add something to bring back progress dialogue or add cancel button in notification bar
             Intent newIntent = new Intent(getContext(), AppNavHomeActivity.class);
             PendingIntent pIntent = PendingIntent.getActivity(getContext(), 0, newIntent, 0);
@@ -913,7 +925,7 @@ ChrootManagerFragment extends Fragment {
                         .setProgress(0, 0, false);
                 mNotifyManager.notify(1, mBuilder.build());
                 statusLog("Error in the Chroot download, posible causes: server down or conection issues");
-                AlertDialog.Builder builder = new AlertDialog.Builder(Objects.requireNonNull(getActivity()));
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setTitle("Error in the Chroot download.");
                 builder.setMessage("Error in the Chroot download, posible causes: server down or conection issues, here is the error: " + result)
                         .setNegativeButton("Cancel", (dialog, id) -> {

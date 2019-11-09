@@ -1,6 +1,6 @@
 package com.offsec.nethunter;
 
-import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -21,18 +21,15 @@ import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.ShellExecuter;
 
 import java.io.BufferedReader;
-//import java.io.IOException;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-
-import static android.os.StrictMode.setThreadPolicy;
 
 public class NetHunterFragment extends Fragment {
 
@@ -44,12 +41,14 @@ public class NetHunterFragment extends Fragment {
     private static final String ARG_SECTION_NUMBER = "section_number";
     private static final String IP_REGEX = "\\b(?:\\d{1,3}\\.){3}\\d{1,3}\\b";
     private static final Pattern IP_REGEX_PATTERN = Pattern.compile(IP_REGEX);
-    Switch HIDSwitch; // A Switch that's never used?
-
+    private Context context;
+    private Activity activity;
+    private NhPaths nh;
     /**
      * Returns a new instance of this fragment for the given section
      * number.
      */
+
 
     public NetHunterFragment() {
 
@@ -86,7 +85,6 @@ public class NetHunterFragment extends Fragment {
         rootView.findViewById(R.id.button1).setOnClickListener(onClickListener);
     }
 
-    @SuppressLint("SetTextI18n")
     private void getExternalIp() {
 
         final TextView ip = activity.findViewById(R.id.editText2);
@@ -99,7 +97,7 @@ public class NetHunterFragment extends Fragment {
 
                 try {
                     StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-                    setThreadPolicy(policy);
+                    StrictMode.setThreadPolicy(policy);
                     URLConnection urlcon = new URL("https://api.ipify.org").openConnection();
                     BufferedReader rd = new BufferedReader(new InputStreamReader(urlcon.getInputStream()));
                     String line;
@@ -116,19 +114,17 @@ public class NetHunterFragment extends Fragment {
                 } else {
                     done = "Invalid IP!";
                 }
-                Objects.requireNonNull(getActivity()).runOnUiThread(() -> ip.setText(done));
+                activity.runOnUiThread(() -> ip.setText(done));
             }
         }).start();
         // CHECK FOR ROOT ACCESS
 
     }
 
-    @SuppressLint("SetTextI18n")
     private void getInterfaces(final View rootView) {
 
-        nh = new NhPaths();
+        final boolean installed = appInstalledOrNot("com.offsec.nhterm");
 
-        final boolean installed = appInstalledOrNot();
 
         // 1 thread, 2 commands
         final TextView netIfaces = rootView.findViewById(R.id.editTextNET); // NET IFACES
@@ -146,22 +142,22 @@ public class NetHunterFragment extends Fragment {
         final TextView terminalIfaces = rootView.findViewById(R.id.editTextNHTerminal); // BUSYBOX IFACES
         final ListView terminalList = rootView.findViewById(R.id.listViewNHTerminal);
 
-        // Don't move this inside the thread. (Will throw a null pointer.)
+        // Dont move this inside the thread. (Will throw a null pointer.)
         netIfaces.setText("Detecting Network interfaces...");
         hidIfaces.setText("Detecting HID interfaces...");
         busyboxIfaces.setText("Detecting Busybox version...");
         kernelverIfaces.setText("Detecting Kernel version...");
-        terminalIfaces.setText("Detecting NetHunter terminal...");
+        terminalIfaces.setText("Detecting Nethunter terminal...");
 
         new Thread(() -> {
 
             String busybox_ver = nh.whichBusybox();
 
             ShellExecuter exe = new ShellExecuter();
-            String[] commandNET = {"sh", "-c", "ip -o addr show | busybox awk '/inet/ {print $2, $3, $4}'"};
-            String[] commandHID = {"sh", "-c", "ls /dev/hidg*"};
-            String[] commandBUSYBOX = {"sh", "-c", busybox_ver + " | " + busybox_ver + " head -1 | " + busybox_ver + " awk '{print $2}'"};
-            String[] commandKERNELVER = {"sh", "-c", "cat /proc/version"};
+            String commandNET[] = {"sh", "-c", "ip -o addr show | busybox awk '/inet/ {print $2, $3, $4}'"};
+            String commandHID[] = {"sh", "-c", "ls /dev/hidg*"};
+            String commandBUSYBOX[] = {"sh", "-c", busybox_ver + " | " + busybox_ver + " head -1 | " + busybox_ver + " awk '{print $2}'"};
+            String commandKERNELVER[] = {"sh", "-c", "cat /proc/version"};
 
             final String outputNET = exe.Executer(commandNET);
             final String outputHID = exe.Executer(commandHID);
@@ -182,7 +178,7 @@ public class NetHunterFragment extends Fragment {
                 } else {
                     netIfaces.setVisibility(View.GONE);
                     netList.setVisibility(View.VISIBLE);
-                    ArrayAdapter<String> aaNET = new ArrayAdapter<>(Objects.requireNonNull(getContext()), R.layout.nethunter_item, netArray);
+                    ArrayAdapter<String> aaNET = new ArrayAdapter<>(activity, R.layout.nethunter_item, netArray);
                     netList.setAdapter(aaNET);
                     fixListHeight(netList, aaNET);
                     netList.setOnItemLongClickListener((parent, view, position, id) -> {
@@ -201,13 +197,13 @@ public class NetHunterFragment extends Fragment {
                 } else {
                     hidIfaces.setVisibility(View.GONE);
                     hidList.setVisibility(View.VISIBLE);
-                    ArrayAdapter<String> aaHID = new ArrayAdapter<>(Objects.requireNonNull(getContext()), R.layout.nethunter_item, hidArray);
+                    ArrayAdapter<String> aaHID = new ArrayAdapter<>(activity, R.layout.nethunter_item, hidArray);
                     hidList.setAdapter(aaHID);
                     fixListHeight(hidList, aaHID);
                     hidList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
                         @Override
                         public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                            Log.d("CLICKED", hidList.getItemAtPosition(position).toString());
+                            Log.d("CLCIKED", hidList.getItemAtPosition(position).toString());
                             String itemData = hidList.getItemAtPosition(position).toString();
                             doCopy(itemData);
                             return false;
@@ -222,7 +218,7 @@ public class NetHunterFragment extends Fragment {
                 } else {
                     busyboxIfaces.setVisibility(View.GONE);
                     busyboxList.setVisibility(View.VISIBLE);
-                    ArrayAdapter<String> aaBUSYBOX = new ArrayAdapter<>(Objects.requireNonNull(getContext()), R.layout.nethunter_item, busyboxArray);
+                    ArrayAdapter<String> aaBUSYBOX = new ArrayAdapter<>(activity, R.layout.nethunter_item, busyboxArray);
                     busyboxList.setAdapter(aaBUSYBOX);
                     fixListHeight(busyboxList, aaBUSYBOX);
                     busyboxList.setOnItemLongClickListener((parent, view, position, id) -> {
@@ -254,7 +250,7 @@ public class NetHunterFragment extends Fragment {
                 } else {
                     kernelverIfaces.setVisibility(View.GONE);
                     kernelverList.setVisibility(View.VISIBLE);
-                    ArrayAdapter<String> aaKERNELVER = new ArrayAdapter<>(Objects.requireNonNull(getContext()), R.layout.nethunter_item, kernelverArray);
+                    ArrayAdapter<String> aaKERNELVER = new ArrayAdapter<>(activity, R.layout.nethunter_item, kernelverArray);
                     kernelverList.setAdapter(aaKERNELVER);
                     kernelverList.setOnItemLongClickListener((parent, view, position, id) -> {
                         Log.d("CLICKED", kernelverList.getItemAtPosition(position).toString());
@@ -267,11 +263,11 @@ public class NetHunterFragment extends Fragment {
         }).start();
     }
 
-    private boolean appInstalledOrNot() {
-        PackageManager pm = Objects.requireNonNull(getActivity()).getPackageManager();
+    private boolean appInstalledOrNot(String uri) {
+        PackageManager pm = activity.getPackageManager();
         boolean app_installed;
         try {
-            pm.getPackageInfo("com.offsec.nhterm", PackageManager.GET_ACTIVITIES);
+            pm.getPackageInfo(uri, PackageManager.GET_ACTIVITIES);
             app_installed = true;
         } catch (PackageManager.NameNotFoundException e) {
             app_installed = false;
@@ -295,7 +291,7 @@ public class NetHunterFragment extends Fragment {
     // Now we can copy and address from networks!!!!!! Surprise! ;)
     private void doCopy(String text) {
         try {
-            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) Objects.requireNonNull(getContext()).getSystemService(Context.CLIPBOARD_SERVICE);
+            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
             android.content.ClipData clip = android.content.ClipData.newPlainText("WordKeeper", text);
             clipboard.setPrimaryClip(clip);
             nh.showMessage(context, "Copied: " + text);

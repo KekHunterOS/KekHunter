@@ -1,4 +1,4 @@
-<LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout
     android:layout_width="fill_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -14,16 +14,13 @@
             android:orientation="vertical"
             android:paddingLeft="@dimen/base_listItem_LR"
             android:paddingRight="@dimen/base_listItem_LR">
-
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal|center"
-                android:gravity="center"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
-                android:text="@string/kex_description" />
-
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="VNC Server Settings:"
+                android:textColor="@color/blue"
+                android:layout_gravity="center_horizontal" />
             <Button
                 android:id="@+id/set_up_vnc"
                 android:layout_weight="1"
@@ -32,36 +29,20 @@
                 android:text="Setup Local Server"
                 android:textColor="#ffffffff" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
+
+            <CheckBox
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:orientation="horizontal">
-
-                <CheckBox
-                    android:id="@+id/vnc_checkBox"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:checked="false"
-                    android:onClick="vncLocalClick"
-                    android:text="Localhost Only" />
-
-                <CheckBox
-                    android:id="@+id/vnc_serviceCheckBox"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Enable at boot" />
-
-            </LinearLayout>
+                android:text="Localhost Only"
+                android:id="@+id/vnc_checkBox"
+                android:checked="true"
+                android:onClick="vncLocalClick" />
 
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal">
-
                 <Button
                     android:id="@+id/start_vnc"
                     android:layout_weight="1"
@@ -79,267 +60,113 @@
                     android:textColor="#ffffffff" />
             </LinearLayout>
 
-
-            <LinearLayout
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:gravity="center_horizontal"
-                android:orientation="horizontal">
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="VNC Client Settings:"
+                android:textColor="@color/blue"
+                android:layout_marginTop="14dp"
+                android:layout_gravity="center_horizontal" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Kex Server Status:"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="CONNECTION NAME"
+                android:layout_weight="1" />
 
-                <TextView
-                    android:id="@+id/KeXstatus"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginRight="16dp"
-                    android:hint="Loading.."
-                    android:maxLength="17"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
-
-                <ImageButton
-                    android:id="@+id/refreshKeX"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="5dp"
-                    app:srcCompat="@drawable/ic_action_refresh" />
-
-            </LinearLayout>
-
-            <LinearLayout
+            <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:gravity="center_horizontal"
-                android:orientation="horizontal"
-                android:paddingBottom="10dp">
+                android:id="@+id/vnc_CONN_NICK"
+                android:text="LOCAL CONNECTION"
+                android:layout_gravity="center_horizontal"
+                android:layout_weight="1" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Current User:"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="IP"
+                android:layout_weight="1" />
 
-                <TextView
-                    android:id="@+id/KeXuser"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginRight="16dp"
-                    android:hint="Loading.."
-                    android:maxLength="17"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/vnc_R_IP"
+                android:layout_gravity="center_horizontal"
+                android:text="127.0.0.1"
+                android:layout_weight="1" />
 
-            </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="PORT:"
+                android:layout_weight="1" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/vnc_R_PORT"
+                android:text="5901"
+                android:layout_gravity="center_horizontal"
+                android:layout_weight="1" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="PASSWORD: "
+                android:maxLines="1"
+                android:maxLength="8"
+                android:layout_weight="1" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword"
+                android:ems="10"
+                android:id="@+id/vnc_PASSWD"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="USER"
+                android:layout_weight="1" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/vnc_USER"
+                android:text="root"
+                android:layout_gravity="center_horizontal"
+                android:layout_weight="1" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="VNC RESOLUTION"
+                android:id="@+id/textView17"
+                android:layout_weight="1" />
+            <Spinner
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/resolution_spinner"
+                android:layout_gravity="center_horizontal" />
 
             <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="OPEN CONNECTION"
                 android:id="@+id/vncClientStart"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="OPEN KEX CLIENT" />
-
-            <Button
-                android:id="@+id/AdvancedButton"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="SHOW ADVANCED SETTINGS" />
-
-            <LinearLayout
-                android:id="@+id/AdvancedView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:saveEnabled="true"
-                android:visibility="gone">
-
-                <Switch
-                    android:id="@+id/immersionSwitch"
-                    style="?android:attr/textAppearanceSmall"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp"
-                    android:text="IMMERSIVE MODE"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                <View
-                    android:id="@+id/divider2"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="?android:attr/listDivider"
-                    android:paddingBottom="15dp" />
-
-                <TextView
-                    android:id="@+id/textView2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:paddingTop="10dp"
-                    android:text="DEVICE RESOLUTION FOR HDMI"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <Spinner
-                        android:id="@+id/resolution"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:dropDownWidth="wrap_content"
-                        android:saveEnabled="false" />
-
-                    <Button
-                        android:id="@+id/ApplyResolutionButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Apply"
-                        android:textColor="#ffffffff" />
-
-                </LinearLayout>
-
-                <Button
-                    android:id="@+id/DelResolutionButton"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Remove selected resolution"
-                    android:textColor="#ffffffff" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:orientation="horizontal">
-
-                    <Button
-                        android:id="@+id/AddResolutionButton"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="New resolution"
-                        android:textColor="#ffffffff"
-                        android:textSize="13sp" />
-
-                    <Button
-                        android:id="@+id/reset_hdmi"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Reset"
-                        android:textColor="#ffffffff"
-                        android:textSize="13sp" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:orientation="horizontal"
-                    android:paddingBottom="10dp">
-
-                    <Button
-                        android:id="@+id/BackupResolutions"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Backup"
-                        android:textColor="#ffffffff"
-                        android:textSize="13sp" />
-
-                    <Button
-                        android:id="@+id/RestoreResolutions"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Restore"
-                        android:textColor="#ffffffff"
-                        android:textSize="13sp" />
-
-                </LinearLayout>
-
-                <View
-                    android:id="@+id/divider3"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="?android:attr/listDivider" />
-
-                <TextView
-                    android:id="@+id/textView3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:paddingTop="10dp"
-                    android:text="VNC SERVER RESOLUTION (OPTIONAL)"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                <Spinner
-                    android:id="@+id/vncresolution"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:dropDownWidth="wrap_content"
-                    android:saveEnabled="false" />
-
-                <Button
-                    android:id="@+id/DelVncResolutionButton"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Remove selected resolution"
-                    android:textColor="#ffffffff" />
-
-                <Button
-                    android:id="@+id/AddVncResolutionButton"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="New resolution"
-                    android:textColor="#ffffffff" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:orientation="horizontal">
-
-                    <Button
-                        android:id="@+id/BackupVncResolutions"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Backup"
-                        android:textColor="#ffffffff"
-                        android:textSize="13sp" />
-
-                    <Button
-                        android:id="@+id/RestoreVncResolutions"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Restore"
-                        android:textColor="#ffffffff"
-                        android:textSize="13sp" />
-
-                </LinearLayout>
-
-            </LinearLayout>
+                android:layout_gravity="right"
+                android:layout_weight="1" />
 
         </LinearLayout>
-
     </ScrollView>
 
 </LinearLayout>
