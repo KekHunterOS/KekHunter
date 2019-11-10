@@ -233,7 +233,7 @@ public class VNCFragment extends Fragment {
                     String vnc_passwd = exe.RunAsRootOutput("su -c cat " + vncpasswd);
                     if(!vnc_passwd.equals("")) {
                         String shebang = "#!/system/bin/sh\n\n#KeX  command to run at boot: \nexport HOME=/root\nexport USER=root";
-                        String kex_cmd = "su -c '"+ nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgcc_s.so.1 nohup vncserver :1 " + localhostonly + " " + selected_vncresCMD + "'";
+                        String kex_cmd = "su -c '"+ nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd LD_PRELOAD=/usr/lib/${HOSTTYPE}-linux-gnu/libgcc_s.so.1 vncserver :1 " + localhostonly + " " + selected_vncresCMD + "'";
                         String fileContents = shebang + "\n" + kex_cmd;
                         exe.RunAsRoot(new String[]{
                                 "cat > " + kex_init + " <<s0133717hur75\n" + fileContents + "\ns0133717hur75\n",
@@ -263,7 +263,7 @@ public class VNCFragment extends Fragment {
             if(vnc_passwd.equals("")) {
                 Toast.makeText(getActivity().getApplicationContext(), "Please setup local server first!", Toast.LENGTH_SHORT).show();
             } else {
-                intentClickListener_NH("export HOME=/root;export USER=root;LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgcc_s.so.1 nohup vncserver :1 " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + "; sleep 1 && exit");
+                intentClickListener_NH("export HOME=/root;export USER=root;LD_PRELOAD=/usr/lib/${HOSTTYPE}-linux-gnu/libgcc_s.so.1 nohup vncserver :1 " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + " >/dev/null 2>&1 < /dev/null; sleep 1 && exit");
                 Log.d(TAG, localhostonly);
             }
         });
@@ -497,7 +497,7 @@ public class VNCFragment extends Fragment {
                 startActivity(intent);
         } catch (Exception e) {
             Log.d("errorLaunching", e.toString());
-            nh.showMessage(context, "NetHunter Kex not found. Please install from NetHunter Store!");
+            nh.showMessage(context, "NetHunter KeX client not found. Please install it from NetHunter Store!");
         }
     }
 
