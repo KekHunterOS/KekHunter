@@ -50,7 +50,7 @@ public class NhPaths implements SharedPreferences.OnSharedPreferenceChangeListen
         CHROOT_SUDO                     = "/usr/bin/sudo";
         CHROOT_INITD_SCRIPT_PATH        = APP_INITD_PATH + "/80postservices";
         CHROOT_SD_PATH                  = "/sdcard";
-        BUSYBOX                         = "";
+        BUSYBOX                         = getBusyboxPath();
     }
 
     public synchronized static NhPaths getInstance(Context context) {
