@@ -369,16 +369,20 @@ public class VNCFragment extends Fragment {
         final TextView KeXstatus = VNCFragment.findViewById(R.id.KeXstatus);
         final TextView KeXuser = VNCFragment.findViewById(R.id.KeXuser);
         ShellExecuter exe = new ShellExecuter();
+        String kex_userCmd = "";
         String kex_statusCmd = exe.RunAsRootOutput("su -c pgrep vnc");
-        if (kex_statusCmd.equals(""))
+        if (kex_statusCmd.equals("")) {
             KeXstatus.setText("STOPPED");
-        else
-            KeXstatus.setText("RUNNING");
-        String kex_userCmd = exe.RunAsRootOutput("su -c ps -ef | grep \"[X]auth\" | awk 'NR==1 {print $1}'");
-        if (kex_userCmd.equals(""))
             KeXuser.setText("None");
-        else
-            KeXuser.setText(kex_userCmd);
+        }
+        else {
+            KeXstatus.setText("RUNNING");
+            kex_userCmd = exe.RunAsRootOutput("su -c ps -f -p " + kex_statusCmd + " -o uname=");
+            if (kex_userCmd.equals(""))
+                KeXuser.setText("None");
+            else
+                KeXuser.setText(kex_userCmd.replaceAll("\\s+", ""));
+        }
     }
 
     private void openResolutionDialog() {
