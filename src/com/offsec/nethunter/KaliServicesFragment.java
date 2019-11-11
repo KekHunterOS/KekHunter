@@ -81,7 +81,7 @@ public class KaliServicesFragment extends Fragment {
         kaliServicesViewModel.getLiveDataKaliServicesModelList().observe(this, kaliServicesModelList -> kaliServicesRecycleViewAdapter.notifyDataSetChanged());
 
         kaliServicesRecycleViewAdapter = new KaliServicesRecycleViewAdapter(context, kaliServicesViewModel.getLiveDataKaliServicesModelList().getValue());
-        RecyclerView recyclerViewServiceTitle = view.findViewById(R.id.f_kaliservices_recycleviewServiceTitle);
+        RecyclerView recyclerViewServiceTitle = view.findViewById(R.id.f_kaliservices_recyclerviewServiceTitle);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
         recyclerViewServiceTitle.setLayoutManager(linearLayoutManager);
         recyclerViewServiceTitle.setAdapter(kaliServicesRecycleViewAdapter);
@@ -364,7 +364,7 @@ public class KaliServicesFragment extends Fragment {
             if (kaliServicesModelList == null) return;
             final LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             final View promptViewDelete = inflater.inflate(R.layout.kaliservices_delete_dialog_view, nullParent, false);
-            final RecyclerView recyclerViewDeleteItem = promptViewDelete.findViewById(R.id.f_kaliservices_delete_recycleview);
+            final RecyclerView recyclerViewDeleteItem = promptViewDelete.findViewById(R.id.f_kaliservices_delete_recyclerview);
             KaliServicesRecycleViewAdapterDeleteItems kaliServicesRecycleViewAdapterDeleteItems = new KaliServicesRecycleViewAdapterDeleteItems(context, kaliServicesModelList);
 
             LinearLayoutManager linearLayoutManagerDelete = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
@@ -388,7 +388,7 @@ public class KaliServicesFragment extends Fragment {
                     for (int i = 0; i < recyclerViewDeleteItem.getChildCount(); i++) {
                         viewHolder = recyclerViewDeleteItem.findViewHolderForAdapterPosition(i);
                         if (viewHolder != null){
-                            CheckBox box = viewHolder.itemView.findViewById(R.id.f_kaliservices_recycleview_dialog_chkbox);
+                            CheckBox box = viewHolder.itemView.findViewById(R.id.f_kaliservices_recyclerview_dialog_chkbox);
                             if (box.isChecked()){
                                 selectedPosition.add(i);
                                 selectedTargetIds.add(i+1);

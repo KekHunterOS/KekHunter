@@ -28,7 +28,7 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/f_kaliservices_recycleviewServiceTitle"
+                android:id="@+id/f_kaliservices_recyclerviewServiceTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
             </androidx.recyclerview.widget.RecyclerView>

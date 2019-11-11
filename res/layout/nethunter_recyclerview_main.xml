@@ -47,7 +47,7 @@
         android:orientation="horizontal">
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/f_nethunter_item_result_recycleview"
+            android:id="@+id/f_nethunter_item_result_recyclerview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"

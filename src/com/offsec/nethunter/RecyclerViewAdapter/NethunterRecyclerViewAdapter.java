@@ -186,7 +186,7 @@ public class NethunterRecyclerViewAdapter extends RecyclerView.Adapter<Nethunter
         private ItemViewHolder(View view) {
             super(view);
             titleTextView = view.findViewById(R.id.f_nethunter_item_title_tv);
-            resultRecyclerView = view.findViewById(R.id.f_nethunter_item_result_recycleview);
+            resultRecyclerView = view.findViewById(R.id.f_nethunter_item_result_recyclerview);
             runButton = view.findViewById(R.id.f_nethunter_item_run_btn);
             editButton = view.findViewById(R.id.f_nethunter_item_edit_btn);
         }

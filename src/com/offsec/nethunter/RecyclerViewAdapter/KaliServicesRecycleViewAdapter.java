@@ -44,7 +44,7 @@ public class KaliServicesRecycleViewAdapter extends RecyclerView.Adapter<KaliSer
 	@NonNull
 	@Override
 	public KaliServicesRecycleViewAdapter.ItemViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-		View view = LayoutInflater.from(context).inflate(R.layout.kaliservices_recycleview_servicetitle, viewGroup, false);
+		View view = LayoutInflater.from(context).inflate(R.layout.kaliservices_recyclerview_servicetitle, viewGroup, false);
 		return new KaliServicesRecycleViewAdapter.ItemViewHolder(view);
 	}
 
@@ -232,11 +232,11 @@ public class KaliServicesRecycleViewAdapter extends RecyclerView.Adapter<KaliSer
 
 		private ItemViewHolder(View view){
 			super(view);
-			nametextView = view.findViewById(R.id.f_kaliservices_recycleview_servicetitle_tv);
-			editbutton = view.findViewById(R.id.f_kaliservices_recycleview_edit_btn);
-			runOnChrootStartCheckbox = view.findViewById(R.id.f_kaliservices_recycleview_runonchrootstart_checkbox);
-			mSwitch = view.findViewById(R.id.f_kaliservices_recycleview_switch_toggle);
-			statustextView = view.findViewById(R.id.f_kaliservices_recycleview_serviceresult_tv);
+			nametextView = view.findViewById(R.id.f_kaliservices_recyclerview_servicetitle_tv);
+			editbutton = view.findViewById(R.id.f_kaliservices_recyclerview_edit_btn);
+			runOnChrootStartCheckbox = view.findViewById(R.id.f_kaliservices_recyclerview_runonchrootstart_checkbox);
+			mSwitch = view.findViewById(R.id.f_kaliservices_recyclerview_switch_toggle);
+			statustextView = view.findViewById(R.id.f_kaliservices_recyclerview_serviceresult_tv);
 		}
 	}
 }
