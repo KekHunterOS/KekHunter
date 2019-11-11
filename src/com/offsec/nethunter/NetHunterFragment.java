@@ -44,6 +44,7 @@ public class NetHunterFragment extends Fragment {
     private Context context;
     private Activity activity;
     private NhPaths nh;
+
     /**
      * Returns a new instance of this fragment for the given section
      * number.
@@ -154,10 +155,11 @@ public class NetHunterFragment extends Fragment {
             String busybox_ver = nh.whichBusybox();
 
             ShellExecuter exe = new ShellExecuter();
-            String commandNET[] = {"sh", "-c", "ip -o addr show | busybox awk '/inet/ {print $2, $3, $4}'"};
+            String commandNET[] = getNetCmd(busybox_ver);
             String commandHID[] = {"sh", "-c", "ls /dev/hidg*"};
-            String commandBUSYBOX[] = {"sh", "-c", busybox_ver + " | " + busybox_ver + " head -1 | " + busybox_ver + " awk '{print $2}'"};
+            String commandBUSYBOX[] = getBusyboxCmd(busybox_ver);
             String commandKERNELVER[] = {"sh", "-c", "cat /proc/version"};
+
 
             final String outputNET = exe.Executer(commandNET);
             final String outputHID = exe.Executer(commandHID);
@@ -263,6 +265,30 @@ public class NetHunterFragment extends Fragment {
         }).start();
     }
 
+    private String[] getBusyboxCmd(String busybox_ver) {
+        String device = android.os.Build.DEVICE;
+        ShellExecuter exe = new ShellExecuter();
+        if ( device.contains("OnePlus7")) {
+            String commandBUSYBOX[] = {"sh", "-c", busybox_ver + " | head -1 | awk '{print $2}'"};
+            return commandBUSYBOX;
+        }
+        else {
+            String commandBUSYBOX[] = {"sh", "-c", busybox_ver + " | " + busybox_ver + " head -1 | " + busybox_ver + " awk '{print $2}'"};
+            return commandBUSYBOX;
+        }
+    }
+    private String[] getNetCmd(String busybox_ver) {
+        String device = android.os.Build.DEVICE;
+        ShellExecuter exe = new ShellExecuter();
+        if ( device.contains("OnePlus7")) {
+            String commandNET[] = {"sh", "-c", "ip -o addr show | awk '/inet/ {print $2, $3, $4}'"};
+            return commandNET;
+        }
+        else {
+            String commandNET[] = {"sh", "-c", "ip -o addr show | busybox awk '/inet/ {print $2, $3, $4}'"};
+            return commandNET;
+        }
+    }
     private boolean appInstalledOrNot(String uri) {
         PackageManager pm = activity.getPackageManager();
         boolean app_installed;
