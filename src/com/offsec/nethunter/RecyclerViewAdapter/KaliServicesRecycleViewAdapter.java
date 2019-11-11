@@ -31,21 +31,21 @@ import com.offsec.nethunter.utils.NhPaths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class KaliServiceRecycleViewAdapterTitles extends RecyclerView.Adapter<KaliServiceRecycleViewAdapterTitles.ItemViewHolder> implements Filterable {
+public class KaliServicesRecycleViewAdapter extends RecyclerView.Adapter<KaliServicesRecycleViewAdapter.ItemViewHolder> implements Filterable {
 	private static final String TAG = "KaliServiceRecycleView";
 	private Context context;
 	private List<KaliServicesModel> kaliServicesModelList;
 
-	public KaliServiceRecycleViewAdapterTitles(Context context, List<KaliServicesModel> kaliServicesModelList){
+	public KaliServicesRecycleViewAdapter(Context context, List<KaliServicesModel> kaliServicesModelList){
 		this.context = context;
 		this.kaliServicesModelList = kaliServicesModelList;
 	}
 
 	@NonNull
 	@Override
-	public KaliServiceRecycleViewAdapterTitles.ItemViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+	public KaliServicesRecycleViewAdapter.ItemViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
 		View view = LayoutInflater.from(context).inflate(R.layout.kaliservices_recycleview_servicetitle, viewGroup, false);
-		return new KaliServiceRecycleViewAdapterTitles.ItemViewHolder(view);
+		return new KaliServicesRecycleViewAdapter.ItemViewHolder(view);
 	}
 
 	@Override
