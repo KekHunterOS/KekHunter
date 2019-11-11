@@ -66,7 +66,6 @@ public class NetHunterFragment extends Fragment {
         setHasOptionsMenu(true);
         this.context = getContext();
         this.activity = getActivity();
-        NethunterSQL.getInstance(context.getApplicationContext());
     }
 
     @Nullable

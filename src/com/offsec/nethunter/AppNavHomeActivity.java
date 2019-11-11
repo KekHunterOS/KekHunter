@@ -25,6 +25,8 @@ import android.widget.TextView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.offsec.nethunter.AsyncTask.CopyBootFilesAsyncTask;
+import com.offsec.nethunter.SQL.KaliServicesSQL;
+import com.offsec.nethunter.SQL.NethunterSQL;
 import com.offsec.nethunter.gps.KaliGPSUpdates;
 import com.offsec.nethunter.gps.LocationUpdateService;
 import com.offsec.nethunter.service.CompatCheckService;
@@ -82,6 +84,12 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         // Initiate the NhPaths singleton class, and it will then keep living until the app dies.
         // Also with its sharepreference listener registered, the CHROOT_PATH variable can be updated immediately on sharepreference changes.
         nhPaths = NhPaths.getInstance(getApplicationContext());
+
+        // Initate all SQL singleton in MainActivity first so that it can be less lagged when switching fragments,
+        // because it takes time to retrive data from database.
+        NethunterSQL.getInstance(getApplicationContext());
+        KaliServicesSQL.getInstance(getApplicationContext());
+
         // Initiate the PermissionCheck class.
         permissionCheck = new PermissionCheck(this, getApplicationContext());
         // Register the nethunter receiver with intent actions.

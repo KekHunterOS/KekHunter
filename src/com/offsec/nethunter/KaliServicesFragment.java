@@ -66,7 +66,6 @@ public class KaliServicesFragment extends Fragment {
         setHasOptionsMenu(true);
         this.context = getContext();
         this.activity = getActivity();
-        KaliServicesSQL.getInstance(context.getApplicationContext());
     }
 
     @Override
