@@ -232,9 +232,17 @@ public class VNCFragment extends Fragment {
                 if (isChecked) {
                     String vnc_passwd = exe.RunAsRootOutput("su -c cat " + vncpasswd);
                     if(!vnc_passwd.equals("")) {
-                        String shebang = "#!/system/bin/sh\n\n#KeX  command to run at boot: \nexport HOME=/root\nexport USER=root";
-                        String kex_cmd = "su -c '"+ nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd LD_PRELOAD=/usr/lib/${HOSTTYPE}-linux-gnu/libgcc_s.so.1 vncserver :1 " + localhostonly + " " + selected_vncresCMD + "'";
-                        String fileContents = shebang + "\n" + kex_cmd;
+                        String arch = System.getProperty("os.arch");
+                        String shebang = "#!/system/bin/sh\n";
+                        String kex_prep = "\n# KeX architecture: " + arch + "\n# Commands to run at boot:\nexport HOME=/root\nexport USER=root";
+                        String kex_cmd = "";
+                        if(arch.equals("aarch64")) {
+                            kex_cmd = "su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgcc_s.so.1 vncserver :1 " + localhostonly + " " + selected_vncresCMD + "'";
+                        }
+                        else {
+                            kex_cmd = "su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd LD_PRELOAD=/usr/lib/arm-linux-gnueabihf/libgcc_s.so.1 vncserver :1 " + localhostonly + " " + selected_vncresCMD + "'";
+                        }
+                        String fileContents = shebang + "\n" + kex_prep + "\n" + kex_cmd;
                         exe.RunAsRoot(new String[]{
                                 "cat > " + kex_init + " <<s0133717hur75\n" + fileContents + "\ns0133717hur75\n",
                                 "chmod 700 " + kex_init
@@ -263,7 +271,7 @@ public class VNCFragment extends Fragment {
             if(vnc_passwd.equals("")) {
                 Toast.makeText(getActivity().getApplicationContext(), "Please setup local server first!", Toast.LENGTH_SHORT).show();
             } else {
-                intentClickListener_NH("export HOME=/root;export USER=root;LD_PRELOAD=/usr/lib/${HOSTTYPE}-linux-gnu/libgcc_s.so.1 nohup vncserver :1 " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + " >/dev/null 2>&1 < /dev/null; sleep 1 && exit");
+                intentClickListener_NH("export HOME=/root;export USER=root;LD_PRELOAD=/usr/lib/${HOSTTYPE}-${OSTYPE}/libgcc_s.so.1 nohup vncserver :1 " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + " >/dev/null 2>&1 < /dev/null; sleep 1 && exit");
                 Log.d(TAG, localhostonly);
             }
         });
