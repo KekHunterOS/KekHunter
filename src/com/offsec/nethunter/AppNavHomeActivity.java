@@ -1,16 +1,18 @@
 package com.offsec.nethunter;
 
-import android.Manifest;
+import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,9 +23,12 @@ import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
+import com.offsec.nethunter.AsyncTask.CopyBootFilesAsyncTask;
 import com.offsec.nethunter.gps.KaliGPSUpdates;
 import com.offsec.nethunter.gps.LocationUpdateService;
 import com.offsec.nethunter.utils.CheckForRoot;
+import com.offsec.nethunter.utils.PermissionCheck;
+import com.offsec.nethunter.utils.ShellExecuter;
 import com.winsontan520.wversionmanager.library.WVersionManager;
 
 import java.text.SimpleDateFormat;
@@ -35,7 +40,6 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -51,6 +55,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
      */
+
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private static NavigationView navigationView;
@@ -58,125 +63,188 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     private final Stack<String> titles = new Stack<>();
     private static SharedPreferences prefs;
     private MenuItem lastSelected;
-    private static Context c;
-    private Boolean weCheckedForRoot = false;
+    //private static Context c;
+    public Context context;
+    public Activity activity;
     private Integer permsCurrent = 1;
     private boolean locationUpdatesRequested = false;
     private KaliGPSUpdates.Receiver locationUpdateReceiver;
 
-    public static Context getAppContext() {
-        return c;
-    }
+    //public static Context getAppContext() {
+    //   return c;
+    //}
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         // ************************************************
-        c = getApplication(); //* DONT REMOVE ME *
+        //c = getApplication(); //* DONT REMOVE ME *
         // ************************************************
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        this.context = getApplicationContext();
+        this.activity = this;
+        SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             askMarshmallowPerms(permsCurrent);
         } else {
             CheckForRoot();
-        }
+        }*/
 
-        setContentView(R.layout.base_layout);
+        ProgressDialog progressDialog = new ProgressDialog(activity);
+        CopyBootFilesAsyncTask copyBootFilesAsyncTask = new CopyBootFilesAsyncTask(context, activity, progressDialog);
+        copyBootFilesAsyncTask.setListener(new CopyBootFilesAsyncTask.CopyBootFilesAsyncTaskListener() {
+            @Override
+            public void onAsyncTaskPrepare() {
+                PermissionCheck permissionCheck = new PermissionCheck(activity, context);
+                if (permissionCheck.isAllPermitted(PermissionCheck.DEFAULT_PERMISSIONS)){
+                    if (!CheckForRoot.isRoot()){
+                        android.app.AlertDialog.Builder adb = new android.app.AlertDialog.Builder(activity);
+                        adb.setCancelable(false);
+                        adb.setTitle("Nethunter app cannot be run properly");
+                        adb.setMessage("Root permission is required!!");
+                        adb.setPositiveButton("Close App", new DialogInterface.OnClickListener(){
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                                System.exit(1);
+                            }
+                        });
+                        adb.create().show();
+                        return;
+                    }
 
-        //set kali wallpaper as background
-        ActionBar ab = getSupportActionBar();
-        if (ab != null) {
-            ab.setHomeButtonEnabled(true);
-            ab.setDisplayHomeAsUpEnabled(true);
-        }
-        mDrawerLayout = findViewById(R.id.drawer_layout);
+                    if (!CheckForRoot.isBusyboxInstalled()){
+                        android.app.AlertDialog.Builder adb = new android.app.AlertDialog.Builder(activity);
+                        adb.setCancelable(false);
+                        adb.setTitle("Nethunter app cannot be run properly");
+                        adb.setMessage("No busybox is detected, please make sure you have busybox installed!!");
+                        adb.setPositiveButton("Close App", new DialogInterface.OnClickListener(){
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                                System.exit(1);
+                            }
+                        });
+                        adb.create().show();
+                    }
+                    Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage("com.offsec.nhterm");
+                    //null pointer check in case package name was not found
+                    if (launchIntent != null) {
+                        if (!permissionCheck.isAllPermitted(PermissionCheck.NH_TERM_PERMISSIONS)) {
+                            permissionCheck.checkPermissions(PermissionCheck.NH_TERM_PERMISSIONS, PermissionCheck.NH_TERM_PERMISSIONS_RQCODE);
+                        }
+                    } else {
+                        new android.app.AlertDialog.Builder(activity).setMessage("Nethunter terminal is not installed yet.")
+                                .setCancelable(false)
+                                .setPositiveButton("QUIT", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.dismiss();
+                                        System.exit(1);
+                                    }
+                                })
+                                .create().show();
+                    }
+                } else {
+                    permissionCheck.checkPermissions(PermissionCheck.DEFAULT_PERMISSIONS, PermissionCheck.DEFAULT_PERMISSION_RQCODE);
+                }
+            }
 
-        navigationView = findViewById(R.id.navigation_view);
-        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        LinearLayout navigationHeadView = (LinearLayout) inflater.inflate(R.layout.sidenav_header, null);
-        navigationView.addHeaderView(navigationHeadView);
+            @Override
+            public void onAsyncTaskFinished(Object result) {
+                setContentView(R.layout.base_layout);
 
-        FloatingActionButton readmeButton = navigationHeadView.findViewById(R.id.info_fab);
-        readmeButton.setOnTouchListener((v, event) -> {
-            //checkUpdate();
-            showLicense();
-            return false;
-        });
+                //set kali wallpaper as background
+                ActionBar ab = getSupportActionBar();
+                if (ab != null) {
+                    ab.setHomeButtonEnabled(true);
+                    ab.setDisplayHomeAsUpEnabled(true);
+                }
+                mDrawerLayout = findViewById(R.id.drawer_layout);
 
-        /// moved build info to the menu
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd KK:mm:ss a zzz",
-                Locale.US);
+                navigationView = findViewById(R.id.navigation_view);
+                LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                LinearLayout navigationHeadView = (LinearLayout) inflater.inflate(R.layout.sidenav_header, null);
+                navigationView.addHeaderView(navigationHeadView);
 
-        prefs = getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+                FloatingActionButton readmeButton = navigationHeadView.findViewById(R.id.info_fab);
+                readmeButton.setOnTouchListener((v, event) -> {
+                    //checkUpdate();
+                    showLicense();
+                    return false;
+                });
 
-        final String buildTime = sdf.format(BuildConfig.BUILD_TIME);
-        TextView buildInfo1 = navigationHeadView.findViewById(R.id.buildinfo1);
-        TextView buildInfo2 = navigationHeadView.findViewById(R.id.buildinfo2);
-        buildInfo1.setText(String.format("Version: %s (%s)", BuildConfig.VERSION_NAME, Build.TAGS));
-        buildInfo2.setText(String.format("Built by %s at %s", BuildConfig.BUILD_NAME, buildTime));
+                /// moved build info to the menu
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd KK:mm:ss a zzz",
+                        Locale.US);
 
-        if (navigationView != null) {
-            setupDrawerContent(navigationView);
-        }
+                prefs = getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            // detail for android 5 devices
-            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.darkTitle));
-        }
+                final String buildTime = sdf.format(BuildConfig.BUILD_TIME);
+                TextView buildInfo1 = navigationHeadView.findViewById(R.id.buildinfo1);
+                TextView buildInfo2 = navigationHeadView.findViewById(R.id.buildinfo2);
+                buildInfo1.setText(String.format("Version: %s (%s)", BuildConfig.VERSION_NAME, Build.TAGS));
+                buildInfo2.setText(String.format("Built by %s at %s", BuildConfig.BUILD_NAME, buildTime));
 
+                if (navigationView != null) {
+                    setupDrawerContent(navigationView);
+                }
 
-//        new ShellExecuter().RunAsRootOutput("/system/bin/bootkali");
-        // now pop in the default fragment
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    // detail for android 5 devices
+                    getWindow().setStatusBarColor(ContextCompat.getColor(activity, R.color.darkTitle));
+                }
 
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.container, NetHunterFragment.newInstance(R.id.nethunter_item))
-                .commit();
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.container, NetHunterFragment.newInstance(R.id.nethunter_item))
+                        .commit();
 
-        // and put the title in the queue for when you need to back through them
-        titles.push(navigationView.getMenu().getItem(0).getTitle().toString());
-        // if the nav bar hasn't been seen, let's show it
-        if (!prefs.getBoolean("seenNav", false)) {
-            mDrawerLayout.openDrawer(GravityCompat.START);
-            SharedPreferences.Editor ed = prefs.edit();
-            ed.putBoolean("seenNav", true);
-            ed.apply();
-        }
+                // and put the title in the queue for when you need to back through them
+                titles.push(navigationView.getMenu().getItem(0).getTitle().toString());
+                // if the nav bar hasn't been seen, let's show it
+                if (!prefs.getBoolean("seenNav", false)) {
+                    mDrawerLayout.openDrawer(GravityCompat.START);
+                    SharedPreferences.Editor ed = prefs.edit();
+                    ed.putBoolean("seenNav", true);
+                    ed.apply();
+                }
 
-        if (lastSelected == null) { // only in the 1st create
-            lastSelected = navigationView.getMenu().getItem(0);
-            lastSelected.setChecked(true);
-        }
-        mDrawerToggle = new ActionBarDrawerToggle(this,
-                mDrawerLayout, R.string.drawer_opened, R.string.drawer_closed);
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
+                if (lastSelected == null) { // only in the 1st create
+                    lastSelected = navigationView.getMenu().getItem(0);
+                    lastSelected.setChecked(true);
+                }
+                mDrawerToggle = new ActionBarDrawerToggle(activity, mDrawerLayout, R.string.drawer_opened, R.string.drawer_closed);
+                mDrawerLayout.setDrawerListener(mDrawerToggle);
 
-        mDrawerLayout.setOnFocusChangeListener((v, hasFocus) -> {
-            if (!hasFocus) {
+                mDrawerLayout.setOnFocusChangeListener((v, hasFocus) -> {
+                    if (!hasFocus) {
+                        setDrawerOptions();
+                    }
+                });
+                mDrawerToggle.syncState();
+                // pre-set the drawer options
                 setDrawerOptions();
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    // Create the NotificationChannel
+                    CharSequence name = getString(R.string.boot_notification_channel);
+                    String description = getString(R.string.boot_notification_channel_description);
+                    int importance = NotificationManager.IMPORTANCE_LOW;
+                    NotificationChannel mChannel = new NotificationChannel(BOOT_CHANNEL_ID, name, importance);
+                    mChannel.setDescription(description);
+                    // Register the channel with the system; you can't change the importance
+                    // or other notification behaviors after this
+                    NotificationManager notificationManager = (NotificationManager) getSystemService(
+                            NOTIFICATION_SERVICE);
+                    if (notificationManager != null) {
+                        notificationManager.createNotificationChannel(mChannel);
+                    }
+                }
             }
         });
-        mDrawerToggle.syncState();
-        // pre-set the drawer options
-        setDrawerOptions();
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // Create the NotificationChannel
-            CharSequence name = getString(R.string.boot_notification_channel);
-            String description = getString(R.string.boot_notification_channel_description);
-            int importance = NotificationManager.IMPORTANCE_LOW;
-            NotificationChannel mChannel = new NotificationChannel(BOOT_CHANNEL_ID, name, importance);
-            mChannel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
-            NotificationManager notificationManager = (NotificationManager) getSystemService(
-                    NOTIFICATION_SERVICE);
-            if (notificationManager != null) {
-                notificationManager.createNotificationChannel(mChannel);
-            }
-        }
-
-
+        copyBootFilesAsyncTask.execute();
     }
 
     public static void setDrawerOptions() {
@@ -346,12 +414,19 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                                     .commit();
                             break;
                         case R.id.vnc_item:
-                            fragmentManager
-                                    .beginTransaction()
-                                    .replace(R.id.container, VNCFragment.newInstance(itemId))
-                                    .addToBackStack(null)
-                                    .commit();
+                            Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage("com.offsec.nethunter.kex");
+                            //null pointer check in case package name was not found
+                            if (launchIntent != null) {
+                                fragmentManager
+                                        .beginTransaction()
+                                        .replace(R.id.container, VNCFragment.newInstance(itemId))
+                                        .addToBackStack(null)
+                                        .commit();
+                            } else {
+                                new android.app.AlertDialog.Builder(activity).setMessage("Nethunter KeX is not installed yet.").create().show();
+                            }
                             break;
+
                         case R.id.searchsploit_item:
                             fragmentManager
                                     .beginTransaction()
@@ -396,13 +471,6 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         }
     }
 
-    private void CheckForRoot() {
-
-        Log.d("AppNav", "Checking for Root");
-        CheckForRoot mytask = new CheckForRoot(this);
-        mytask.execute();
-    }
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -431,107 +499,98 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         restoreActionBar();
     }
 
-    private void askMarshmallowPerms(Integer permnum) {
-        if (permnum == 1) {
-            if (ContextCompat.checkSelfPermission(this,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        1);
-            } else {
-                CheckForRoot mytask = new CheckForRoot(this);
-                mytask.execute();
-            }
-        }
-        if (permnum == 2) {
-            if (ContextCompat.checkSelfPermission(this,
-                    "com.offsec.nhterm.permission.RUN_SCRIPT")
-                    != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{"com.offsec.nhterm.permission.RUN_SCRIPT"},
-                        2);
-            }
-        }
-        if (permnum == 3) {
-            if (ContextCompat.checkSelfPermission(this,
-                    "com.offsec.nhterm.permission.RUN_SCRIPT_SU")
-                    != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{"com.offsec.nhterm.permission.RUN_SCRIPT_SU"},
-                        3);
-            }
-        }
-        if (permnum == 4) {
-            if (ContextCompat.checkSelfPermission(this,
-                    "com.offsec.nhterm.permission.RUN_SCRIPT_NH")
-                    != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{"com.offsec.nhterm.permission.RUN_SCRIPT_NH"},
-                        4);
-            }
-        }
-        if (permnum == 5) {
-            Log.d("HOLA", "CODE0: " + permnum);
-            if (ContextCompat.checkSelfPermission(this,
-                    "com.offsec.nhterm.permission.RUN_SCRIPT_NH_LOGIN")
-                    != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{"com.offsec.nhterm.permission.RUN_SCRIPT_NH_LOGIN"},
-                        5);
-            }
-        }
-        if (permnum == 6) {
-            Log.d("HOLA", "CODE0: " + permnum);
-            if (ContextCompat.checkSelfPermission(this,
-                    "com.offsec.nhvnc.permission.OPEN_VNC_CONN")
-                    != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{"com.offsec.nhvnc.permission.OPEN_VNC_CONN"},
-                        6);
-            }
-        }
-        if (permnum == 7) {
-            Log.d("HOLA", "CODE0: " + permnum);
-            if (ContextCompat.checkSelfPermission(this,
-                    Manifest.permission.ACCESS_FINE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        7);
-            }
-        }
-        if (permnum == 8) {
-            Log.d("HOLA", "CODE0: " + permnum);
-            if (ContextCompat.checkSelfPermission(this,
-                    Manifest.permission.ACCESS_COARSE_LOCATION)
-                    != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
-                        8);
-            }
-            // Add CheckForRoot after last permission check.  Sometimes files don't copy over on first run
-            // so we need to force it to check.  Doing it earlier runs risk of no permission and SuperSU
-            // display conflicting with permission requests
-            CheckForRoot();
-        }
-    }
-
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
-        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            Integer permsNum = 8;
-            if (permsCurrent < permsNum) {
-                Log.d("AppNav", "Ask permission");
-                permsCurrent = permsCurrent + 1;
-                askMarshmallowPerms(permsCurrent);
-            } else {
-                Log.d("AppNav", "Permissions granted");
-                CheckForRoot();
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        boolean isAllgranted = true;
+        for (int grantResult:grantResults){
+            if (grantResult != 0){
+                isAllgranted = false;
+                break;
             }
-        } else {
-            Log.d("AppNav", "Not granted permission");
-            askMarshmallowPerms(permsCurrent);
+        }
+        switch (requestCode) {
+            case PermissionCheck.DEFAULT_PERMISSION_RQCODE:
+                //Check if all permissions are granted after the permission request to user.
+                if (!isAllgranted) {
+                    android.app.AlertDialog.Builder ad = new android.app.AlertDialog.Builder(activity);
+                    ad.setCancelable(false);
+                    ad.setTitle("Nethunter app cannot be run properly");
+                    ad.setMessage("Please grant all the permission requests from outside the app or restart the app to grant the rest of permissions again.");
+                    ad.setPositiveButton("Close App", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            System.exit(1);
+                        }
+                    });
+                    ad.create().show();
+                } else {
+                    if (!CheckForRoot.isRoot()) {
+                        android.app.AlertDialog.Builder ad = new android.app.AlertDialog.Builder(activity);
+                        ad.setCancelable(false);
+                        ad.setTitle("Nethunter app cannot be run properly");
+                        ad.setMessage("Root permission is required!!");
+                        ad.setPositiveButton("Close App", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                                System.exit(1);
+                            }
+                        });
+                        ad.create().show();
+                    } else if (!CheckForRoot.isBusyboxInstalled()) {
+                        android.app.AlertDialog.Builder ad = new android.app.AlertDialog.Builder(activity);
+                        ad.setCancelable(false);
+                        ad.setTitle("Nethunter app cannot be run properly");
+                        ad.setMessage("No busybox is detected, please make sure you have busybox installed!!");
+                        ad.setPositiveButton("Close App", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                                System.exit(1);
+                            }
+                        });
+                        ad.create().show();
+                    } else {
+                        Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage("com.offsec.nhterm");
+                        //null pointer check in case package name was not found
+                        if (launchIntent != null) {
+                            PermissionCheck permissionCheck = new PermissionCheck(activity, context);
+                            if (!permissionCheck.isAllPermitted(PermissionCheck.NH_TERM_PERMISSIONS)) {
+                                permissionCheck.checkPermissions(PermissionCheck.NH_TERM_PERMISSIONS, PermissionCheck.NH_TERM_PERMISSIONS_RQCODE);
+                            }
+                        } else {
+                            new android.app.AlertDialog.Builder(activity).setMessage("Nethunter terminal is not installed yet.")
+                                    .setCancelable(false)
+                                    .setPositiveButton("QUIT", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            dialogInterface.dismiss();
+                                            System.exit(1);
+                                        }
+                                    })
+                                    .create().show();
+                        }
+                    }
+                }
+                break;
+            case PermissionCheck.NH_TERM_PERMISSIONS_RQCODE: {
+                if (!isAllgranted) {
+                    android.app.AlertDialog.Builder ad = new android.app.AlertDialog.Builder(activity);
+                    ad.setCancelable(false);
+                    ad.setTitle("Nethunter Terminal app cannot be opened");
+                    ad.setMessage("Please grant all the permission requests from outside the app or restart the app to grant the rest of permissions again.");
+                    ad.setPositiveButton("I GOT IT", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            System.exit(1);
+                        }
+                    });
+                    ad.create().show();
+                }
+                break;
+            }
         }
     }
 

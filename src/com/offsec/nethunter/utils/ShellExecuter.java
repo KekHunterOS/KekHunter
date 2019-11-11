@@ -88,10 +88,12 @@ public class ShellExecuter {
 
             BufferedReader br = new BufferedReader(new InputStreamReader(stdout));
             while ((line = br.readLine()) != null) {
-                output = output + line;
+                output = output + line + '\n';
             }
-            br.close();
+            /* remove the last \n */
+            if (output.length() > 0) output = output.substring(0,output.length()-1);
 
+            br.close();
             // Lint says while does not loop here (probably because it doesn't do anything except shell error)
             br = new BufferedReader(new InputStreamReader(stderr));
             while ((line = br.readLine()) != null) {
@@ -107,16 +109,6 @@ public class ShellExecuter {
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
-    }
-    boolean isRootAvailable() {
-
-        NhPaths nh;
-        nh = new NhPaths();
-
-        String busybox_ver = nh.whichBusybox() + " id -u";
-        String result = RunAsRootOutput(busybox_ver);
-
-        return result.equals("0");
     }
 
     public String RunAsRootOutput(String command) {
@@ -135,8 +127,10 @@ public class ShellExecuter {
 
             BufferedReader br = new BufferedReader(new InputStreamReader(stdout));
             while ((line = br.readLine()) != null) {
-                output = output + line;
+                output = output + line + '\n';
             }
+            /* remove the last \n */
+            if (output.length() > 0) output = output.substring(0,output.length()-1);
             br.close();
             br = new BufferedReader(new InputStreamReader(stderr));
             while ((line = br.readLine()) != null) {

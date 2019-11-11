@@ -423,7 +423,7 @@ public class WVersionManager implements IWVersionManager {
     }
 
     class VersionContentRequest extends AsyncTask<String, Void, String> {
-        final Context context;
+        private final Context context;
         int statusCode;
 
         VersionContentRequest(Context context) {
@@ -504,7 +504,7 @@ public class WVersionManager implements IWVersionManager {
                                 showDialog();
                             }
                         } else if (currentVersionCode >= mVersionCode) {
-                            Toast.makeText(activity, "You are on the latest version of Nethunter", Toast.LENGTH_LONG).show();
+                            Toast.makeText(context, "You are on the latest version of Nethunter", Toast.LENGTH_LONG).show();
                         }
                     }
                 } catch (JSONException e) {

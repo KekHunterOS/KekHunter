@@ -21,7 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 class CustomCommandsSQL extends SQLiteOpenHelper {
-    private final NhPaths nh;
+    private NhPaths nh;
     private final static int DATABASE_VERSION = 2;
     private final static String DATABASE_NAME = "KaliLaunchers";
 
@@ -47,7 +47,7 @@ class CustomCommandsSQL extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS");
+        db.execSQL("DROP TABLE IF EXISTS " + CustomCommand.TABLE);
         this.onCreate(db);
     }
 
@@ -160,9 +160,7 @@ class CustomCommandsSQL extends SQLiteOpenHelper {
             src.close();
             dst.close();
             Log.d("importDB", "Successful");
-            Toast.makeText(context.getApplicationContext(),
-                    "Import DB Successful",
-                    Toast.LENGTH_SHORT).show();
+            nh.showMessage(context, "Import DB Successful");
 
         } catch (Exception e) {
             Log.d("importDB", e.toString());
@@ -186,9 +184,7 @@ class CustomCommandsSQL extends SQLiteOpenHelper {
             src.close();
             dst.close();
             Log.d("ExportDB", "Successful");
-            Toast.makeText(context.getApplicationContext(),
-                    "Export DB Successful",
-                    Toast.LENGTH_SHORT).show();
+            nh.showMessage(context, "Export DB Successful");
 
         } catch (Exception e) {
             Log.d("ExportDB", "ExportDB Failed!");

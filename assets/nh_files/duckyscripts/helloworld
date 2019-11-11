@@ -1,12 +1,52 @@
-REM This is a comment
-STRING Hello world!
-STRING Example of typing to computer. Nethunter is awesome!
-REM To sleep for five seconds use miliseconds
-SLEEP 5000
-STRING I slept for 5 seconds, now I'm awake!
-STRING abcdefghijklmnopqrstuvwxyz
-STRING ABCDEFGHIJKLMNOPQRSTUVWXYZ
-STRING 1234567890-=!@#$%^&*()_+
-STRING []\;',./{}|:"<>?`~
-MOUSE 300 300
+REM Please checkout https://github.com/hak5darren/USB-Rubber-Ducky/wiki/Duckyscript for the ducky command.
+REM You can use the ducky command for converting the input to shell base command.
+REM If the very first character is in UPPERCASE, then the whole line will be treated as ducky script.
+REM e.g 'CTRL alt dEleTe' is a valid ducky command, but 'ctrl alt delete' is not.
+REM If the very first character is in lower case, the whole line will be treated as a shell script.
+REM e.g 'touch /sdcard/abcdefghijklmn.txt'
+REM So the most beautiful is you can just add your shell script between the ducky commands, see the example below!
+
+echo "[!] I am so nervous as this is my first time to use it!"
+REM Use shell for loop to loop 2 times..
+for i in 0 1
+do
+REM Sleep for 1 second
+DELAY 1
+STRING 1234567890
 ENTER
+STRING abcdefghijklmnopqrstuvwxyz
+ENTER
+STRING ABCDEFGHIJKLMNOPQRSTUVWXYZ
+ENTER
+STRING ~!@#$%^&*()+-=/.,[]{}'"\/|?<>
+ENTER
+
+REM The REPEAT command will repeat the last command which will be this REM command
+REPEAT 2
+done
+
+REM Let's take a screenshot from the terminal, and check it out!!!
+screencap -p /sdcard/screenshot.png
+
+REM This will press ctrl + alt + delete
+CTRL ALT DELETE
+
+REM Just sleep for 2 second
+DELAY 2
+
+REM Press ESC
+ESC
+
+REM Testing the mouse now..
+REM this will press right click
+MOUSE --b2
+DELAY 1
+
+REM this will press left click
+MOUSE --b1
+DELAY 1
+REM THis will hold left mouse button, drag 100 pixels to the right and 50 pixels up, then release
+MOUSE --hold --b1
+MOUSE --hold --b1 100 0
+MOUSE --hold --b1 0 -50
+MOUSE --b1
