@@ -145,8 +145,6 @@ public class MacchangerFragment extends Fragment {
         currentMacTextView = null;
         currentHostNameTextView = null;
         reloadImageButton = null;
-        context = null;
-        activity = null;
     }
 
     private void genRandomMACAddress() {

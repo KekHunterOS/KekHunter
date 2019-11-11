@@ -65,7 +65,6 @@ public class DuckHunterPreviewFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         previewSource = null;
-        activity = null;
     }
 
     public class PreviewDuckyBroadcastReceiver extends BroadcastReceiver {

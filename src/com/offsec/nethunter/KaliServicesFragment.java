@@ -4,26 +4,22 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.offsec.nethunter.AsyncTask.KaliServicesAsyncTask;
-import com.offsec.nethunter.RecyclerViewAdapter.KaliServiceRecycleViewAdapterTitles;
+import com.offsec.nethunter.RecyclerViewAdapter.KaliServicesRecycleViewAdapter;
 import com.offsec.nethunter.RecyclerViewAdapter.KaliServicesRecycleViewAdapterDeleteItems;
 import com.offsec.nethunter.RecyclerViewData.KaliServicesData;
 import com.offsec.nethunter.SQL.KaliServicesSQL;
@@ -42,7 +38,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.transition.Visibility;
 
 public class KaliServicesFragment extends Fragment {
     private static final String TAG = "KaliServicesFragment";
@@ -53,7 +48,7 @@ public class KaliServicesFragment extends Fragment {
     private Button addButton;
     private Button deleteButton;
     private Button moveButton;
-    private KaliServiceRecycleViewAdapterTitles kaliServiceRecycleViewAdapterTitles;
+    private KaliServicesRecycleViewAdapter kaliServicesRecycleViewAdapter;
     private static int targetPositionId;
 
     public static KaliServicesFragment newInstance(int sectionNumber) {
@@ -84,13 +79,13 @@ public class KaliServicesFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         KaliServicesViewModel kaliServicesViewModel = ViewModelProviders.of(this).get(KaliServicesViewModel.class);
         kaliServicesViewModel.init(context);
-        kaliServicesViewModel.getLiveDataKaliServicesModelList().observe(this, kaliServicesModelList -> kaliServiceRecycleViewAdapterTitles.notifyDataSetChanged());
+        kaliServicesViewModel.getLiveDataKaliServicesModelList().observe(this, kaliServicesModelList -> kaliServicesRecycleViewAdapter.notifyDataSetChanged());
 
+        kaliServicesRecycleViewAdapter = new KaliServicesRecycleViewAdapter(context, kaliServicesViewModel.getLiveDataKaliServicesModelList().getValue());
         RecyclerView recyclerViewServiceTitle = view.findViewById(R.id.f_kaliservices_recycleviewServiceTitle);
-        kaliServiceRecycleViewAdapterTitles = new KaliServiceRecycleViewAdapterTitles(context, kaliServicesViewModel.getLiveDataKaliServicesModelList().getValue());
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
         recyclerViewServiceTitle.setLayoutManager(linearLayoutManager);
-        recyclerViewServiceTitle.setAdapter(kaliServiceRecycleViewAdapterTitles);
+        recyclerViewServiceTitle.setAdapter(kaliServicesRecycleViewAdapter);
 
         refreshButton = view.findViewById(R.id.f_kaliservices_refreshButton);
         addButton = view.findViewById(R.id.f_kaliservices_addItemButton);
@@ -122,7 +117,7 @@ public class KaliServicesFragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                kaliServiceRecycleViewAdapterTitles.getFilter().filter(newText);
+                kaliServicesRecycleViewAdapter.getFilter().filter(newText);
                 return false;
             }
         });
@@ -200,13 +195,11 @@ public class KaliServicesFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        activity = null;
-        context = null;
         refreshButton = null;
         addButton = null;
         deleteButton = null;
         moveButton = null;
-        kaliServiceRecycleViewAdapterTitles = null;
+        kaliServicesRecycleViewAdapter = null;
     }
 
     private void onRefreshItemSetup(){

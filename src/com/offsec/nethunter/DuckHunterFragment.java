@@ -178,8 +178,6 @@ public class DuckHunterFragment extends Fragment {
         super.onDestroyView();
         menu = null;
         mViewPager = null;
-        context = null;
-        activity = null;
     }
 
     private static void setLang() {

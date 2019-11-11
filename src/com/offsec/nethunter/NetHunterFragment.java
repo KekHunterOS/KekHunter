@@ -83,10 +83,11 @@ public class NetHunterFragment extends Fragment {
         nethunterViewModel.getLiveDataNethunterModelList().observe(this, nethunterModelList -> {
             nethunterRecyclerViewAdapter.notifyDataSetChanged();
         });
+
+        nethunterRecyclerViewAdapter = new NethunterRecyclerViewAdapter(context, nethunterViewModel.getLiveDataNethunterModelList().getValue());
         RecyclerView itemRecyclerView = view.findViewById(R.id.f_nethunter_recyclerview);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
         itemRecyclerView.setLayoutManager(linearLayoutManager);
-        nethunterRecyclerViewAdapter = new NethunterRecyclerViewAdapter(context, nethunterViewModel.getLiveDataNethunterModelList().getValue());
         itemRecyclerView.setAdapter(nethunterRecyclerViewAdapter);
 
         refreshButton = view.findViewById(R.id.f_nethunter_refreshButton);
@@ -195,8 +196,6 @@ public class NetHunterFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        context = null;
-        activity = null;
         refreshButton = null;
         addButton = null;
         deleteButton = null;
