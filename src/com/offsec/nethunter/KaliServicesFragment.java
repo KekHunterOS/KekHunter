@@ -107,6 +107,8 @@ public class KaliServicesFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+
+        nh = new NhPaths();
         KaliServices = new String[][]{
 
                 // {name, check_cmd, start_cmd, stop_cmd, init_service_filename}
