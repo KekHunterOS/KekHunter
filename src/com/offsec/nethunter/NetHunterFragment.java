@@ -158,7 +158,7 @@ public class NetHunterFragment extends Fragment {
             String commandNET[] = getNetCmd(busybox_ver);
             String commandHID[] = {"sh", "-c", "ls /dev/hidg*"};
             String commandBUSYBOX[] = getBusyboxCmd(busybox_ver);
-            String commandKERNELVER[] = {"sh", "-c", "cat /proc/version"};
+            String commandKERNELVER[] = {"sh", "-c", "uname -a"};
 
 
             final String outputNET = exe.Executer(commandNET);

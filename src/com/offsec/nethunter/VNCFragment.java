@@ -271,7 +271,12 @@ public class VNCFragment extends Fragment {
             if(vnc_passwd.equals("")) {
                 Toast.makeText(getActivity().getApplicationContext(), "Please setup local server first!", Toast.LENGTH_SHORT).show();
             } else {
-                intentClickListener_NH("export HOME=/root;export USER=root;LD_PRELOAD=/usr/lib/${HOSTTYPE}-${OSTYPE}/libgcc_s.so.1 nohup vncserver :1 " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + " >/dev/null 2>&1 < /dev/null; sleep 1 && exit");
+                String arch = System.getProperty("os.arch");
+                if(arch.equals("aarch64")) {
+                    intentClickListener_NH("export HOME=/root;export USER=root;LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgcc_s.so.1 nohup vncserver :1 " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + "; sleep 1 && exit");
+                } else {
+                    intentClickListener_NH("export HOME=/root;export USER=root;LD_PRELOAD=/usr/lib/arm-linux-gnueabihf/libgcc_s.so.1 nohup vncserver :1 " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + "; sleep 1 && exit");
+                }
                 Log.d(TAG, localhostonly);
             }
         });
@@ -370,7 +375,7 @@ public class VNCFragment extends Fragment {
         final TextView KeXuser = VNCFragment.findViewById(R.id.KeXuser);
         ShellExecuter exe = new ShellExecuter();
         String kex_userCmd = "";
-        String kex_statusCmd = exe.RunAsRootOutput("su -c pgrep vnc");
+        String kex_statusCmd = exe.RunAsRootOutput("su -c pidof Xtigervnc");
         if (kex_statusCmd.equals("")) {
             KeXstatus.setText("STOPPED");
             KeXuser.setText("None");
