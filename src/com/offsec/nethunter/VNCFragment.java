@@ -273,15 +273,15 @@ public class VNCFragment extends Fragment {
             } else {
                 String arch = System.getProperty("os.arch");
                 if(arch.equals("aarch64")) {
-                    intentClickListener_NH("export HOME=/root;export USER=root;LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgcc_s.so.1 nohup vncserver :1 " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + "; sleep 1 && exit");
+                    intentClickListener_NH("export HOME=/root;export USER=root;LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgcc_s.so.1 nohup vncserver :1 " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + " >/dev/null 2>&1 </dev/null; sleep 2 && exit");
                 } else {
-                    intentClickListener_NH("export HOME=/root;export USER=root;LD_PRELOAD=/usr/lib/arm-linux-gnueabihf/libgcc_s.so.1 nohup vncserver :1 " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + "; sleep 1 && exit");
+                    intentClickListener_NH("export HOME=/root;export USER=root;LD_PRELOAD=/usr/lib/arm-linux-gnueabihf/libgcc_s.so.1 nohup vncserver :1 " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + " >/dev/null 2>&1 </dev/null; sleep 2 && exit");
                 }
                 Log.d(TAG, localhostonly);
             }
         });
         addClickListener(StopVNCButton, v -> {
-            intentClickListener_NH("vncserver -kill :1 ;sleep 1 && exit"); // since is a kali command we can send it as is
+            intentClickListener_NH("vncserver -kill :1 ;sleep 2 && exit"); // since is a kali command we can send it as is
             refreshVNC(rootView);
         });
         addClickListener(OpenVNCButton, v -> {
@@ -382,11 +382,15 @@ public class VNCFragment extends Fragment {
         }
         else {
             KeXstatus.setText("RUNNING");
-            kex_userCmd = exe.RunAsRootOutput("su -c ps -f -p " + kex_statusCmd + " -o uname=");
+            // The following looks a bit unelegant but works with the widest range of Android versions & devices
+            kex_userCmd = exe.RunAsRootOutput("su -c ps -p " + kex_statusCmd + "|grep Xtigervnc|awk '{print $1}'");
             if (kex_userCmd.equals(""))
                 KeXuser.setText("None");
             else
                 KeXuser.setText(kex_userCmd.replaceAll("\\s+", ""));
+            //Android cannot resolve Kali UID's and always returns system. Let's prettyfy it for now
+            if (!kex_userCmd.equals("root"))
+                KeXuser.setText("non-root");
         }
     }
 
