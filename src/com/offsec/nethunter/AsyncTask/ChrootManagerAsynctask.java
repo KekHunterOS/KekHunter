@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.offsec.nethunter.ChrootManagerFragment;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.ShellExecuter;
 
@@ -40,6 +41,7 @@ public class ChrootManagerAsynctask extends AsyncTask<Object, Integer, Void> {
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
+        ChrootManagerFragment.isAsyncTaskRunning = true;
         if (listener != null) {
             listener.onAsyncTaskPrepare();
         }
@@ -126,6 +128,7 @@ public class ChrootManagerAsynctask extends AsyncTask<Object, Integer, Void> {
         if (listener != null) {
             listener.onAsyncTaskFinished(resultCode, resultString);
         }
+        ChrootManagerFragment.isAsyncTaskRunning = false;
     }
 
     public void setListener(ChrootManagerAsyncTaskListener listener) {
