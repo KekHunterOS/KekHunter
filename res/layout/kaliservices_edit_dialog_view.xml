@@ -27,6 +27,7 @@
             android:id="@+id/f_kaliservices_edit_adb_et_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:inputType="text"
             android:layout_marginStart="4dp"/>
 
         <LinearLayout
