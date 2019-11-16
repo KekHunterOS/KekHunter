@@ -211,9 +211,9 @@ public class KaliServicesAsyncTask extends AsyncTask<List<KaliServicesModel>, Vo
 		StringBuilder tmpStringBuilder = new StringBuilder();
 		for (int i = 0; i < kaliServicesModelList.size(); i++) {
 			if (kaliServicesModelList.get(i).getRunOnChrootStart().equals("1")) {
-				tmpStringBuilder.append(kaliServicesModelList.get(i).getCommandforStartService() + "\\n");
+				tmpStringBuilder.append(kaliServicesModelList.get(i).getCommandforStartService()).append("\n");
 			}
 		}
-		new ShellExecuter().RunAsRootOutput("echo \"" + tmpStringBuilder.toString() + "\" > " + NhPaths.APP_SCRIPTS_PATH + "/kaliservices");
+		new ShellExecuter().RunAsRootOutput("cat << 'EOF' > " + NhPaths.APP_SCRIPTS_PATH + "/kaliservices" + "\n" + tmpStringBuilder.toString() + "\nEOF");
 	}
 }
