@@ -196,7 +196,7 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
     }
 
     private void copyFile(String TARGET_BASE_PATH, String filename) {
-        if (filename.matches("^.*kaliservices$")){
+        if (filename.matches("^.*kaliservices$|^.*runonboot_services")){
             return;
         }
         AssetManager assetManager = context.get().getAssets();

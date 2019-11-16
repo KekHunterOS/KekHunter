@@ -25,7 +25,18 @@
     <string name="kaliservices_howto_checkservice">To Check if a service in kali is up or not, a command will be run OUTSIDE KaliChroot that looks like this:\n\nbusybox ps -o pid,comm | grep \'&lt;service_name>\'\n\nService is considered UP if the return value is 0 and vice versa.</string>
     <string name="kaliservices_howto_runServiceOnBoot">To automacticailly start the service after Kali Chroot is up, check this option.</string>
 
+    <!-- CustomCommands -->
+    <string name="custom_commands_description">You can ADD, DELETE, MOVE, EDIT, SEARCH, BACKUP, RESTORE and RESET your custom command item.</string>
+    <string-array name="custom_commands_sendto_array">
+        <item>android</item>
+        <item>kali</item>
+    </string-array>
+    <string-array name="custom_commands_execmode_array">
+        <item>interactive</item>
+        <item>background</item>
+    </string-array>
 
+    <!-- Bad USB -->
     <string name="badusb_label">BadUSB MITM Attack</string>
     <string name="badusb_description">This is our implementation of the BadUSB attack as demonstrated at Black Hat USA 2014. Enabling this USB gadget mode will allow your device to act as a USB network interface when plugged into a target computer. Connecting the USB cable to a PC will force all traffic from that PC (Windows or Linux) through the NetHunter device, where the traffic can be MITM\'ed.</string>
 

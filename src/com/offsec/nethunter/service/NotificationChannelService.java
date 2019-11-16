@@ -13,7 +13,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.app.TaskStackBuilder;
 
-import com.offsec.nethunter.AppNavHomeActivity;
+import com.offsec.nethunter.AsyncTask.CustomCommandsAsyncTask;
 import com.offsec.nethunter.BuildConfig;
 import com.offsec.nethunter.R;
 
@@ -29,6 +29,8 @@ public class NotificationChannelService extends IntentService {
     public static final String DOWNLOADING = BuildConfig.APPLICATION_ID + ".DOWNLOADING";
     public static final String INSTALLING = BuildConfig.APPLICATION_ID + ".INSTALLING";
     public static final String BACKINGUP = BuildConfig.APPLICATION_ID + ".BACKINGUP";
+    public static final String CUSTOMCOMMAND_START = BuildConfig.APPLICATION_ID + ".CUSTOMCOMMAND_START";
+    public static final String CUSTOMCOMMAND_FINISH = BuildConfig.APPLICATION_ID + ".CUSTOMCOMMAND_FINISH";
 
     public NotificationChannelService(){
         super("NotificationChannelService");
@@ -55,13 +57,13 @@ public class NotificationChannelService extends IntentService {
             if (intent.getAction() != null){
                 NotificationCompat.Builder builder;
                 NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(getApplicationContext());
+                notificationManagerCompat.cancelAll();
+                resultIntent = new Intent();
+                stackBuilder = TaskStackBuilder.create(this);
+                stackBuilder.addNextIntentWithParentStack(resultIntent);
+                resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
                 switch (intent.getAction()){
                     case REMINDMOUNTCHROOT:
-                        notificationManagerCompat.cancelAll();
-                        resultIntent = new Intent();
-                        stackBuilder = TaskStackBuilder.create(this);
-                        stackBuilder.addNextIntentWithParentStack(resultIntent);
-                        resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
                         builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
                                 .setAutoCancel(true)
                                 .setSmallIcon(R.drawable.ic_stat_ic_nh_notificaiton)
@@ -73,11 +75,6 @@ public class NotificationChannelService extends IntentService {
                         notificationManagerCompat.notify(NOTIFY_ID, builder.build());
                         break;
                     case USENETHUNTER:
-                        notificationManagerCompat.cancelAll();
-                        resultIntent = new Intent();
-                        stackBuilder = TaskStackBuilder.create(this);
-                        stackBuilder.addNextIntentWithParentStack(resultIntent);
-                        resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
                         builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
                                 .setAutoCancel(true)
                                 .setSmallIcon(R.drawable.ic_stat_ic_nh_notificaiton)
@@ -90,11 +87,6 @@ public class NotificationChannelService extends IntentService {
                         notificationManagerCompat.notify(NOTIFY_ID, builder.build());
                         break;
                     case DOWNLOADING:
-                        notificationManagerCompat.cancelAll();
-                        resultIntent = new Intent();
-                        stackBuilder = TaskStackBuilder.create(this);
-                        stackBuilder.addNextIntentWithParentStack(resultIntent);
-                        resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
                         builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
                                 .setAutoCancel(true)
                                 .setSmallIcon(R.drawable.ic_stat_ic_nh_notificaiton)
@@ -107,11 +99,6 @@ public class NotificationChannelService extends IntentService {
                         notificationManagerCompat.notify(NOTIFY_ID, builder.build());
                         break;
                     case INSTALLING:
-                        notificationManagerCompat.cancelAll();
-                        resultIntent = new Intent();
-                        stackBuilder = TaskStackBuilder.create(this);
-                        stackBuilder.addNextIntentWithParentStack(resultIntent);
-                        resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
                         builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
                                 .setAutoCancel(true)
                                 .setSmallIcon(R.drawable.ic_stat_ic_nh_notificaiton)
@@ -124,11 +111,6 @@ public class NotificationChannelService extends IntentService {
                         notificationManagerCompat.notify(NOTIFY_ID, builder.build());
                         break;
                     case BACKINGUP:
-                        notificationManagerCompat.cancelAll();
-                        resultIntent = new Intent();
-                        stackBuilder = TaskStackBuilder.create(this);
-                        stackBuilder.addNextIntentWithParentStack(resultIntent);
-                        resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
                         builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
                                 .setAutoCancel(true)
                                 .setSmallIcon(R.drawable.ic_stat_ic_nh_notificaiton)
@@ -140,11 +122,50 @@ public class NotificationChannelService extends IntentService {
                                 .setContentIntent(resultPendingIntent);
                         notificationManagerCompat.notify(NOTIFY_ID, builder.build());
                         break;
+                    case CUSTOMCOMMAND_START:
+                        builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
+                                .setAutoCancel(false)
+                                .setSmallIcon(R.drawable.ic_stat_ic_nh_notificaiton)
+                                .setStyle(new NotificationCompat.BigTextStyle().bigText(
+                                        "Command: \"" + intent.getStringExtra("CMD") +
+                                        "\" is being run in background and in " +
+                                        intent.getStringExtra("ENV") + " environment."))
+                                .setContentTitle("Custom Commands")
+                                .setContentText(
+                                        "Command: \"" + intent.getStringExtra("CMD") +
+                                        "\" is being run in background and in " +
+                                        intent.getStringExtra("ENV") + " environment.")
+                                .setPriority(NotificationCompat.PRIORITY_MAX)
+                                .setContentIntent(resultPendingIntent);
+                        notificationManagerCompat.notify(NOTIFY_ID, builder.build());
+                        break;
+                    case CUSTOMCOMMAND_FINISH:
+                        final int returnCode = intent.getIntExtra("RETURNCODE", 0);
+                        final String CMD = intent.getStringExtra("CMD");
+                        String resultString = "";
+                        if (returnCode == CustomCommandsAsyncTask.ANDROID_CMD_SUCCESS) {
+                            resultString = "Return success.\nCommand: \"" + CMD + "\" has been executed in android environment.";
+                        } else if (returnCode == CustomCommandsAsyncTask.ANDROID_CMD_FAIL) {
+                            resultString = "Return error.\nCommand: \"" + CMD + "\" has been executed in android environment.";
+                        } else if (returnCode == CustomCommandsAsyncTask.KALI_CMD_SUCCESS) {
+                            resultString = "Return success.\nCommand: \"" + CMD + "\" has been executed in Kali chroot environment.";
+                        } else if (returnCode == CustomCommandsAsyncTask.KALI_CMD_FAIL) {
+                            resultString = "Return error.\nCommand: \"" + CMD + "\" has been executed in Kali chroot environment.";
+                        }
+                        builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
+                                .setAutoCancel(false)
+                                .setSmallIcon(R.drawable.ic_stat_ic_nh_notificaiton)
+                                .setStyle(new NotificationCompat.BigTextStyle().bigText(resultString))
+                                .setContentTitle("Custom Commands")
+                                .setContentText(resultString)
+                                .setPriority(NotificationCompat.PRIORITY_MAX)
+                                .setContentIntent(resultPendingIntent);
+                        notificationManagerCompat.notify(NOTIFY_ID, builder.build());
+                        break;
                 }
             }
         }
     }
-
 
     @Override
     public void onDestroy() {
@@ -161,5 +182,4 @@ public class NotificationChannelService extends IntentService {
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
     }
-
 }

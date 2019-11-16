@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="3dp"
+    android:background="@color/cardview_shadow_start_color"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:orientation="horizontal"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp">
+        <TextView
+            android:id="@+id/f_customcommands_recyclerview_tv_cmdlabel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="8dp"
+            android:text="Loading.."
+            android:textColor="@android:color/background_light"
+            android:textSize="20sp"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_weight="0.2"/>
+        <Button
+            android:id="@+id/f_customcommands_recyclerview_btn_edit"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:textColor="@android:color/holo_blue_dark"
+            android:layout_weight="0.8"
+            android:text="EDIT"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_weight="0.2">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.3"
+                    android:textColor="@color/accent_material_dark"
+                    android:text="Send to:"/>
+
+                <TextView
+                    android:id="@+id/f_customcommands_recyclerview_tv_execenvironment"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.7"
+                    android:textColor="@color/accent_material_light"
+                    android:text="system"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.3"
+                    android:textColor="@color/accent_material_dark"
+                    android:text="Exec Mode:"/>
+
+                <TextView
+                    android:id="@+id/f_customcommands_recyclerview_tv_execmode"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.3"
+                    android:textColor="@color/accent_material_light"
+                    android:text="mode"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.3"
+                    android:textColor="@color/accent_material_dark"
+                    android:text="RunOnBoot:"/>
+
+                <TextView
+                    android:id="@+id/f_customcommands_recyclerview_tv_runonboot"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.1"
+                    android:textColor="@color/accent_material_light"
+                    android:text="no"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/f_customcommands_recyclerview_btn_run"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.8"
+            android:textColor="@android:color/holo_blue_dark"
+            android:text="RUN"/>
+    </LinearLayout>
+
+</LinearLayout>
