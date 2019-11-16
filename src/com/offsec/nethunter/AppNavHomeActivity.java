@@ -25,6 +25,7 @@ import android.widget.TextView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.offsec.nethunter.AsyncTask.CopyBootFilesAsyncTask;
+import com.offsec.nethunter.SQL.CustomCommandsSQL;
 import com.offsec.nethunter.SQL.KaliServicesSQL;
 import com.offsec.nethunter.SQL.NethunterSQL;
 import com.offsec.nethunter.gps.KaliGPSUpdates;
@@ -85,11 +86,6 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         // Also with its sharepreference listener registered, the CHROOT_PATH variable can be updated immediately on sharepreference changes.
         nhPaths = NhPaths.getInstance(getApplicationContext());
 
-        // Initate all SQL singleton in MainActivity first so that it can be less lagged when switching fragments,
-        // because it takes time to retrive data from database.
-        NethunterSQL.getInstance(getApplicationContext());
-        KaliServicesSQL.getInstance(getApplicationContext());
-
         // Initiate the PermissionCheck class.
         permissionCheck = new PermissionCheck(this, getApplicationContext());
         // Register the nethunter receiver with intent actions.
@@ -117,6 +113,13 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
 
                 // Fetch the busybox path again after the busybox_nh is copied.
                 NhPaths.BUSYBOX = NhPaths.getBusyboxPath();
+
+                // Now Initate all SQL singleton in MainActivity so that it can be less lagged when switching fragments,
+                // because it takes time to retrive data from database.
+                NethunterSQL.getInstance(getApplicationContext());
+                KaliServicesSQL.getInstance(getApplicationContext());
+                CustomCommandsSQL.getInstance(getApplicationContext());
+
                 // Setup the default SharePreference value.
                 setDefaultSharePreference();
 
