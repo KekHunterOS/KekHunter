@@ -19,8 +19,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.offsec.nethunter.RecyclerViewAdapter.KaliServicesRecycleViewAdapter;
-import com.offsec.nethunter.RecyclerViewAdapter.KaliServicesRecycleViewAdapterDeleteItems;
+import com.offsec.nethunter.RecyclerViewAdapter.KaliServicesRecyclerViewAdapter;
+import com.offsec.nethunter.RecyclerViewAdapter.KaliServicesRecyclerViewAdapterDeleteItems;
 import com.offsec.nethunter.RecyclerViewData.KaliServicesData;
 import com.offsec.nethunter.SQL.KaliServicesSQL;
 import com.offsec.nethunter.models.KaliServicesModel;
@@ -48,7 +48,7 @@ public class KaliServicesFragment extends Fragment {
     private Button addButton;
     private Button deleteButton;
     private Button moveButton;
-    private KaliServicesRecycleViewAdapter kaliServicesRecycleViewAdapter;
+    private KaliServicesRecyclerViewAdapter kaliServicesRecyclerViewAdapter;
     private static int targetPositionId;
 
     public static KaliServicesFragment newInstance(int sectionNumber) {
@@ -78,13 +78,13 @@ public class KaliServicesFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         KaliServicesViewModel kaliServicesViewModel = ViewModelProviders.of(this).get(KaliServicesViewModel.class);
         kaliServicesViewModel.init(context);
-        kaliServicesViewModel.getLiveDataKaliServicesModelList().observe(this, kaliServicesModelList -> kaliServicesRecycleViewAdapter.notifyDataSetChanged());
+        kaliServicesViewModel.getLiveDataKaliServicesModelList().observe(this, kaliServicesModelList -> kaliServicesRecyclerViewAdapter.notifyDataSetChanged());
 
-        kaliServicesRecycleViewAdapter = new KaliServicesRecycleViewAdapter(context, kaliServicesViewModel.getLiveDataKaliServicesModelList().getValue());
+        kaliServicesRecyclerViewAdapter = new KaliServicesRecyclerViewAdapter(context, kaliServicesViewModel.getLiveDataKaliServicesModelList().getValue());
         RecyclerView recyclerViewServiceTitle = view.findViewById(R.id.f_kaliservices_recyclerviewServiceTitle);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
         recyclerViewServiceTitle.setLayoutManager(linearLayoutManager);
-        recyclerViewServiceTitle.setAdapter(kaliServicesRecycleViewAdapter);
+        recyclerViewServiceTitle.setAdapter(kaliServicesRecyclerViewAdapter);
 
         refreshButton = view.findViewById(R.id.f_kaliservices_refreshButton);
         addButton = view.findViewById(R.id.f_kaliservices_addItemButton);
@@ -116,7 +116,7 @@ public class KaliServicesFragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                kaliServicesRecycleViewAdapter.getFilter().filter(newText);
+                kaliServicesRecyclerViewAdapter.getFilter().filter(newText);
                 return false;
             }
         });
@@ -198,7 +198,7 @@ public class KaliServicesFragment extends Fragment {
         addButton = null;
         deleteButton = null;
         moveButton = null;
-        kaliServicesRecycleViewAdapter = null;
+        kaliServicesRecyclerViewAdapter = null;
     }
 
     private void onRefreshItemSetup(){
@@ -365,11 +365,11 @@ public class KaliServicesFragment extends Fragment {
             final LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             final View promptViewDelete = inflater.inflate(R.layout.kaliservices_delete_dialog_view, nullParent, false);
             final RecyclerView recyclerViewDeleteItem = promptViewDelete.findViewById(R.id.f_kaliservices_delete_recyclerview);
-            KaliServicesRecycleViewAdapterDeleteItems kaliServicesRecycleViewAdapterDeleteItems = new KaliServicesRecycleViewAdapterDeleteItems(context, kaliServicesModelList);
+            KaliServicesRecyclerViewAdapterDeleteItems kaliServicesRecyclerViewAdapterDeleteItems = new KaliServicesRecyclerViewAdapterDeleteItems(context, kaliServicesModelList);
 
             LinearLayoutManager linearLayoutManagerDelete = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
             recyclerViewDeleteItem.setLayoutManager(linearLayoutManagerDelete);
-            recyclerViewDeleteItem.setAdapter(kaliServicesRecycleViewAdapterDeleteItems);
+            recyclerViewDeleteItem.setAdapter(kaliServicesRecyclerViewAdapterDeleteItems);
 
             AlertDialog.Builder adbDelete = new AlertDialog.Builder(activity);
             adbDelete.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
