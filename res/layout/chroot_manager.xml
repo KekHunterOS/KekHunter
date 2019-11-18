@@ -101,7 +101,7 @@
         android:gravity="bottom"
         android:scrollbars="vertical"
         android:singleLine="false"
-        android:textSize="13dp"
+        android:textSize="13sp"
         app:layout_constraintBottom_toTopOf="@id/f_chrootmanager_btn_scrollView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

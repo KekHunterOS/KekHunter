@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:textSize="18dp"
+            android:textSize="18sp"
             android:textColor="@color/accent_material_dark"
             android:text="Title:"/>
 
@@ -40,7 +40,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
                 android:layout_weight="0.9"
-                android:textSize="18dp"
+                android:textSize="18sp"
                 android:textColor="@color/accent_material_dark"
                 android:text="Command for starting the service:"/>
 
@@ -75,7 +75,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
                 android:layout_weight="0.9"
-                android:textSize="18dp"
+                android:textSize="18sp"
                 android:textColor="@color/accent_material_dark"
                 android:text="Command for stopping the service:"/>
 
@@ -109,7 +109,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
                 android:layout_weight="0.9"
-                android:textSize="18dp"
+                android:textSize="18sp"
                 android:textColor="@color/accent_material_dark"
                 android:text="String for checking the service:"/>
 
@@ -143,7 +143,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="RunOnChrootStart"
-                android:textSize="18dp"
+                android:textSize="18sp"
                 android:textColor="@color/accent_material_dark"
                 android:layout_marginStart="4dp"/>
 
