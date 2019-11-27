@@ -21,7 +21,6 @@ class SearchSploitSQL extends SQLiteOpenHelper {
 
     SearchSploitSQL(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        NhPaths nh = new NhPaths();
 
     }
 

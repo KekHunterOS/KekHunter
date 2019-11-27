@@ -19,6 +19,7 @@ import com.offsec.nethunter.utils.BootKali;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.ShellExecuter;
 
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 /**
@@ -30,10 +31,10 @@ import androidx.fragment.app.FragmentActivity;
 
     public class DeAuthFragment  extends Fragment {
     private final ShellExecuter exe = new ShellExecuter();
-    private FragmentActivity myContext;
-
+    private Context context;
     private NhPaths nh;
     private static final String ARG_SECTION_NUMBER = "section_number";
+
     public static DeAuthFragment newInstance(int sectionNumber) {
         DeAuthFragment fragment = new DeAuthFragment();
         Bundle args = new Bundle();
@@ -42,11 +43,16 @@ import androidx.fragment.app.FragmentActivity;
         return fragment;
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        context = getContext();
+        nh = new NhPaths();
+    }
+
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.deauth, container, false);
-
-        SharedPreferences sharedpreferences = getActivity().getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-        Context mContext = getActivity().getApplicationContext();
+        SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
         setHasOptionsMenu(true);
         final Button scan = rootView.findViewById(R.id.scan_networks);
         final EditText wlan = rootView.findViewById(R.id.wlan_interface);
@@ -169,7 +175,7 @@ import androidx.fragment.app.FragmentActivity;
             intent.putExtra("com.offsec.nhterm.iInitialCommand", command);
             startActivity(intent);
         } catch (Exception e) {
-            Toast.makeText(getActivity().getApplicationContext(), getString(R.string.toast_install_terminal), Toast.LENGTH_SHORT).show();
+            nh.showMessage(context, getString(R.string.toast_install_terminal));
 
         }
     }
