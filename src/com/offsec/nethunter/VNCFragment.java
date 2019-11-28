@@ -205,14 +205,16 @@ public class VNCFragment extends Fragment {
 
         // Checkbox for localhost only
         if (localhostCheckBox.isChecked())
-            localhostonly = "-localhost ";
+            localhostonly = "-localhost yes ";
+        else
+            localhostonly = "-localhost no ";
         View.OnClickListener checkBoxListener = v -> {
             if (localhostCheckBox.isChecked()) {
-                localhostonly = "-localhost ";
+                localhostonly = "-localhost yes ";
                 sharedpreferences.edit().putBoolean("localhost", true).apply();
 
             } else {
-                localhostonly = "";
+                localhostonly = "-localhost no ";
                 sharedpreferences.edit().putBoolean("localhost", false).apply();
             }
         };
