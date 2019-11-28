@@ -49,8 +49,8 @@ android {
     defaultConfig {
         minSdkVersion 17
         targetSdkVersion 28
-        versionCode 2019041200
-        versionName "2019.4"
+        versionCode 2019041400
+        versionName "2019.4c"
     }
 
     sourceSets {
