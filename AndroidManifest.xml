@@ -37,6 +37,7 @@
         android:supportsPictureInPicture="false"
         android:theme="@style/Theme.Nethunter"
         android:windowSoftInputMode="adjustResize"
+        android:requestLegacyExternalStorage="true"
         tools:replace="android:theme">
         <activity
             android:name=".AppNavHomeActivity"
