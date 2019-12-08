@@ -40,6 +40,7 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
     private CopyBootFilesAsyncTaskListener listener;
     private String result = "";
     private SharedPreferences prefs;
+    private ShellExecuter exe = new ShellExecuter();
     private final WeakReference<Context> context;
 
     public CopyBootFilesAsyncTask(Context context, Activity activity, ProgressDialog progressDialog){
@@ -91,8 +92,9 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
             publishProgress("Doing sdcard files update. (nh_files).");
             assetsToFiles(NhPaths.SD_PATH, "", "sdcard");
             publishProgress("Fixing permissions for new files");
-            ShellExecuter exe = new ShellExecuter();
             exe.RunAsRoot(new String[]{"chmod -R 700 " + NhPaths.APP_SCRIPTS_PATH + "/*", "chmod -R 700 " + NhPaths.APP_INITD_PATH + "/*"});
+            // disable the magisk notification for nethunter app as it will keep popping up bunch of toast message when executing runtime command.
+            disableMagiskNotification();
             SharedPreferences.Editor ed = prefs.edit();
             ed.putString(TAG, buildTime);
             ed.apply();
@@ -240,19 +242,16 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
     }
 
     private void MakeSYSWriteable(){
-        ShellExecuter exe = new ShellExecuter();
         Log.d(TAG, "Making /system writeable for symlink");
         exe.RunAsRoot(new String[]{"mount -o rw,remount,rw /system"});
     }
 
     private void MakeSYSReadOnly(){
-        ShellExecuter exe = new ShellExecuter();
         Log.d(TAG, "Making /system readonly for symlink");
         exe.RunAsRoot(new String[]{"mount -o ro,remount,ro /system"});
     }
 
     private void NotFound(String filename){
-        ShellExecuter exe = new ShellExecuter();
         Log.d(TAG, "Symlinking " + filename);
         Log.d(TAG, "command output: ln -s " + NhPaths.APP_SCRIPTS_PATH + "/" + filename + " /system/bin/" + filename);
         exe.RunAsRoot(new String[]{"ln -s " + NhPaths.APP_SCRIPTS_PATH + "/" + filename + " /system/bin/" + filename});
@@ -290,6 +289,17 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
         return asset;
     }
 
+    private void disableMagiskNotification(){
+        if (new File(NhPaths.MAGISK_DB_PATH).exists()) {
+            exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_BIN_PATH + "/sqlite3 " +
+                    NhPaths.MAGISK_DB_PATH +
+                    " \"UPDATE policies SET logging='0',notification='0' WHERE package_name='" +
+                    BuildConfig.APPLICATION_ID + "';\"");
+        } else {
+            Log.e(TAG, NhPaths.MAGISK_DB_PATH + " not found, skip disabling the magisk notification for nethunter app.");
+        }
+    }
+
     @Override
     protected void onProgressUpdate(String... progress) {
         super.onProgressUpdate(progress);
@@ -305,8 +315,8 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
         if (listener != null) {
             listener.onAsyncTaskFinished(result);
         }
-
     }
+
     public void setListener(CopyBootFilesAsyncTaskListener listener) {
         this.listener = listener;
     }
