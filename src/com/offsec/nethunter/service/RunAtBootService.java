@@ -32,13 +32,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class RunAtBootService extends IntentService {
+public class RunAtBootService extends JobIntentService {
 
     private static final String TAG = "Nethunter: Startup";
+    static final int SERVICE_JOB_ID = 1;
     private NotificationCompat.Builder n = null;
-    public RunAtBootService(){
-        super("RunAtBootService");
-    }
 
     @Override
     public void onCreate() {
@@ -64,9 +62,16 @@ public class RunAtBootService extends IntentService {
         }
     }
 
-    @Override
-    protected void onHandleIntent(@NonNull Intent intent) {
+    public static void enqueueWork(Context context, Intent work) {
+        enqueueWork(context, RunAtBootService.class, SERVICE_JOB_ID, work);
+    }
 
+    @Override
+    protected void onHandleWork(@NonNull Intent intent) {
+        onHandleIntent(intent);
+    }
+
+    protected void onHandleIntent(@NonNull Intent intent) {
         //1. Check root -> 2. Check Busybox -> 3. run nethunter init.d files. -> Push notifications.
         String isOK = "OK.";
         doNotification("Doing boot checks...");
@@ -122,7 +127,7 @@ public class RunAtBootService extends IntentService {
             );
 
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            if (notificationManager != null){
+            if (notificationManager != null) {
                 notificationManager.createNotificationChannel(serviceChannel);
             }
         }
