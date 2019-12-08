@@ -49,7 +49,7 @@ public class CustomCommandsRecyclerViewAdapter extends RecyclerView.Adapter<Cust
 		itemViewHolder.execEnvTextView.setText(customCommandsModelList.get(position).getRuntimeEnv());
 		itemViewHolder.execModeTextView.setText(customCommandsModelList.get(position).getExecutionMode());
 		itemViewHolder.runOnBootTextView.setText(customCommandsModelList.get(position).getRunOnBoot().equals("1")?"yes":"no");
-		itemViewHolder.editButton.setOnClickListener(v -> {
+		itemViewHolder.commandLabelTextView.setOnLongClickListener(v -> {
 			final ViewGroup nullParent = null;
 			final LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			final View promptViewEdit = mInflater.inflate(R.layout.customcommands_edit_dialog_view, nullParent);
@@ -59,19 +59,19 @@ public class CustomCommandsRecyclerViewAdapter extends RecyclerView.Adapter<Cust
 			final Spinner execModeSpinner = promptViewEdit.findViewById(R.id.f_customcommands_edit_adb_spr_execmode);
 			final CheckBox runOnBootCheckbox = promptViewEdit.findViewById(R.id.f_customcommands_edit_adb_checkbox_runonboot);
 
-            commandLabelEditText.setText(CustomCommandsData.getInstance().customCommandsModelListFull.get(
+			commandLabelEditText.setText(CustomCommandsData.getInstance().customCommandsModelListFull.get(
 					CustomCommandsData.getInstance().customCommandsModelListFull.indexOf(
 							customCommandsModelList.get(position))).getCommandLabel());
-            commandEditText.setText(CustomCommandsData.getInstance().customCommandsModelListFull.get(
+			commandEditText.setText(CustomCommandsData.getInstance().customCommandsModelListFull.get(
 					CustomCommandsData.getInstance().customCommandsModelListFull.indexOf(
 							customCommandsModelList.get(position))).getCommand());
-            sendToSpinner.setSelection(CustomCommandsData.getInstance().customCommandsModelListFull.get(
-                    CustomCommandsData.getInstance().customCommandsModelListFull.indexOf(
-                            customCommandsModelList.get(position))).getRuntimeEnv().equals("android")?0:1);
-            execModeSpinner.setSelection(CustomCommandsData.getInstance().customCommandsModelListFull.get(
-                    CustomCommandsData.getInstance().customCommandsModelListFull.indexOf(
-                            customCommandsModelList.get(position))).getExecutionMode().equals("interactive")?0:1);
-            runOnBootCheckbox.setChecked(CustomCommandsData.getInstance().customCommandsModelListFull.get(
+			sendToSpinner.setSelection(CustomCommandsData.getInstance().customCommandsModelListFull.get(
+					CustomCommandsData.getInstance().customCommandsModelListFull.indexOf(
+							customCommandsModelList.get(position))).getRuntimeEnv().equals("android")?0:1);
+			execModeSpinner.setSelection(CustomCommandsData.getInstance().customCommandsModelListFull.get(
+					CustomCommandsData.getInstance().customCommandsModelListFull.indexOf(
+							customCommandsModelList.get(position))).getExecutionMode().equals("interactive")?0:1);
+			runOnBootCheckbox.setChecked(CustomCommandsData.getInstance().customCommandsModelListFull.get(
 					CustomCommandsData.getInstance().customCommandsModelListFull.indexOf(
 							customCommandsModelList.get(position))).getRunOnBoot().equals("1"));
 
@@ -101,6 +101,7 @@ public class CustomCommandsRecyclerViewAdapter extends RecyclerView.Adapter<Cust
 				});
 			});
 			adEdit.show();
+			return false;
 		});
 		itemViewHolder.runButton.setOnClickListener(v -> CustomCommandsData.getInstance().runCommandforitem(position, context));
 	}
@@ -153,7 +154,7 @@ public class CustomCommandsRecyclerViewAdapter extends RecyclerView.Adapter<Cust
 		private TextView execEnvTextView;
         private TextView execModeTextView;
         private TextView runOnBootTextView;
-		private Button editButton;
+		//private Button editButton;
         private Button runButton;
 
 		private ItemViewHolder(View view){
@@ -162,7 +163,7 @@ public class CustomCommandsRecyclerViewAdapter extends RecyclerView.Adapter<Cust
             execEnvTextView = view.findViewById(R.id.f_customcommands_recyclerview_tv_execenvironment);
             execModeTextView = view.findViewById(R.id.f_customcommands_recyclerview_tv_execmode);
             runOnBootTextView = view.findViewById(R.id.f_customcommands_recyclerview_tv_runonboot);
-            editButton = view.findViewById(R.id.f_customcommands_recyclerview_btn_edit);
+            //editButton = view.findViewById(R.id.f_customcommands_recyclerview_btn_edit);
             runButton = view.findViewById(R.id.f_customcommands_recyclerview_btn_run);
 		}
 	}

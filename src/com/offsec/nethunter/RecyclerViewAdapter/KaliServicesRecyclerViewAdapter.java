@@ -56,7 +56,7 @@ public class KaliServicesRecyclerViewAdapter extends RecyclerView.Adapter<KaliSe
 		itemViewHolder.runOnChrootStartCheckbox.setChecked(kaliServicesModelList.get(position).getRunOnChrootStart().equals("1"));
 		itemViewHolder.mSwitch.setChecked(kaliServicesModelList.get(position).getStatus().startsWith("[+]"));
 		itemViewHolder.statustextView.setText(tempStatusTextView);
-		itemViewHolder.editbutton.setOnClickListener(v -> {
+		itemViewHolder.nametextView.setOnLongClickListener(v -> {
 			final ViewGroup nullParent = null;
 			final LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			final View promptViewEdit = mInflater.inflate(R.layout.kaliservices_edit_dialog_view, nullParent);
@@ -155,6 +155,7 @@ public class KaliServicesRecyclerViewAdapter extends RecyclerView.Adapter<KaliSe
 				});
 			});
 			adEdit.show();
+			return false;
 		});
 
 		itemViewHolder.runOnChrootStartCheckbox.setOnCheckedChangeListener((compoundButton, isChecked) -> {
@@ -225,7 +226,7 @@ public class KaliServicesRecyclerViewAdapter extends RecyclerView.Adapter<KaliSe
 
 	class ItemViewHolder extends RecyclerView.ViewHolder{
 		private TextView nametextView;
-		private Button editbutton;
+		//private Button editbutton;
 		private Switch mSwitch;
 		private CheckBox runOnChrootStartCheckbox;
 		private TextView statustextView;
@@ -233,7 +234,7 @@ public class KaliServicesRecyclerViewAdapter extends RecyclerView.Adapter<KaliSe
 		private ItemViewHolder(View view){
 			super(view);
 			nametextView = view.findViewById(R.id.f_kaliservices_recyclerview_servicetitle_tv);
-			editbutton = view.findViewById(R.id.f_kaliservices_recyclerview_edit_btn);
+			//editbutton = view.findViewById(R.id.f_kaliservices_recyclerview_edit_btn);
 			runOnChrootStartCheckbox = view.findViewById(R.id.f_kaliservices_recyclerview_runonchrootstart_checkbox);
 			mSwitch = view.findViewById(R.id.f_kaliservices_recyclerview_switch_toggle);
 			statustextView = view.findViewById(R.id.f_kaliservices_recyclerview_serviceresult_tv);

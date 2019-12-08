@@ -4,7 +4,8 @@
     <string name="app_nav_home_label">NetHunter</string>
 
     <string name="hometitle">System Information</string>
-    <string name="nethunter_description">Welcome to Kali Linux NetHunter by Offensive Security! This application is designed to make it easier to execute attacks and control services. The navigation menu contains links to useful commands, settings, macros, and attack configuration pages. Most configurations work out of the box but some may require some minimal tweaking.</string>
+    <!--string name="nethunter_description">Welcome to Kali Linux NetHunter by Offensive Security! This application is designed to make it easier to execute attacks and control services. The navigation menu contains links to useful commands, settings, macros, and attack configuration pages. Most configurations work out of the box but some may require some minimal tweaking.</string-->
+    <string name="nethunter_description">You can ADD, DELETE, MOVE, SEARCH, BACKUP, RESTORE and RESET your custom command item. You can also long click on the item label to EDIT the item.</string>
     <string name="nethunter_current_interfaces">Network Interfaces</string>
     <string name="nethunter_external_ip">External IP</string>
     <string name="nethunter_hid_detect">HID Interfaces</string>
@@ -19,14 +20,14 @@
     <string name="hid_windows_cmd_description">This Windows CMD payload allows you to enter raw commands to a Windows command prompt. Hitting the list menu will allow you to choose keyboard layout or UAC bypass options. </string>
 
     <!-- KaliServices -->
-    <string name="kali_services_description">Kali Chroot services can be started and stopped via the switch toggle buttons, you can also ADD, DELETE, MOVE, EDIT, SEARCH, BACKUP, RESTORE and RESET your own service item</string>
+    <string name="kali_services_description">Kali Chroot services can be started and stopped via the switch toggle buttons, you can also ADD, DELETE, MOVE, SEARCH, BACKUP, RESTORE and RESET your own service item, and long click on the item label to EDIT the item as well.</string>
     <string name="kaliservices_howto_startservice">To START a service in kali, a command will be run INSIDE KaliChroot that looks like this:\n\nbusybox chroot &lt;chroot_folder> /usr/bin/sudo &lt;command_to_start_service>\n\nService is considered STARTED if the return value is 0 and vice versa.</string>
     <string name="kaliservices_howto_stopservice">To STOP a service in kali, a command will be run INSIDE KaliChroot that looks like this:\n\nbusybox chroot &lt;chroot_folder> /usr/bin/sudo &lt;command_to_stop_service>\n\nService is considered STOPPED if the return value is 0 and vice versa.</string>
     <string name="kaliservices_howto_checkservice">To Check if a service in kali is up or not, a command will be run OUTSIDE KaliChroot that looks like this:\n\nbusybox ps -o pid,comm | grep \'&lt;service_name>\'\n\nService is considered UP if the return value is 0 and vice versa.</string>
     <string name="kaliservices_howto_runServiceOnBoot">To automacticailly start the service after Kali Chroot is up, check this option.</string>
 
     <!-- CustomCommands -->
-    <string name="custom_commands_description">You can ADD, DELETE, MOVE, EDIT, SEARCH, BACKUP, RESTORE and RESET your custom command item.</string>
+    <string name="custom_commands_description">You can ADD, DELETE, MOVE, SEARCH, BACKUP, RESTORE and RESET your custom command item. You can also long click on the item label to EDIT the item.</string>
     <string-array name="custom_commands_sendto_array">
         <item>android</item>
         <item>kali</item>
@@ -119,7 +120,7 @@
     <string name="toast_install_terminal">Error launching intent. Install Android Terminal!</string>
     <string name="descriptiontext" />
 
-    <string name="macchanger_description">Change the MAC of any network interface.\n\nIt can be randomly generated or manually typed. \n\nThe MAC must contain 6 pair of combinations using the charset: [0–9|a-f] something like:\n\n 00:11:22:ab:cd:ef </string>
+    <string name="macchanger_description">Change the MAC of any network interface.\nIt can be randomly generated or manually typed. \nThe MAC must contain 6 pair of combinations using the charset: [0–9|a-f] something like:\n 00:11:22:ab:cd:ef \n **Please note that Android Q has random MAC feature provided for wlan interface already, so this will not work on Android Version >= 10 </string>
     <string name="interface_select">Pick an interface:</string>
     <string name="macchanger_select">Select macchanger mode:</string>
     <string name="reset_mac">Reset wlan0 MAC address</string>

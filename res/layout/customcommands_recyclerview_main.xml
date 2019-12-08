@@ -13,7 +13,8 @@
         android:layout_height="48dp"
         android:orientation="horizontal"
         android:paddingStart="8dp"
-        android:paddingEnd="8dp">
+        android:paddingEnd="8dp"
+        android:paddingBottom="4dp">
         <TextView
             android:id="@+id/f_customcommands_recyclerview_tv_cmdlabel"
             android:layout_width="match_parent"
@@ -22,16 +23,17 @@
             android:text="Loading.."
             android:textColor="@android:color/background_light"
             android:textSize="20sp"
+            android:background="?attr/selectableItemBackground"
             android:clickable="true"
-            android:focusable="true"
-            android:layout_weight="0.2"/>
-        <Button
+            android:focusable="true"/>
+
+        <!--Button
             android:id="@+id/f_customcommands_recyclerview_btn_edit"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:textColor="@android:color/holo_blue_dark"
             android:layout_weight="0.8"
-            android:text="EDIT"/>
+            android:text="EDIT"/-->
     </LinearLayout>
 
     <LinearLayout
@@ -114,6 +116,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.8"
             android:textColor="@android:color/holo_blue_dark"
+            android:layout_gravity="bottom"
             android:text="RUN"/>
     </LinearLayout>
 
