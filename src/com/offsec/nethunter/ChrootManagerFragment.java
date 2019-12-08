@@ -598,13 +598,16 @@ public class ChrootManagerFragment extends Fragment {
         chrootManagerAsynctask = new ChrootManagerAsynctask(ChrootManagerAsynctask.CHECK_CHROOT);
         chrootManagerAsynctask.setListener(new ChrootManagerAsynctask.ChrootManagerAsyncTaskListener() {
             @Override
-            public void onAsyncTaskPrepare() { }
+            public void onAsyncTaskPrepare() {
+                broadcastBackPressedIntent(false);
+            }
 
             @Override
             public void onAsyncTaskProgressUpdate(int progress) { }
 
             @Override
             public void onAsyncTaskFinished(int resultCode, ArrayList<String> resultString) {
+                broadcastBackPressedIntent(true);
                 setButtonVisibilty(resultCode);
                 setMountStatsTextView(resultCode);
                 setAllButtonEnable(true);
