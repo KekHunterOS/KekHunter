@@ -26,7 +26,7 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
 	private static final String[][] customcommandsData = {
 			{"1", "Update Kali Metapackages",
                     "apt update && apt-get -y upgrade",
-                    "kali", "interactive", "1"},
+                    "kali", "interactive", "0"},
 			{"2", "Launch Wifite",
                     "wifite",
                     "kali", "interactive", "0"},
