@@ -40,7 +40,7 @@ fi
 bklog "[!] Starting user defined Kali services"
 while IFS= read -r line; do
     if [ ! -z "$line" ]; then
-        $BUSYBOX chroot $MNT $CHROOT_EXEC ${line[@]}
+        $BUSYBOX chroot $MNT $CHROOT_EXEC -E PATH=$PATH su -c "$line"
     fi
 done < /data/data/$APP_PGK_NAME/files/scripts/kaliservices
 bklog "[+] Kali services should be started!"

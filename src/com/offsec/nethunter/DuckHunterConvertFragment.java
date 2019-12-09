@@ -136,8 +136,6 @@ public class DuckHunterConvertFragment extends Fragment implements View.OnClickL
     public void onDestroyView() {
         super.onDestroyView();
         editsource = null;
-        context = null;
-        activity = null;
     }
 
     @Override

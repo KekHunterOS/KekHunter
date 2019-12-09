@@ -145,15 +145,14 @@ public class MacchangerFragment extends Fragment {
         currentMacTextView = null;
         currentHostNameTextView = null;
         reloadImageButton = null;
-        context = null;
-        activity = null;
     }
 
     private void genRandomMACAddress() {
         SecureRandom random = new SecureRandom();
         byte[] macAddr = new byte[6];
         random.nextBytes(macAddr);
-        mac1.setText(String.format("%02x", macAddr[0]));
+        //the second-least-significant bit and the least-significant bit of the first octet of the address must be 1 and 0 respectively
+        mac1.setText(String.format("%02x", ((macAddr[0] & 0xfc) | 0x2)));
         mac2.setText(String.format("%02x", macAddr[1]));
         mac3.setText(String.format("%02x", macAddr[2]));
         mac4.setText(String.format("%02x", macAddr[3]));

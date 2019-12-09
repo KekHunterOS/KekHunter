@@ -107,7 +107,7 @@ public class ChrootManagerFragment extends Fragment {
         resultViewerLoggerTextView.setMovementMethod(new ScrollingMovementMethod());
         kaliFolderTextView.setClickable(true);
         kaliFolderTextView.setText(sharedPreferences.getString(SharePrefTag.CHROOT_ARCH_SHAREPREF_TAG, NhPaths.ARCH_FOLDER));
-        LinearLayoutCompat kaliViewFolderlinearLayout = view.findViewById(R.id.f_chrootmanager_viewholder);
+        final LinearLayoutCompat kaliViewFolderlinearLayout = view.findViewById(R.id.f_chrootmanager_viewholder);
         kaliViewFolderlinearLayout.setOnClickListener(view1 -> new AlertDialog.Builder(activity)
                 .setMessage(baseChrootPathTextView.getText().toString() +
                         kaliFolderTextView.getText().toString())
@@ -144,10 +144,7 @@ public class ChrootManagerFragment extends Fragment {
         addMetaPkgButton = null;
         removeChrootButton = null;
         backupChrootButton = null;
-        sharedPreferences = null;
         chrootManagerAsynctask = null;
-        context = null;
-        activity = null;
     }
 
     private void setEditButton(){
@@ -601,13 +598,16 @@ public class ChrootManagerFragment extends Fragment {
         chrootManagerAsynctask = new ChrootManagerAsynctask(ChrootManagerAsynctask.CHECK_CHROOT);
         chrootManagerAsynctask.setListener(new ChrootManagerAsynctask.ChrootManagerAsyncTaskListener() {
             @Override
-            public void onAsyncTaskPrepare() { }
+            public void onAsyncTaskPrepare() {
+                broadcastBackPressedIntent(false);
+            }
 
             @Override
             public void onAsyncTaskProgressUpdate(int progress) { }
 
             @Override
             public void onAsyncTaskFinished(int resultCode, ArrayList<String> resultString) {
+                broadcastBackPressedIntent(true);
                 setButtonVisibilty(resultCode);
                 setMountStatsTextView(resultCode);
                 setAllButtonEnable(true);

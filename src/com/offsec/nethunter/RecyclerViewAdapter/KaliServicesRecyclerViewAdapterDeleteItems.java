@@ -14,22 +14,22 @@ import com.offsec.nethunter.models.KaliServicesModel;
 
 import java.util.List;
 
-public class KaliServicesRecycleViewAdapterDeleteItems extends RecyclerView.Adapter<KaliServicesRecycleViewAdapterDeleteItems.ItemViewHolder>{
+public class KaliServicesRecyclerViewAdapterDeleteItems extends RecyclerView.Adapter<KaliServicesRecyclerViewAdapterDeleteItems.ItemViewHolder>{
 
 	private static final String TAG = "KaliServiceRecycleViewChild";
 	private Context context;
 	private List<KaliServicesModel> kaliServicesModelList;
 
-	public KaliServicesRecycleViewAdapterDeleteItems(Context context, List<KaliServicesModel> kaliServicesModelList){
+	public KaliServicesRecyclerViewAdapterDeleteItems(Context context, List<KaliServicesModel> kaliServicesModelList){
 		this.context = context;
 		this.kaliServicesModelList = kaliServicesModelList;
 	}
 
 	@NonNull
 	@Override
-	public KaliServicesRecycleViewAdapterDeleteItems.ItemViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-		View view = LayoutInflater.from(context).inflate(R.layout.kaliservices_recycleview_dialog_delete, viewGroup, false);
-		return new KaliServicesRecycleViewAdapterDeleteItems.ItemViewHolder(view);
+	public KaliServicesRecyclerViewAdapterDeleteItems.ItemViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+		View view = LayoutInflater.from(context).inflate(R.layout.kaliservices_recyclerview_dialog_delete, viewGroup, false);
+		return new KaliServicesRecyclerViewAdapterDeleteItems.ItemViewHolder(view);
 	}
 
 	@Override
@@ -46,7 +46,7 @@ public class KaliServicesRecycleViewAdapterDeleteItems extends RecyclerView.Adap
 		private CheckBox runOnChrootStartCheckBox;
 		private ItemViewHolder(View view){
 			super(view);
-			runOnChrootStartCheckBox = view.findViewById(R.id.f_kaliservices_recycleview_dialog_chkbox);
+			runOnChrootStartCheckBox = view.findViewById(R.id.f_kaliservices_recyclerview_dialog_chkbox);
 		}
 	}
 

@@ -52,7 +52,7 @@ public class NethunterRecyclerViewAdapter extends RecyclerView.Adapter<Nethunter
         holder.resultRecyclerView.setLayoutManager(linearLayoutManager);
         holder.resultRecyclerView.setAdapter(new NethunterRecyclerViewAdapterResult(context, nethunterModelList.get(position).getResult()));
         holder.runButton.setOnClickListener(v -> NethunterData.getInstance().runCommandforItem(position));
-        holder.editButton.setOnClickListener(v -> {
+        holder.titleTextView.setOnLongClickListener(v -> {
             final ViewGroup nullParent = null;
             final LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             final View promptViewEdit = mInflater.inflate(R.layout.nethunter_edit_dialog_view, nullParent);
@@ -132,6 +132,7 @@ public class NethunterRecyclerViewAdapter extends RecyclerView.Adapter<Nethunter
                 });
             });
             ad.show();
+            return false;
         });
     }
 
@@ -182,13 +183,13 @@ public class NethunterRecyclerViewAdapter extends RecyclerView.Adapter<Nethunter
         private TextView titleTextView;
         private RecyclerView resultRecyclerView;
         private Button runButton;
-        private Button editButton;
+        //private Button editButton;
         private ItemViewHolder(View view) {
             super(view);
             titleTextView = view.findViewById(R.id.f_nethunter_item_title_tv);
-            resultRecyclerView = view.findViewById(R.id.f_nethunter_item_result_recycleview);
+            resultRecyclerView = view.findViewById(R.id.f_nethunter_item_result_recyclerview);
             runButton = view.findViewById(R.id.f_nethunter_item_run_btn);
-            editButton = view.findViewById(R.id.f_nethunter_item_edit_btn);
+            //editButton = view.findViewById(R.id.f_nethunter_item_edit_btn);
         }
     }
 }

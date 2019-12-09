@@ -17,6 +17,7 @@ import com.offsec.nethunter.BuildConfig;
 import com.offsec.nethunter.ChrootManagerFragment;
 import com.offsec.nethunter.KaliServicesFragment;
 import com.offsec.nethunter.R;
+import com.offsec.nethunter.RecyclerViewData.NethunterData;
 import com.offsec.nethunter.utils.CheckForRoot;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.ShellExecuter;
@@ -31,26 +32,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class RunAtBootService extends IntentService {
+public class RunAtBootService extends JobIntentService {
 
     private static final String TAG = "Nethunter: Startup";
-    private final ShellExecuter exe = new ShellExecuter();
-    boolean isAllFine = true;
+    static final int SERVICE_JOB_ID = 1;
     private NotificationCompat.Builder n = null;
-    private HashMap<String, String> hashMap = new HashMap<>();
-    private NhPaths nhPaths;
-
-    public RunAtBootService(){
-        super("RunAtBootService");
-    }
 
     @Override
     public void onCreate() {
         super.onCreate();
+        NhPaths.getInstance(getApplicationContext());
         // Create notification channel first.
         createNotificationChannel();
-        nhPaths = NhPaths.getInstance(getApplicationContext());
-
     }
 
     private void doNotification(String contents) {
@@ -69,13 +62,21 @@ public class RunAtBootService extends IntentService {
         }
     }
 
-    @Override
-    protected void onHandleIntent(@NonNull Intent intent) {
+    public static void enqueueWork(Context context, Intent work) {
+        enqueueWork(context, RunAtBootService.class, SERVICE_JOB_ID, work);
+    }
 
+    @Override
+    protected void onHandleWork(@NonNull Intent intent) {
+        onHandleIntent(intent);
+    }
+
+    protected void onHandleIntent(@NonNull Intent intent) {
         //1. Check root -> 2. Check Busybox -> 3. run nethunter init.d files. -> Push notifications.
         String isOK = "OK.";
         doNotification("Doing boot checks...");
 
+        HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("ROOT", "No root access is granted.");
         hashMap.put("BUSYBOX", "No busybox is found.");
         hashMap.put("KALICHROOT", "kali Chroot is not yet installed.");
@@ -88,6 +89,7 @@ public class RunAtBootService extends IntentService {
             hashMap.put("BUSYBOX", isOK);
         }
 
+        ShellExecuter exe = new ShellExecuter();
         exe.RunAsRootOutput(NhPaths.BUSYBOX + " run-parts " + NhPaths.APP_INITD_PATH);
         if (exe.RunAsRootReturnValue(NhPaths.APP_SCRIPTS_PATH + "/chrootmgr -c \"status\"") == 0){
             // remove possible vnc locks (if the phone is rebooted with the vnc server running)
@@ -98,7 +100,6 @@ public class RunAtBootService extends IntentService {
         String resultMsg = "Boot completed.\nEveryting is fine and Kali Chroot has been started!";
         for(Map.Entry<String, String> entry: hashMap.entrySet()){
             if (!entry.getValue().equals(isOK)){
-                isAllFine = false;
                 resultMsg = "Make sure the above requirements are met.";
                 break;
             }
@@ -114,9 +115,6 @@ public class RunAtBootService extends IntentService {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (nhPaths != null) {
-            nhPaths.onDestroy();
-        }
     }
 
     private void createNotificationChannel() {
@@ -129,7 +127,9 @@ public class RunAtBootService extends IntentService {
             );
 
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(serviceChannel);
+            if (notificationManager != null) {
+                notificationManager.createNotificationChannel(serviceChannel);
+            }
         }
     }
 }

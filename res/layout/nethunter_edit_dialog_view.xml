@@ -29,6 +29,7 @@
                 android:id="@+id/f_nethunter_edit_adb_et_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="text"
                 android:layout_marginStart="4dp"/>
 
             <LinearLayout
@@ -90,13 +91,13 @@
                     app:elevation="6dp"
                     app:fabCustomSize="32dp"
                     app:pressedTranslationZ="12dp" />
-
             </LinearLayout>
 
             <EditText
                 android:id="@+id/f_nethunter_edit_adb_et_delimiter"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="text"
                 android:layout_marginStart="4dp" />
 
             <LinearLayout

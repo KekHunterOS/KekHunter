@@ -31,21 +31,21 @@ import com.offsec.nethunter.utils.NhPaths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class KaliServiceRecycleViewAdapterTitles extends RecyclerView.Adapter<KaliServiceRecycleViewAdapterTitles.ItemViewHolder> implements Filterable {
+public class KaliServicesRecyclerViewAdapter extends RecyclerView.Adapter<KaliServicesRecyclerViewAdapter.ItemViewHolder> implements Filterable {
 	private static final String TAG = "KaliServiceRecycleView";
 	private Context context;
 	private List<KaliServicesModel> kaliServicesModelList;
 
-	public KaliServiceRecycleViewAdapterTitles(Context context, List<KaliServicesModel> kaliServicesModelList){
+	public KaliServicesRecyclerViewAdapter(Context context, List<KaliServicesModel> kaliServicesModelList){
 		this.context = context;
 		this.kaliServicesModelList = kaliServicesModelList;
 	}
 
 	@NonNull
 	@Override
-	public KaliServiceRecycleViewAdapterTitles.ItemViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-		View view = LayoutInflater.from(context).inflate(R.layout.kaliservices_recycleview_servicetitle, viewGroup, false);
-		return new KaliServiceRecycleViewAdapterTitles.ItemViewHolder(view);
+	public KaliServicesRecyclerViewAdapter.ItemViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+		View view = LayoutInflater.from(context).inflate(R.layout.kaliservices_recyclerview_servicetitle, viewGroup, false);
+		return new KaliServicesRecyclerViewAdapter.ItemViewHolder(view);
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public class KaliServiceRecycleViewAdapterTitles extends RecyclerView.Adapter<Ka
 		itemViewHolder.runOnChrootStartCheckbox.setChecked(kaliServicesModelList.get(position).getRunOnChrootStart().equals("1"));
 		itemViewHolder.mSwitch.setChecked(kaliServicesModelList.get(position).getStatus().startsWith("[+]"));
 		itemViewHolder.statustextView.setText(tempStatusTextView);
-		itemViewHolder.editbutton.setOnClickListener(v -> {
+		itemViewHolder.nametextView.setOnLongClickListener(v -> {
 			final ViewGroup nullParent = null;
 			final LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			final View promptViewEdit = mInflater.inflate(R.layout.kaliservices_edit_dialog_view, nullParent);
@@ -155,6 +155,7 @@ public class KaliServiceRecycleViewAdapterTitles extends RecyclerView.Adapter<Ka
 				});
 			});
 			adEdit.show();
+			return false;
 		});
 
 		itemViewHolder.runOnChrootStartCheckbox.setOnCheckedChangeListener((compoundButton, isChecked) -> {
@@ -225,18 +226,18 @@ public class KaliServiceRecycleViewAdapterTitles extends RecyclerView.Adapter<Ka
 
 	class ItemViewHolder extends RecyclerView.ViewHolder{
 		private TextView nametextView;
-		private Button editbutton;
+		//private Button editbutton;
 		private Switch mSwitch;
 		private CheckBox runOnChrootStartCheckbox;
 		private TextView statustextView;
 
 		private ItemViewHolder(View view){
 			super(view);
-			nametextView = view.findViewById(R.id.f_kaliservices_recycleview_servicetitle_tv);
-			editbutton = view.findViewById(R.id.f_kaliservices_recycleview_edit_btn);
-			runOnChrootStartCheckbox = view.findViewById(R.id.f_kaliservices_recycleview_runonchrootstart_checkbox);
-			mSwitch = view.findViewById(R.id.f_kaliservices_recycleview_switch_toggle);
-			statustextView = view.findViewById(R.id.f_kaliservices_recycleview_serviceresult_tv);
+			nametextView = view.findViewById(R.id.f_kaliservices_recyclerview_servicetitle_tv);
+			//editbutton = view.findViewById(R.id.f_kaliservices_recyclerview_edit_btn);
+			runOnChrootStartCheckbox = view.findViewById(R.id.f_kaliservices_recyclerview_runonchrootstart_checkbox);
+			mSwitch = view.findViewById(R.id.f_kaliservices_recyclerview_switch_toggle);
+			statustextView = view.findViewById(R.id.f_kaliservices_recyclerview_serviceresult_tv);
 		}
 	}
 }

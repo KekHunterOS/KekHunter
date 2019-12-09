@@ -3,7 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="5dp">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -24,10 +25,10 @@
                 android:layout_marginStart="4dp"
                 android:textSize="18sp"
                 android:textColor="@color/accent_material_dark"
-                android:text="Title:"/>
+                android:text="Label:"/>
 
             <EditText
-                android:id="@+id/f_kaliservices_add_adb_et_title"
+                android:id="@+id/f_customcommands_add_adb_et_label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
@@ -43,119 +44,80 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
-                    android:layout_weight="0.9"
                     android:textSize="18sp"
                     android:textColor="@color/accent_material_dark"
-                    android:text="Command for starting the service:"/>
+                    android:text="Command:"/>
 
-                <com.google.android.material.floatingactionbutton.FloatingActionButton xmlns:app="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/f_kaliservices_add_btn_info_fab1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.1"
-                    android:src="@drawable/ic_action_information"
-                    android:textSize="12sp"
-                    android:layout_marginEnd="8dp"
-                    app:elevation="6dp"
-                    app:fabCustomSize="32dp"
-                    app:pressedTranslationZ="12dp" />
             </LinearLayout>
 
             <EditText
-                android:id="@+id/f_kaliservices_add_adb_et_startcommand"
+                android:id="@+id/f_customcommands_add_adb_et_command"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"/>
+                android:layout_marginStart="4dp"
+                android:hint="Enter your command string here"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_marginBottom="4dp">
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
-                    android:layout_weight="0.9"
+                    android:layout_weight="0.4"
                     android:textSize="18sp"
                     android:textColor="@color/accent_material_dark"
-                    android:text="Command for stopping the service:"/>
+                    android:text="Send to:"/>
 
-                <com.google.android.material.floatingactionbutton.FloatingActionButton xmlns:app="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/f_kaliservices_add_btn_info_fab2"
-                    android:layout_width="wrap_content"
+                <Spinner
+                    android:id="@+id/f_customcommands_add_adb_spr_sendto"
+                    android:entries="@array/custom_commands_sendto_array"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.1"
-                    android:src="@drawable/ic_action_information"
-                    android:textSize="12sp"
-                    android:layout_marginEnd="8dp"
-                    app:elevation="6dp"
-                    app:fabCustomSize="32dp"
-                    app:pressedTranslationZ="12dp" />
+                    android:layout_weight="0.6" />
             </LinearLayout>
-            <EditText
-                android:id="@+id/f_kaliservices_add_adb_et_stopcommand"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_marginBottom="4dp">
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
-                    android:layout_weight="0.9"
+                    android:layout_weight="0.4"
                     android:textSize="18sp"
                     android:textColor="@color/accent_material_dark"
-                    android:text="String for checking the service:"/>
+                    android:text="Exec mode:"/>
 
-                <com.google.android.material.floatingactionbutton.FloatingActionButton xmlns:app="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/f_kaliservices_add_btn_info_fab3"
-                    android:layout_width="wrap_content"
+                <Spinner
+                    android:id="@+id/f_customcommands_add_adb_spr_execmode"
+                    android:entries="@array/custom_commands_execmode_array"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.1"
-                    android:src="@drawable/ic_action_information"
-                    android:textSize="12sp"
-                    android:layout_marginEnd="8dp"
-                    app:elevation="6dp"
-                    app:fabCustomSize="32dp"
-                    app:pressedTranslationZ="12dp" />
+                    android:layout_weight="0.6" />
+
             </LinearLayout>
-
-
-            <EditText
-                android:id="@+id/f_kaliservices_add_adb_et_checkstatuscommand"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_marginBottom="4dp">
 
                 <CheckBox
-                    android:id="@+id/f_kaliservices_add_adb_checkbox_runonboot"
+                    android:id="@+id/f_customcommands_add_adb_checkbox_runonboot"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="RunOnChrootStart"
+                    android:text="RunOnBoot"
                     android:textSize="18sp"
                     android:textColor="@color/accent_material_dark"
                     android:layout_marginStart="4dp"/>
 
-                <com.google.android.material.floatingactionbutton.FloatingActionButton xmlns:app="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/f_kaliservices_add_btn_info_fab4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_action_information"
-                    android:layout_marginStart="8dp"
-                    android:textSize="12sp"
-                    app:elevation="6dp"
-                    app:fabCustomSize="32dp"
-                    app:pressedTranslationZ="12dp" />
             </LinearLayout>
 
 
@@ -174,14 +136,14 @@
                 android:orientation="horizontal"
                 android:layout_marginTop="10dp">
                 <Spinner
-                    android:id="@+id/f_kaliservices_add_adb_spr_positions"
+                    android:id="@+id/f_customcommands_add_adb_spr_positions"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
                     android:entries="@array/array_insert_position">
                 </Spinner>
                 <Spinner
-                    android:id="@+id/f_kaliservices_add_adb_spr_titles"
+                    android:id="@+id/f_customcommands_add_adb_spr_labels"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp">

@@ -29,24 +29,52 @@ IFACE=$1
 MACADDRESS=$2
 bklog "[!] Changing Mac address for wlan0 now"
 
-settings put global airplane_mode_on 1
-am broadcast -a android.intent.action.AIRPLANE_MODE --ez state true
-sleep 5
-settings put global airplane_mode_on 0
-am broadcast -a android.intent.action.AIRPLANE_MODE --ez state false
+ANDROID_VER=$(getprop ro.build.version.release)
+## example mac: b2:c9:94:22:28:88
 
-CURRENT_TIME=$(data +%s)
-while true; do
-    if $BUSYBOX ip link set dev $IFACE address $MACADDRESS 2>/dev/null; then
-        svc wifi enable
-        bklog "[+] Completed."
-        return 0
-    else
-        if [ $(($(data +%s) - $CURRENT_TIME)) -lt 10 ]; then
-            continue
+if [ ${ANDROID_VER//\.*} -ge 10 ]; then
+    bklog "[!] Your device is running android version >= 10, using soft change method."
+    svc wifi disable
+    svc wifi enable
+    bklog "[!] Wait about 5 seconds before soft shutdown on $IFACE"
+    sleep 5
+    $BUSYBOX ip link set dev $IFACE down
+    CURRENT_TIME=$(date +%s)
+    while true; do
+        if $BUSYBOX ip link set dev $IFACE address $MACADDRESS 2>/dev/null; then
+            svc wifi enable
+            bklog "[+] Completed."
+            break
         else
-            return 1
+            if [ $(($(date +%s) - $CURRENT_TIME)) -lt 10 ]; then
+                continue
+            else
+                exit 1
+            fi
         fi
-    fi
-done
-
+    done
+    sleep 1
+    $BUSYBOX ip link set dev $IFACE up
+    exit 0
+else
+    bklog "[!] Your device is running android version < 10, using hard change method."
+    settings put global airplane_mode_on 1
+    am broadcast -a android.intent.action.AIRPLANE_MODE --ez state true
+    sleep 5
+    settings put global airplane_mode_on 0
+    am broadcast -a android.intent.action.AIRPLANE_MODE --ez state false
+    CURRENT_TIME=$(date +%s)
+    while true; do
+        if $BUSYBOX ip link set dev $IFACE address $MACADDRESS 2>/dev/null; then
+            svc wifi enable
+            bklog "[+] Completed."
+            exit 0
+        else
+            if [ $(($(date +%s) - $CURRENT_TIME)) -lt 10 ]; then
+                continue
+            else
+                exit 1
+            fi
+        fi
+    done
+fi

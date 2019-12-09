@@ -17,12 +17,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.offsec.nethunter.AsyncTask.CopyBootFilesAsyncTask;
+import com.offsec.nethunter.SQL.CustomCommandsSQL;
+import com.offsec.nethunter.SQL.KaliServicesSQL;
+import com.offsec.nethunter.SQL.NethunterSQL;
 import com.offsec.nethunter.gps.KaliGPSUpdates;
 import com.offsec.nethunter.gps.LocationUpdateService;
 import com.offsec.nethunter.service.CompatCheckService;
@@ -62,10 +67,8 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     private NavigationView navigationView;
     private CharSequence mTitle = "NetHunter";
     private Stack<String> titles = new Stack<>();
-    private static SharedPreferences prefs;
+    private SharedPreferences prefs;
     public static MenuItem lastSelectedMenuItem;
-    public Context context;
-    public Activity activity;
     private boolean locationUpdatesRequested = false;
     private KaliGPSUpdates.Receiver locationUpdateReceiver;
     private NhPaths nhPaths;
@@ -78,14 +81,13 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        this.context = getApplicationContext();
-        this.activity = this;
 
         // Initiate the NhPaths singleton class, and it will then keep living until the app dies.
         // Also with its sharepreference listener registered, the CHROOT_PATH variable can be updated immediately on sharepreference changes.
-        nhPaths = NhPaths.getInstance(context);
+        nhPaths = NhPaths.getInstance(getApplicationContext());
+
         // Initiate the PermissionCheck class.
-        permissionCheck = new PermissionCheck(activity, context);
+        permissionCheck = new PermissionCheck(this, getApplicationContext());
         // Register the nethunter receiver with intent actions.
         nethunterReceiver = new NethunterReceiver();
         IntentFilter AppNavHomeIntentFilter = new IntentFilter();
@@ -93,13 +95,13 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         AppNavHomeIntentFilter.addAction(NethunterReceiver.BACKPRESSED);
         AppNavHomeIntentFilter.addAction(NethunterReceiver.CHECKCHROOT);
         AppNavHomeIntentFilter.addAction("ChrootManager");
-        activity.registerReceiver(nethunterReceiver, new IntentFilter(AppNavHomeIntentFilter));
+        this.registerReceiver(nethunterReceiver, new IntentFilter(AppNavHomeIntentFilter));
         // initiate prefs.
         prefs = getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
 
         // Start copying the app files to the corresponding path.
-        ProgressDialog progressDialog = new ProgressDialog(activity);
-        CopyBootFilesAsyncTask copyBootFilesAsyncTask = new CopyBootFilesAsyncTask(context, activity, progressDialog);
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        CopyBootFilesAsyncTask copyBootFilesAsyncTask = new CopyBootFilesAsyncTask(getApplicationContext(), this, progressDialog);
         copyBootFilesAsyncTask.setListener(new CopyBootFilesAsyncTask.CopyBootFilesAsyncTaskListener() {
             @Override
             public void onAsyncTaskPrepare() {
@@ -111,6 +113,13 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
 
                 // Fetch the busybox path again after the busybox_nh is copied.
                 NhPaths.BUSYBOX = NhPaths.getBusyboxPath();
+
+                // Now Initate all SQL singleton in MainActivity so that it can be less lagged when switching fragments,
+                // because it takes time to retrive data from database.
+                NethunterSQL.getInstance(getApplicationContext());
+                KaliServicesSQL.getInstance(getApplicationContext());
+                CustomCommandsSQL.getInstance(getApplicationContext());
+
                 // Setup the default SharePreference value.
                 setDefaultSharePreference();
 
@@ -126,7 +135,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                 }
 
                 // Thirdly, check if nethunter terminal app has been installed.
-                if (context.getPackageManager().getLaunchIntentForPackage("com.offsec.nhterm") == null) {
+                if (getApplicationContext().getPackageManager().getLaunchIntentForPackage("com.offsec.nhterm") == null) {
                     showWarningDialog("Nethunter app cannot be run properly", "Nethunter terminal is not installed yet.", true);
                 }
 
@@ -141,7 +150,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
 
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
@@ -262,7 +271,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     @Override
     protected void onStart() {
         super.onStart();
-        if (navigationView != null) startService(new Intent(context, CompatCheckService.class));
+        if (navigationView != null) startService(new Intent(getApplicationContext(), CompatCheckService.class));
     }
 
     @Override
@@ -291,8 +300,9 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         mDrawerLayout = findViewById(R.id.drawer_layout);
 
         navigationView = findViewById(R.id.navigation_view);
+        final ViewGroup nullParent = null;
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        LinearLayout navigationHeadView = (LinearLayout) inflater.inflate(R.layout.sidenav_header, null);
+        LinearLayout navigationHeadView = (LinearLayout) inflater.inflate(R.layout.sidenav_header, nullParent);
         navigationView.addHeaderView(navigationHeadView);
 
         FloatingActionButton readmeButton = navigationHeadView.findViewById(R.id.info_fab);
@@ -318,7 +328,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             // detail for android 5 devices
-            getWindow().setStatusBarColor(ContextCompat.getColor(activity, R.color.darkTitle));
+            getWindow().setStatusBarColor(ContextCompat.getColor(this, R.color.darkTitle));
         }
 
         getSupportFragmentManager()
@@ -342,10 +352,10 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
             lastSelectedMenuItem = navigationView.getMenu().getItem(0);
             lastSelectedMenuItem.setChecked(true);
         }
-        mDrawerToggle = new ActionBarDrawerToggle(activity, mDrawerLayout, R.string.drawer_opened, R.string.drawer_closed);
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.drawer_opened, R.string.drawer_closed);
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
-        startService(new Intent(context, CompatCheckService.class));
+        startService(new Intent(getApplicationContext(), CompatCheckService.class));
     }
 
     private void checkUpdate() {
@@ -369,7 +379,9 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                 .setNegativeButton("Close", (dialog, which) -> dialog.cancel()); //nhwarning
         AlertDialog ad = adb.create();
         ad.setCancelable(false);
-        ad.getWindow().getAttributes().windowAnimations = R.style.DialogStyle;
+        if (ad.getWindow() != null) {
+            ad.getWindow().getAttributes().windowAnimations = R.style.DialogStyle;
+        }
         ad.show();
     }
 
@@ -438,7 +450,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                             changeFragment(fragmentManager, MITMfFragment.newInstance(itemId));
                             break;
                         case R.id.vnc_item:
-                            if (context.getPackageManager().getLaunchIntentForPackage("com.offsec.nhvnc") == null) {
+                            if (getApplicationContext().getPackageManager().getLaunchIntentForPackage("com.offsec.nhvnc") == null) {
                                 showWarningDialog("", "Nethunter VNC is not installed yet.", false);
                             } else {
                                 if (!permissionCheck.isAllPermitted(PermissionCheck.NH_VNC_PERMISSIONS)) {
@@ -521,7 +533,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     }
 
     public void showWarningDialog(String title, String message, boolean NeedToExit) {
-        android.app.AlertDialog.Builder warningAD = new android.app.AlertDialog.Builder(activity);
+        android.app.AlertDialog.Builder warningAD = new android.app.AlertDialog.Builder(this);
         warningAD.setCancelable(false);
         warningAD.setTitle(title);
         warningAD.setMessage(message);
@@ -569,7 +581,11 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                                 }
                             }
                         } catch (Exception e) {
-                            Log.e(AppNavHomeActivity.TAG, e.getMessage());
+                            if (e.getMessage() != null) {
+                                Log.e(AppNavHomeActivity.TAG, e.getMessage());
+                            } else {
+                                Log.e(AppNavHomeActivity.TAG, "e.getMessage is Null.");
+                            }
                         }
                         break;
                 }
