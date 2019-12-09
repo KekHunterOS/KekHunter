@@ -198,7 +198,7 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
     }
 
     private void copyFile(String TARGET_BASE_PATH, String filename) {
-        if (filename.matches("^.*kaliservices$|^.*runonboot_services")){
+        if (filename.matches("^.*/kaliservices$|^.*/runonboot_services$")){
             return;
         }
         AssetManager assetManager = context.get().getAssets();
@@ -291,10 +291,13 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
 
     private void disableMagiskNotification(){
         if (new File(NhPaths.MAGISK_DB_PATH).exists()) {
-            exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_BIN_PATH + "/sqlite3 " +
+            Log.d(TAG, "Disabling magisk notifcication and log for nethunter app.");
+            if (exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_BIN_PATH + "/sqlite3 " +
                     NhPaths.MAGISK_DB_PATH +
                     " \"UPDATE policies SET logging='0',notification='0' WHERE package_name='" +
-                    BuildConfig.APPLICATION_ID + "';\"");
+                    BuildConfig.APPLICATION_ID + "';\"").isEmpty()) {
+                Log.d(TAG, "Updated magisk db successfully.");
+            } else { Log.e(TAG, "Failed updating to magisk db."); }
         } else {
             Log.e(TAG, NhPaths.MAGISK_DB_PATH + " not found, skip disabling the magisk notification for nethunter app.");
         }
