@@ -32,7 +32,6 @@ dependencies {
     implementation 'joda-time:joda-time:2.10.4'
     implementation 'com.google.guava:guava:24.1-jre'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.1.0'
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.0-beta-3'
 }
 
 android {
@@ -52,8 +51,8 @@ android {
     defaultConfig {
         minSdkVersion 17
         targetSdkVersion 29
-        versionCode 2019040010
-        versionName "2019.4-RC10"
+        versionCode 2012010003
+        versionName "2020.1-rc4"
         multiDexEnabled true
     }
 

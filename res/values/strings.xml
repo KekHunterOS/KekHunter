@@ -168,6 +168,9 @@
         <item>adb</item>
     </string-array>
 
+    <!-- KeX -->
+    <string name="kex_description">Welcome to the Kali NetHunter Desktop Experience.\nYou can add, save, and restore your own custom resolutions, start KeX at boot, and even output your screen to HDMI!</string>
+
     <!-- MITMf -->
     <string name="mitmf_description">Written by @byt3bl33d3r, MITMf aims to provide a one-stop-shop for Man-In-The-Middle and network attacks while updating and improving existing attacks and techniques.</string>
     <string-array name="mitmf_interface_array">
@@ -276,7 +279,7 @@
     <string name="drawertitlekaliservices">Kali Services</string>
     <string name="drawertitlecustomcommands">Custom Commands</string>
     <string name="drawertitlemacchanger">MAC Changer</string>
-    <string name="drawertitlevncmanager">VNC Manager</string>
+    <string name="drawertitlevncmanager">KeX Manager</string>
     <string name="drawertitlehid">HID Attacks</string>
     <string name="drawertitleduckhunter">DuckHunter HID</string>
     <string name="drawertitlebadusb">Bad USB MITM Attack</string>
