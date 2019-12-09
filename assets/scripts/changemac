@@ -1,0 +1,80 @@
+#!/system/bin/sh
+
+######### IMPORT BOOTKALI ENVIRONMENT #########
+SCRIPT_PATH=$(readlink -f $0)
+. ${SCRIPT_PATH%/*}/bootkali_log
+. ${SCRIPT_PATH%/*}/bootkali_env
+
+## Validate busybox path.
+if [ -z "$BUSYBOX" ]; then
+    bklog "[-] No busybox_nh is installed or busybox is not granted execute permission, if you did have it installed, please symlink it to /system/bin and grant it the permission."
+    exit 1
+fi
+
+function show_usage() {
+    bklog "[!] Usage: sh changemac [interface_name] [mac_address](must be in XX:XX:XX:XX:XX:XX format)"
+}
+
+if [ -z "$1" -o -z "$2" ]; then
+    show_usage
+    exit 1
+fi
+
+if echo "$2" | $BUSYBOX grep "[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}"; then
+    show_usage
+    exit 1
+fi
+
+IFACE=$1
+MACADDRESS=$2
+bklog "[!] Changing Mac address for wlan0 now"
+
+ANDROID_VER=$(getprop ro.build.version.release)
+## example mac: b2:c9:94:22:28:88
+
+if [ ${ANDROID_VER//\.*} -ge 10 ]; then
+    bklog "[!] Your device is running android version >= 10, using soft change method."
+    svc wifi disable
+    svc wifi enable
+    bklog "[!] Wait about 5 seconds before soft shutdown on $IFACE"
+    sleep 5
+    $BUSYBOX ip link set dev $IFACE down
+    CURRENT_TIME=$(date +%s)
+    while true; do
+        if $BUSYBOX ip link set dev $IFACE address $MACADDRESS 2>/dev/null; then
+            svc wifi enable
+            bklog "[+] Completed."
+            break
+        else
+            if [ $(($(date +%s) - $CURRENT_TIME)) -lt 10 ]; then
+                continue
+            else
+                exit 1
+            fi
+        fi
+    done
+    sleep 1
+    $BUSYBOX ip link set dev $IFACE up
+    exit 0
+else
+    bklog "[!] Your device is running android version < 10, using hard change method."
+    settings put global airplane_mode_on 1
+    am broadcast -a android.intent.action.AIRPLANE_MODE --ez state true
+    sleep 5
+    settings put global airplane_mode_on 0
+    am broadcast -a android.intent.action.AIRPLANE_MODE --ez state false
+    CURRENT_TIME=$(date +%s)
+    while true; do
+        if $BUSYBOX ip link set dev $IFACE address $MACADDRESS 2>/dev/null; then
+            svc wifi enable
+            bklog "[+] Completed."
+            exit 0
+        else
+            if [ $(($(date +%s) - $CURRENT_TIME)) -lt 10 ]; then
+                continue
+            else
+                exit 1
+            fi
+        fi
+    done
+fi

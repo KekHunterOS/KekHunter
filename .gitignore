@@ -18,6 +18,8 @@ proguard/
 # Log Files
 *.log
 !assets/scripts/*
+# Debug folder
+debug/
 
 *.pydevproject
 .project

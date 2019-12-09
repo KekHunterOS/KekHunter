@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/f_kaliservices_banner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:layout_gravity="center_horizontal|center"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="parent"
+        android:text="@string/kali_services_description" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/f_kaliservices_scrollView"
+        android:scrollbars="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="4dp"
+        app:layout_constraintTop_toBottomOf="@+id/f_kaliservices_banner"
+        app:layout_constraintBottom_toTopOf="@+id/f_kaliservices_btn_scrollView">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/f_kaliservices_recyclerviewServiceTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            </androidx.recyclerview.widget.RecyclerView>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <HorizontalScrollView
+        android:id="@+id/f_kaliservices_btn_scrollView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
+        android:scrollbars="none"
+        app:layout_constraintTop_toBottomOf="@+id/f_kaliservices_scrollView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:id="@+id/f_kaliservices_linearlayoutBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/f_kaliservices_refreshButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@android:style/Holo.Light.ButtonBar"
+                android:text="Refresh" />
+
+            <Button
+                android:id="@+id/f_kaliservices_addItemButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@android:style/Holo.Light.ButtonBar"
+                android:text="Add" />
+
+            <Button
+                android:id="@+id/f_kaliservices_deleteItemButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@android:style/Holo.Light.ButtonBar"
+                android:text="Delete" />
+
+            <Button
+                android:id="@+id/f_kaliservices_moveItemButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@android:style/Holo.Light.ButtonBar"
+                android:text="Move" />
+
+        </LinearLayout>
+    </HorizontalScrollView>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

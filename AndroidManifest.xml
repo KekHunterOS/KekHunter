@@ -17,7 +17,8 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE"/>
 
     <supports-screens
         android:anyDensity="true"
@@ -45,7 +46,6 @@
             android:theme="@style/Theme.Nethunter">
             <intent-filter android:label="@string/app_nav_home_label">
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
@@ -59,6 +59,7 @@
                 android:minHeight="320dp"
                 android:minWidth="480dp" />
         </activity>
+
         <activity
             android:name=".EditSourceActivity"
             android:label="Edit Source"
@@ -78,17 +79,43 @@
                 android:value=".DeAuthWhitelistActivity" />
         </activity>
 
-        <receiver android:name=".receiver.BootCompletedReceiver">
+        <receiver android:name=".receiver.BootCompletedReceiver"
+            android:enabled="true"
+            android:exported="true">
             <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.ACTION_BOOT_COMPLETED" />
+                <action android:name="android.intent.action.REBOOT" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="android.intent.action.ACTION_SHUTDOWN" />
             </intent-filter>
         </receiver>
 
         <service
+            android:name=".service.CompatCheckService"
+            android:enabled="true"
+            android:exported="false"/>
+        <service
+            android:name=".service.NotificationChannelService"
+            android:enabled="true"
+            android:exported="false"/>
+        <service
             android:name=".service.RunAtBootService"
+            android:enabled="true"
             android:exported="false"
-            android:permission="android.permission.BIND_JOB_SERVICE"
-            android:process=":runAtBoot" />
+            android:permission="android.permission.BIND_JOB_SERVICE"/>
+        <!--service
+            android:name=".service.DummyAccessibilityService"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/dummy_accessibility_service"/>
+        </service-->
         <service
             android:name=".gps.LocationUpdateService"
             android:enabled="true"

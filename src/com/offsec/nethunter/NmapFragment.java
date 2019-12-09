@@ -52,7 +52,6 @@ public class NmapFragment extends Fragment {
     private EditText searchBar;
     private EditText portsBar;
     private Context context;
-    private NhPaths nh;
 
     public NmapFragment() {
     }
@@ -69,7 +68,6 @@ public class NmapFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = getContext();
-        nh = new NhPaths();
     }
 
     @Override
@@ -78,7 +76,7 @@ public class NmapFragment extends Fragment {
         // Default advanced options as invisible
         final LinearLayout AdvLayout = rootView.findViewById(R.id.nmap_adv_layout);
         AdvLayout.setVisibility(View.GONE);
-        SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+        SharedPreferences sharedpreferences = context.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
 
         // Switch to activate open/close of advanced options
         Switch advswitch = rootView.findViewById(R.id.nmap_adv_switch);
@@ -443,7 +441,7 @@ public class NmapFragment extends Fragment {
             intent.putExtra("com.offsec.nhterm.iInitialCommand", command);
             startActivity(intent);
         } catch (Exception e) {
-            nh.showMessage(context, getString(R.string.toast_install_terminal));
+            NhPaths.showMessage(context, getString(R.string.toast_install_terminal));
         }
     }
 }

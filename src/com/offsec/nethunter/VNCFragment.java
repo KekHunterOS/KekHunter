@@ -41,7 +41,6 @@ public class VNCFragment extends Fragment {
     private String localhostonly = "";
     private Context context;
     private Activity activity;
-    private NhPaths nh = new NhPaths();
     private static final String ARG_SECTION_NUMBER = "section_number";
     private String selected_res;
     private String selected_vncres;
@@ -69,17 +68,12 @@ public class VNCFragment extends Fragment {
         super.onCreate(savedInstanceState);
         context = getContext();
         activity = getActivity();
-        nh = new NhPaths();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.vnc_setup, container, false);
-        View AdvancedView = rootView.findViewById(R.id.AdvancedView);
-        Button Advanced = rootView.findViewById(R.id.AdvancedButton);
-        CheckBox localhostCheckBox = rootView.findViewById(R.id.vnc_checkBox);
-        //    super.onActivityCreated(savedInstanceState);
-        SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+        SharedPreferences sharedpreferences = context.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
 
         confirm_res = sharedpreferences.getBoolean("confirm_res", false);
         if (confirm_res) {
@@ -520,7 +514,7 @@ public class VNCFragment extends Fragment {
                 startActivity(intent);
         } catch (Exception e) {
             Log.d("errorLaunching", e.toString());
-            nh.showMessage(context, "NetHunter KeX client not found. Please install it from NetHunter Store!");
+            NhPaths.showMessage(context, "NetHunter VNC not found!");
         }
     }
 
@@ -532,7 +526,7 @@ public class VNCFragment extends Fragment {
             intent.putExtra("com.offsec.nhterm.iInitialCommand", command);
             startActivity(intent);
         } catch (Exception e) {
-            nh.showMessage(context, getString(R.string.toast_install_terminal));
+            NhPaths.showMessage(context, getString(R.string.toast_install_terminal));
 
         }
     }

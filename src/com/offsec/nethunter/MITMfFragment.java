@@ -61,7 +61,6 @@ public class MITMfFragment extends Fragment {
     String M_Responder_WRedir; // --wredir
 
 
-    private NhPaths nh;
     private Context context;
     private Activity activity;
     private static final String ARG_SECTION_NUMBER = "section_number";
@@ -79,7 +78,6 @@ public class MITMfFragment extends Fragment {
         super.onCreate(savedInstanceState);
         context = getContext();
         activity = getActivity();
-        nh = new NhPaths();
     }
 
     @Override
@@ -130,14 +128,14 @@ public class MITMfFragment extends Fragment {
         }
 
         intentClickListener_NH("mitmf " + sb.toString());
-        nh.showMessage(context, "MITMf Started!");
+        NhPaths.showMessage(context, "MITMf Started!");
     }
 
     private void stop() {
         ShellExecuter exe = new ShellExecuter();
         String[] command = new String[1];
         exe.RunAsRoot(command);
-        nh.showMessage(context, "MITMf Stopped!");
+        NhPaths.showMessage(context, "MITMf Stopped!");
     }
     /* Stop execution menu */
 
@@ -460,7 +458,6 @@ public class MITMfFragment extends Fragment {
 
     public static class MITMfConfigFragment extends Fragment {
         private Context context;
-        private NhPaths nh;
         private String configFilePath;
         final ShellExecuter exe = new ShellExecuter();
 
@@ -468,8 +465,7 @@ public class MITMfFragment extends Fragment {
         public void onCreate(@Nullable Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             context = getContext();
-            nh = new NhPaths();
-            configFilePath = nh.CHROOT_PATH + "/etc/mitmf/mitmf.conf";
+            configFilePath = NhPaths.CHROOT_PATH() + "/etc/mitmf/mitmf.conf";
         }
 
         @Override
@@ -488,9 +484,9 @@ public class MITMfFragment extends Fragment {
             button.setOnClickListener(v -> {
                 Boolean isSaved = exe.SaveFileContents(source.getText().toString(), configFilePath);
                 if (isSaved) {
-                    nh.showMessage(context, "Source updated");
+                    NhPaths.showMessage(context, "Source updated");
                 } else {
-                    nh.showMessage(context, "Source not updated");
+                    NhPaths.showMessage(context, "Source not updated");
                 }
             });
             return rootView;
@@ -513,7 +509,7 @@ public class MITMfFragment extends Fragment {
             intent.putExtra("com.offsec.nhterm.iInitialCommand", command);
             startActivity(intent);
         } catch (Exception e) {
-            nh.showMessage(context, getString(R.string.toast_install_terminal));
+            NhPaths.showMessage(context, getString(R.string.toast_install_terminal));
         }
     }
 }

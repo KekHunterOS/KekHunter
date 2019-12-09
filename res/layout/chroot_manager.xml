@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/fragment_chrootmanager">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        android:id="@+id/f_chrootmanager_viewholder">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="12dp"
+                android:gravity="bottom"
+                android:layout_weight="0.9"
+                android:text="Click EDIT button to change your Kali Chroot Path below."/>
+            <Button
+                android:id="@+id/f_chrootmanager_edit_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="0.1"
+                android:text="EDIT"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+            <LinearLayout
+                android:id="@+id/f_chrootmanager_chrootpath_linearlayout"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:layout_weight="0.9">
+                <TextView
+                    android:id="@+id/f_chrootmanager_base_path_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:text="KaliChrootPath: /data/local/nhsystem/"
+                    android:textColor="@android:color/background_light"
+                    android:enabled="false"/>
+                <TextView
+                    android:id="@+id/f_chrootmanager_kalifolder_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:text="kali-arm64"
+                    android:singleLine="true"
+                    android:textColor="@android:color/background_light"/>
+            </LinearLayout>
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/f_chrootmanager_dummy_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Status:"
+                android:textColor="@android:color/background_light"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="4dp" />
+
+            <TextView
+                android:id="@+id/f_chrootmanager_mountresult_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Loading..."
+                android:layout_marginEnd="12dp" />
+
+
+        </LinearLayout>
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <TextView
+        android:id="@+id/f_chrootmanager_viewlogger"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
+        android:alpha="100"
+        android:background="@android:color/black"
+        android:gravity="bottom"
+        android:scrollbars="vertical"
+        android:singleLine="false"
+        android:textSize="13sp"
+        app:layout_constraintBottom_toTopOf="@id/f_chrootmanager_btn_scrollView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/f_chrootmanager_viewholder" />
+
+    <HorizontalScrollView
+        android:id="@+id/f_chrootmanager_btn_scrollView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
+        android:scrollbars="none"
+        app:layout_constraintTop_toBottomOf="@+id/f_chrootmanager_viewlogger"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:id="@+id/f_chrootmanager_btn_linearlayout">
+
+            <Button
+                android:id="@+id/f_chrootmanager_mount_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:text="Start Kali Chroot"
+                android:visibility="gone"/>
+
+            <Button
+                android:id="@+id/f_chrootmanager_unmount_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@+id/f_chrootmanager_mount_btn"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:text="Stop Kali Chroot"
+                android:visibility="gone"/>
+
+            <Button
+                android:id="@+id/f_chrootmanager_install_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@+id/f_chrootmanager_unmount_btn"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:text="Install Kali Chroot"
+                android:visibility="gone"/>
+
+            <Button
+                android:id="@+id/f_chrootmanager_addmetapkg_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@+id/f_chrootmanager_install_btn"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:text="Add Metapackge"
+                android:visibility="gone"/>
+
+            <Button
+                android:id="@+id/f_chrootmanager_backupchroot_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@+id/f_chrootmanager_addmetapkg_btn"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:text="Backup Kali Chroot"
+                android:visibility="gone"/>
+
+            <Button
+                android:id="@+id/f_chrootmanager_removechroot_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@+id/f_chrootmanager_backupchroot_btn"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:text="Remove Kali Chroot"
+                android:visibility="gone"/>
+        </LinearLayout>
+    </HorizontalScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

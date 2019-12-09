@@ -1,4 +1,46 @@
 #!/system/bin/sh
 
-# this runs after the Kaliservices
+# This runs after the KaliChroot has been started.
 
+if [ ! $? -eq 0 ]; then
+    exit 1
+fi
+
+## Define the nethunter app package name.
+APP_PGK_NAME=com.offsec.nethunter
+
+USERINIT_SCRIPT_PATH=$(readlink -f $0)
+. /data/data/$APP_PGK_NAME/files/scripts/bootkali_log
+. /data/data/$APP_PGK_NAME/files/scripts/bootkali_env
+
+## Validate busybox path.
+if [ -z "$BUSYBOX" ]; then
+    bklog "[-] No busybox_nh is installed or busybox is not granted execute permission, if you did have it installed, please symlink it to /system/bin and grant it the permission."
+    exit 1
+fi
+
+## Validate kali Chroot path.
+if [ ! -d "$MNT" ]; then
+    bklog "[-] \"$MNT\" directory not exist!"
+    bklog "[!] Click the button [INSTALL KALI CHROOT] down below now!"
+    exit 2
+fi
+if [ -z "$MNT" ]; then
+    bklog "[-] The \$MNT variable is not defined, please run nethunter app first."
+    exit 2
+fi
+
+## Define chroot shell executable path.
+if [ ! -x $MNT$CHROOT_EXEC ]; then
+    bklog "[-] Your chroot has no \"sudo\" installed, please install it manually first."
+    bklog "[-] Also make sure your Kali Chroot is not corrupted."
+    exit 2
+fi
+
+bklog "[!] Starting user defined Kali services"
+while IFS= read -r line; do
+    if [ ! -z "$line" ]; then
+        $BUSYBOX chroot $MNT $CHROOT_EXEC -E PATH=$PATH su -c "$line"
+    fi
+done < /data/data/$APP_PGK_NAME/files/scripts/kaliservices
+bklog "[+] Kali services should be started!"
