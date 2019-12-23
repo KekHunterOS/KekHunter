@@ -41,13 +41,14 @@ public class VNCFragment extends Fragment {
     private String localhostonly = "";
     private Context context;
     private Activity activity;
+    private NhPaths nh;
     private static final String ARG_SECTION_NUMBER = "section_number";
     private String selected_res;
     private String selected_vncres;
     private String selected_vncresCMD = "";
     private String selected_disp;
     private String selected_ppi;
-    private File vncpasswd = new File(nh.CHROOT_PATH + "/root/.vnc/passwd");
+    private File vncpasswd = new File(nh.CHROOT_PATH() + "/root/.vnc/passwd");
     private boolean showingAdvanced;
     private boolean localhost;
     private boolean confirm_res;
@@ -73,6 +74,9 @@ public class VNCFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.vnc_setup, container, false);
+        View AdvancedView = rootView.findViewById(R.id.AdvancedView);
+        Button Advanced = rootView.findViewById(R.id.AdvancedButton);
+        CheckBox localhostCheckBox = rootView.findViewById(R.id.vnc_checkBox);
         SharedPreferences sharedpreferences = context.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
 
         confirm_res = sharedpreferences.getBoolean("confirm_res", false);
@@ -124,7 +128,6 @@ public class VNCFragment extends Fragment {
 
         // Add device resolution to vnc-resolution (only first run)
         ShellExecuter exe = new ShellExecuter();
-        nh = new NhPaths();
         File vncResFile = new File(nh.APP_SD_FILES_PATH + "/configs/vnc-resolutions");
         String device_res = xwidth + "x" + xheight;
         if (vncResFile.length() == 0)
