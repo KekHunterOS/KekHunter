@@ -181,23 +181,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
             if (isAllRequiredPermissionsGranted()) {
                 setRootView();
             }
-       /* } else if (requestCode == PermissionCheck.NH_VNC_PERMISSIONS_RQCODE){
-            for (int grantResult:grantResults){
-                if (grantResult != 0){
-                    showWarningDialog("VNC Manager not available", "Please grant all the permission requests from outside the app or restart the app to grant the rest of permissions again.", false);
-                    return;
-                }
-            }
-        } else if (requestCode == PermissionCheck.NH_VNC_PERMISSIONS_ONFRAGMENTCLICK_RQCODE){
-            for (int grantResult:grantResults){
-                if (grantResult != 0){
-                    showWarningDialog("VNC Manager not available", "Please grant all the permission requests from outside the app or restart the app to grant the rest of permissions again.", false);
-                    return;
-                }
-            }
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            changeFragment(fragmentManager, VNCFragment.newInstance(R.id.vnc_item));
-        */}
+        }
     }
 
     @Override
