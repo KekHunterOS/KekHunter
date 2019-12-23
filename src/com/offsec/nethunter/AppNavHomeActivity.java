@@ -181,22 +181,6 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
             if (isAllRequiredPermissionsGranted()) {
                 setRootView();
             }
-        } else if (requestCode == PermissionCheck.NH_VNC_PERMISSIONS_RQCODE){
-            for (int grantResult:grantResults){
-                if (grantResult != 0){
-                    showWarningDialog("VNC Manager not available", "Please grant all the permission requests from outside the app or restart the app to grant the rest of permissions again.", false);
-                    return;
-                }
-            }
-        } else if (requestCode == PermissionCheck.NH_VNC_PERMISSIONS_ONFRAGMENTCLICK_RQCODE){
-            for (int grantResult:grantResults){
-                if (grantResult != 0){
-                    showWarningDialog("VNC Manager not available", "Please grant all the permission requests from outside the app or restart the app to grant the rest of permissions again.", false);
-                    return;
-                }
-            }
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            changeFragment(fragmentManager, VNCFragment.newInstance(R.id.vnc_item));
         }
     }
 
@@ -451,14 +435,10 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                             changeFragment(fragmentManager, MITMfFragment.newInstance(itemId));
                             break;
                         case R.id.vnc_item:
-                            if (getApplicationContext().getPackageManager().getLaunchIntentForPackage("com.offsec.nhvnc") == null) {
-                                showWarningDialog("", "Nethunter VNC is not installed yet.", false);
+                            if (getApplicationContext().getPackageManager().getLaunchIntentForPackage("com.offsec.nethunter.kex") == null) {
+                                showWarningDialog("", "Nethunter KeX is not installed yet, please install from the store!", false);
                             } else {
-                                if (!permissionCheck.isAllPermitted(PermissionCheck.NH_VNC_PERMISSIONS)) {
-                                    permissionCheck.checkPermissions(PermissionCheck.NH_VNC_PERMISSIONS, PermissionCheck.NH_VNC_PERMISSIONS_ONFRAGMENTCLICK_RQCODE);
-                                } else {
                                     changeFragment(fragmentManager, VNCFragment.newInstance(itemId));
-                                }
                             }
                             break;
                         case R.id.searchsploit_item:
