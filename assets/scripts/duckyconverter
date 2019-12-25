@@ -2831,7 +2831,7 @@ function command_interpreter(){
                 echo "Invalid DELAY format, should be like: [123], [.123], [1.23] and [123.]"
                 exit 1
             fi
-            echo "sleep $TMP_CONTENT" >> $OUTFILE
+            echo "$BUSYBOX usleep $TMP_CONTENT" >> $OUTFILE
         elif [ "$TMP_CMD" = "REM" ]; then
             echo "#### \"${TMP_CONTENT[@]}\" ####" >> $OUTFILE
         elif [ "$TMP_CMD" = "REPEAT" ]; then
