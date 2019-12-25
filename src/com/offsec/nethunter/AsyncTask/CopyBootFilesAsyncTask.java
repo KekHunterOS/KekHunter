@@ -290,7 +290,7 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
     }
 
     private void disableMagiskNotification(){
-        if (new File(NhPaths.MAGISK_DB_PATH).exists()) {
+        if (exe.RunAsRootReturnValue("[ -f " + NhPaths.MAGISK_DB_PATH + " ]") == 0) {
             Log.d(TAG, "Disabling magisk notifcication and log for nethunter app.");
             if (exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_BIN_PATH + "/sqlite3 " +
                     NhPaths.MAGISK_DB_PATH +
