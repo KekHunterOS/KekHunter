@@ -1,8 +1,8 @@
 #!/system/bin/sh
 
 ## Important note:
-## Some new devices may already use USB HAL to apply vendor's .rc file to implement their USB ConfigFS,
-## which is not done by the init.usb.configfs.rc under root directory, but other .rc files under sub directory of /vendor
+## Some new devices may already use USB HAL to apply vendor's own executable file to implement their USB ConfigFS,
+## which is not done by the init.usb.configfs.rc under root directory, but another executable file under sub directory of /vendor
 ## And some devices may have different function instance name when symlinking to /config/usb_gadget/g1/configs/b.1,
 ## like "function0" or "f1". That makes us harder to determine what instance name or what functions should be configured for users.
 ## That said, this script may not work on other devices even they are already using USB ConfigFs.
@@ -33,6 +33,7 @@ ORI_FUNCS=($(printf '%s\n' "${ORI_FUNCS_UNSORT[@]}" | $BUSYBOX sort -n))
 ## otherwise it cannot be determined what prefix name and the first instance number should be used.
 if [ -z "$ORI_FUNCS" ]; then
     bklog "[-] No symlinked function is found in $DIR_CUR_FUNCS, something is wrong, aborting.."
+    exit 1
 fi
 
 ## Seperate the prefix name and the instance order.
@@ -55,7 +56,6 @@ function print_usage(){
     bklog "[!] mass_storage => enable mass storage only."
     bklog "[!] rndis => enable RNDIS only, usually target on Windows or Linux."
     bklog "[!] acm,ecm => enable network card simulation on Mac OS when these two are enabled together.\n"
-
     bklog "[!] e.g. 'usbarmy -t win -f reset'"
     bklog "[!] e.g. 'usbarmy -t win -f adb,hid,mass_storage,rndis' "
     bklog "[!] e.g. 'usbarmy -t mac -f adb,hid,mass_storage,acm,ecm'"
@@ -77,7 +77,9 @@ function revert_to_ori_state(){
     clear_funcs
     start adbd
     setprop sys.usb.ffs.ready 1
-    ln -s $DIR_ALL_FUNCS/ffs.adb $DIR_CUR_FUNCS/$SYMLINK_FUNC_NAME
+    if [ ! -e $DIR_CUR_FUNCS/$SYMLINK_FUNC_NAME ]; then
+        ln -s $DIR_ALL_FUNCS/ffs.adb $DIR_CUR_FUNCS/$SYMLINK_FUNC_NAME
+    fi
     fireup_funcs
 }
 
@@ -236,17 +238,17 @@ function switch_funcs(){
             bklog "[-] rndis should not be used with Mac OS."; exit 1
         else
             if [ "$i" = "hid" -a $IS_HID_KEYBOARD_READY -eq 1 ]; then
-                bklog "[-] Your kernel doesn't support HID keyboard, aborting.." && exit 1
+                bklog "[-] Your kernel doesn't support HID keyboard, aborting.."; exit 1
             elif [ "$i" = "hid" -a $IS_HID_MOUSE_READY -eq 1 ]; then
-                bklog "[-] Your kernel doesn't support HID mouse, aborting.." && exit 1
+                bklog "[-] Your kernel doesn't support HID mouse, aborting.."; exit 1
             elif [ "$i" = "mass_storage" -a $IS_MASS_READY -eq 1 ]; then
-                bklog "[-] Your kernel doesn't support MASS_STORAGE, aborting.." && exit 1
+                bklog "[-] Your kernel doesn't support MASS_STORAGE, aborting.."; exit 1
             elif [ "$i" = "rndis" -a $IS_RNDIS_READY -eq 1 ]; then
-                bklog "[-] Your kernel doesn't support RNDIS, aborting.." && exit 1
+                bklog "[-] Your kernel doesn't support RNDIS, aborting.."; exit 1
             elif [ "$i" = "acm" -a $IS_ACM_READY -eq 1 ]; then
-                bklog "[-] Your kernel doesn't support ACM, aborting.." && exit 1
+                bklog "[-] Your kernel doesn't support ACM, aborting.."; exit 1
             elif [ "$i" = "ecm" -a $IS_ECM_READY -eq 1 ]; then
-                bklog "[-] Your kernel doesn't support ECM, aborting.." && exit 1
+                bklog "[-] Your kernel doesn't support ECM, aborting.."; exit 1
             fi
         fi
     done
