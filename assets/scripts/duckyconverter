@@ -2823,15 +2823,15 @@ function command_interpreter(){
             TMP_CONTENT=(${TMP_CONTENT//0a/ })
             ## loop each hex string and then pass it to convert_ducky function to do the match
             for TMP_HEX_CHAR in ${TMP_CONTENT[@]}; do
-                log -t "BBBB" "The char in hex is: $TMP_HEX_CHAR"
+                log -t "duckyconverter" "The char in hex is: $TMP_HEX_CHAR"
                 convert_ducky $TMP_HEX_CHAR
             done
         elif [ "$TMP_CMD" = "DELAY" ]; then
-            if ! echo "$TMP_CONTENT" | $BUSYBOX grep -q -E "^[0-9]*\.?[0-9]*$"; then
-                echo "Invalid DELAY format, should be like: [123], [.123], [1.23] and [123.]"
+            if ! echo "$TMP_CONTENT" | $BUSYBOX grep -q -E "^[0-9]*$"; then
+                echo "Invalid DELAY format, should be an integer >= 0."
                 exit 1
             fi
-            echo "$BUSYBOX usleep $TMP_CONTENT" >> $OUTFILE
+            echo "$BUSYBOX usleep ${TMP_CONTENT}000" >> $OUTFILE
         elif [ "$TMP_CMD" = "REM" ]; then
             echo "#### \"${TMP_CONTENT[@]}\" ####" >> $OUTFILE
         elif [ "$TMP_CMD" = "REPEAT" ]; then
