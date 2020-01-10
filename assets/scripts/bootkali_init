@@ -11,13 +11,14 @@ if [ -z "$BUSYBOX" ]; then
 fi
 
 ## Validate kali Chroot path.
+if [ -z "$MNT" ]; then
+    bklog "[-] The \$MNT variable is not defined, please run nethunter app first."
+    exit 2
+fi
+
 if [ ! -d "$MNT" ]; then
     bklog "[-] \"$MNT\" directory not exist!"
     bklog "[!] Click the button [INSTALL KALI CHROOT] down below now!"
-    exit 2
-fi
-if [ -z "$MNT" ]; then
-    bklog "[-] The \$MNT variable is not defined, please run nethunter app first."
     exit 2
 fi
 
@@ -82,8 +83,8 @@ f_mount_fs_to_kali() {
     if [ ! -e "/dev/fd" -o ! -e "/dev/stdin" -o ! -e "/dev/stdout" -o ! -e "/dev/stderr" ]; then
         [ -e "/dev/fd" ] || ln -s /proc/self/fd /dev/ && bklog "[+] linked /proc/self/fd to /dev/"
         [ -e "/dev/stdin" ] || ln -s /proc/self/fd/0 /dev/stdin && bklog "[+] linked /proc/self/fd/0 to /dev/stdin"
-        [ -e "/dev/stdout" ] || ln -s /proc/self/fd/1 /dev/stdout && bklog "[+] linked /proc/self/fd/2 to /dev/stdout"
-        [ -e "/dev/stderr" ] || ln -s /proc/self/fd/2 /dev/stderr && bklog "[+] linked /proc/self/fd/3 to /dev/stderr"
+        [ -e "/dev/stdout" ] || ln -s /proc/self/fd/1 /dev/stdout && bklog "[+] linked /proc/self/fd/1 to /dev/stdout"
+        [ -e "/dev/stderr" ] || ln -s /proc/self/fd/2 /dev/stderr && bklog "[+] linked /proc/self/fd/2 to /dev/stderr"
     fi
 
     ######### SET TUN ########
