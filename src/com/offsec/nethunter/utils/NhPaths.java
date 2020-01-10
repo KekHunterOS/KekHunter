@@ -30,6 +30,7 @@ public class NhPaths implements SharedPreferences.OnSharedPreferenceChangeListen
     public static String CHROOT_SD_PATH;
     public static String CHROOT_SUDO;
     public static String CHROOT_INITD_SCRIPT_PATH;
+    public static String CHROOT_SYMLINK_PATH;
     public static String APP_SD_SQLBACKUP_PATH;
     public static String BUSYBOX;
     public static String MAGISK_DB_PATH;
@@ -51,6 +52,7 @@ public class NhPaths implements SharedPreferences.OnSharedPreferenceChangeListen
         CHROOT_SUDO                     = "/usr/bin/sudo";
         CHROOT_INITD_SCRIPT_PATH        = APP_INITD_PATH + "/80postservices";
         CHROOT_SD_PATH                  = "/sdcard";
+        CHROOT_SYMLINK_PATH             = NH_SYSTEM_PATH + "/kalifs";
         BUSYBOX                         = getBusyboxPath();
         MAGISK_DB_PATH                  = "/data/adb/magisk.db";
     }

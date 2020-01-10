@@ -9,8 +9,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.system.Os;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +30,7 @@ import com.offsec.nethunter.service.CompatCheckService;
 import com.offsec.nethunter.service.NotificationChannelService;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.SharePrefTag;
+import com.offsec.nethunter.utils.ShellExecuter;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -167,8 +171,9 @@ public class ChrootManagerFragment extends Fragment {
             availableChrootPathextview.setText("\n List of available folder(s) in\n\"" + NhPaths.NH_SYSTEM_PATH + "/\":\n\n");
             File chrootDir = new File(NhPaths.NH_SYSTEM_PATH);
             int count = 0;
-            for (File file: chrootDir.listFiles()){
-                if (file.isDirectory()){
+            for (File file : Objects.requireNonNull(chrootDir.listFiles())) {
+                if (file.isDirectory()) {
+                    if (file.getName().equals("kalifs")) continue;
                     count += 1;
                     availableChrootPathextview.append("    " + count + ". " + file.getName() + "\n");
                 }
@@ -188,6 +193,7 @@ public class ChrootManagerFragment extends Fragment {
                     kaliFolderTextView.setText(NhPaths.ARCH_FOLDER);
                     sharedPreferences.edit().putString(SharePrefTag.CHROOT_ARCH_SHAREPREF_TAG, NhPaths.ARCH_FOLDER).commit();
                     sharedPreferences.edit().putString(SharePrefTag.CHROOT_PATH_SHAREPREF_TAG, NhPaths.CHROOT_PATH()).commit();
+                    new ShellExecuter().RunAsRootOutput("ln -sfn " + NhPaths.CHROOT_PATH() + " " + NhPaths.CHROOT_SYMLINK_PATH);
                     compatCheck();
                 }
                 dialogInterface.dismiss();

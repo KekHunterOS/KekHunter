@@ -12,13 +12,14 @@ if [ -z "$BUSYBOX" ]; then
 fi
 
 ## Validate kali Chroot path.
+if [ -z "$MNT" ]; then
+    bklog "[-] The \$MNT variable is not defined, please run nethunter app first."
+    exit 2
+fi
+
 if [ ! -d "$MNT" ]; then
     bklog "[-] \"$MNT\" directory not exist!"
     bklog "[!] Click the button [INSTALL KALI CHROOT] down below now!"
-    exit 2
-fi
-if [ -z "$MNT" ]; then
-    bklog "[-] The \$MNT variable is not defined, please run nethunter app first."
     exit 2
 fi
 
@@ -29,4 +30,5 @@ if [ ! -x $MNT$CHROOT_EXEC ]; then
     exit 2
 fi
 
+clear
 $BUSYBOX chroot $MNT $CHROOT_EXEC -E PATH=$PATH su

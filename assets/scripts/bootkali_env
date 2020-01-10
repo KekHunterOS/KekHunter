@@ -1,8 +1,8 @@
 #!/system/bin/sh
 
-###################################################################
+##########################################################################
 #### DEFINE GLOBAL ENVIRONMENT VARIABLES FOR ALL NETHUNTER APP SCRIPT ####
-###################################################################
+##########################################################################
 
 unset LD_PRELOAD
 
@@ -31,7 +31,10 @@ if [ -z "$BUSYBOX" ]; then
 fi
 
 ## Define the Kali Chroot path.
-MNT=`cat /data/data/$APP_PGK_NAME/shared_prefs/$APP_PGK_NAME.xml | grep "\"chroot_path\"" | $BUSYBOX sed "s/^.*\"chroot_path\">\(.*\)<\/string>/\1/g"`
+MNT=`readlink -e $NHSYSTEM_PATH/kalifs`
+if [ -z "$MNT" ]; then
+    MNT=`cat /data/data/$APP_PGK_NAME/shared_prefs/$APP_PGK_NAME.xml | grep "\"chroot_path\"" | sed "s/^.*\"chroot_path\">\(.*\)<\/string>/\1/g"`
+fi
 
 ## Define the path of xz tool
 XZ=/data/data/$APP_PGK_NAME/files/scripts/bin/xz
