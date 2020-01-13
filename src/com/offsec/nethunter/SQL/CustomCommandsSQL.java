@@ -24,7 +24,7 @@ import java.util.ArrayList;
 public class CustomCommandsSQL extends SQLiteOpenHelper {
     private static CustomCommandsSQL instance;
     private static final String DATABASE_NAME = "CustomCommandsFragment";
-    private static final String TAG = "CCCC";
+    private static final String TAG = "CustomCommandsSQL";
     private static final String TABLE_NAME = DATABASE_NAME;
     private static ArrayList<String> COLUMNS = new ArrayList<>();
     private static final String[][] customcommandsData = {
@@ -59,6 +59,10 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        if (new File(NhPaths.APP_DATABASE_PATH + "/KaliLaunchers").exists()) {
+            convertOldDBtoNewDB(db);
+            return;
+        }
         db.execSQL("CREATE TABLE " + TABLE_NAME + " (" + COLUMNS.get(0) + " INTEGER, " +
                 COLUMNS.get(1) + " TEXT, " + COLUMNS.get(2) +  " TEXT, " +
                 COLUMNS.get(3) + " TEXT, " + COLUMNS.get(4) + " TEXT, " +
@@ -82,8 +86,8 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion > 3) {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+            this.onCreate(db);
         }
-        this.onCreate(db);
     }
 
     public ArrayList<CustomCommandsModel> bindData(ArrayList<CustomCommandsModel> customCommandsModelArrayList) {
@@ -210,7 +214,7 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
             if (!isOldDB(storedDBpath)) {
                 return "Invalid DB format.";
             } else {
-                if (convertOldDBtoNewDB(storedDBpath)) {
+                if (restoreOldDBtoNewDB(storedDBpath)) {
                     return null;
                 } else {
                     return "Failed to convert to the new DB format.";
@@ -289,11 +293,13 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
         tempDB.close();
         return false;
     }
+
     //Convert the old db of customcommands sql to the new one.
-    private boolean convertOldDBtoNewDB(String storedDBpath) {
+    private boolean restoreOldDBtoNewDB(String storedDBpath) {
         SQLiteDatabase tempDB = SQLiteDatabase.openDatabase(storedDBpath, null, SQLiteDatabase.OPEN_READWRITE);
         try {
             SQLiteDatabase currentDB = this.getWritableDatabase();
+            currentDB.beginTransaction();
             currentDB.execSQL("DELETE FROM " + TABLE_NAME + ";");
             currentDB.execSQL("ATTACH DATABASE ? AS oldDB",new String[]{storedDBpath});
             currentDB.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMNS.get(0) + "," +
@@ -303,6 +309,8 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
                     " FROM oldDB.LAUNCHERS;");
             currentDB.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(3) + " = LOWER(" + COLUMNS.get(3) + ");");
             currentDB.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(4) + " = LOWER(" + COLUMNS.get(4) + ");");
+            currentDB.setTransactionSuccessful();
+            currentDB.endTransaction();
             tempDB.close();
             currentDB.close();
             return true;
@@ -312,6 +320,26 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
         }
         tempDB.close();
         return false;
+    }
+
+    private void convertOldDBtoNewDB(SQLiteDatabase currentDB) {
+        currentDB.beginTransaction();
+        currentDB.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        currentDB.execSQL("CREATE TABLE " + TABLE_NAME + " (" + COLUMNS.get(0) + " INTEGER, " +
+                COLUMNS.get(1) + " TEXT, " + COLUMNS.get(2) +  " TEXT, " +
+                COLUMNS.get(3) + " TEXT, " + COLUMNS.get(4) + " TEXT, " +
+                COLUMNS.get(5) + " INTEGER)");
+        currentDB.execSQL("ATTACH DATABASE ? AS oldDB",new String[]{NhPaths.APP_DATABASE_PATH + "/KaliLaunchers"});
+        currentDB.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMNS.get(0) + "," +
+                COLUMNS.get(1) + "," + COLUMNS.get(2) + "," +
+                COLUMNS.get(3) + "," + COLUMNS.get(4) + "," +
+                COLUMNS.get(5) + ")" + " SELECT " + "ID,BTN_LABEL,COMMAND,SEND_TO_SHELL,EXEC_MODE,RUN_AT_BOOT" +
+                " FROM oldDB.LAUNCHERS;");
+        currentDB.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(3) + " = LOWER(" + COLUMNS.get(3) + ");");
+        currentDB.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(4) + " = LOWER(" + COLUMNS.get(4) + ");");
+        currentDB.setTransactionSuccessful();
+        currentDB.endTransaction();
+        SQLiteDatabase.deleteDatabase(new File(NhPaths.APP_DATABASE_PATH + "/KaliLaunchers"));
     }
 
     private boolean ifTableExists (SQLiteDatabase tempDB, String tableName) {
