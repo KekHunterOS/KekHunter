@@ -210,6 +210,10 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
         if (!new File(storedDBpath).exists()){
             return "db file not found.";
         }
+        if (SQLiteDatabase.openDatabase(storedDBpath, null, SQLiteDatabase.OPEN_READONLY).getVersion()
+            > this.getReadableDatabase().getVersion()) {
+            return "db cannot be restored.\nReason: the db version of your backup db is larger than the current db version.";
+        }
         if (!verifyDB(storedDBpath)) {
             if (!isOldDB(storedDBpath)) {
                 return "Invalid DB format.";
