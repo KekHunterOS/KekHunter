@@ -48,7 +48,7 @@ SYMLINK_FUNC_NAME="$FUNCS_NAME_PREFIX$FUNCS_NAME_ORDER"
 ################################
 
 function print_usage(){
-    bklog "[!] Usage: usbarmy -t <Target OS> -f <USB Functions>"
+    bklog "[!] Usage: usbarmory -t <Target OS> -f <USB Functions>"
     bklog "[!] Available target OS: [win|lnx|mac]; win => Windows; lnx => Linux; mac => Mac OS"
     bklog "[!] Available configfs functions: [reset] or [adb,hid,mass_storage,rndis,acm,ecm]"
     bklog "[!] reset => enable adb only."
@@ -56,9 +56,9 @@ function print_usage(){
     bklog "[!] mass_storage => enable mass storage only."
     bklog "[!] rndis => enable RNDIS only, usually target on Windows or Linux."
     bklog "[!] acm,ecm => enable network card simulation on Mac OS when these two are enabled together.\n"
-    bklog "[!] e.g. 'usbarmy -t win -f reset'"
-    bklog "[!] e.g. 'usbarmy -t win -f adb,hid,mass_storage,rndis' "
-    bklog "[!] e.g. 'usbarmy -t mac -f adb,hid,mass_storage,acm,ecm'"
+    bklog "[!] e.g. 'usbarmory -t win -f reset'"
+    bklog "[!] e.g. 'usbarmory -t win -f adb,hid,mass_storage,rndis' "
+    bklog "[!] e.g. 'usbarmory -t mac -f adb,hid,mass_storage,acm,ecm'"
 }
 
 function clear_funcs(){
