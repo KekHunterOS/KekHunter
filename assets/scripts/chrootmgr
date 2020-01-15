@@ -36,7 +36,7 @@ f_chroot_usage(){
     bklog "[!] chrootmgr [-p <your chroot folder>] -c \"backup <full_path_of_your_chroot_folder> <full_path_with_desired_name.tar.[gx]z>\""
     bklog "[!] chrootmgr [-p <your chroot folder>] -c \"restore <full_path_of_your_.tar.[gx]z> </data/local/nhsystem/>\""
     bklog "[!] chrootmgr [-p <your chroot folder>] -c \"remove <full_path_of_your_chroot_folder>\" ---> Delete your chroot folder without rebooting the device, but not 100% guranteed success"
-    bklog "[!] chrootmgr -c \"sha256sum <URL of the checksum file> <the target file to be checked.>\" ---> Delete your chroot folder without rebooting the device, but not 100% guranteed success"
+    bklog "[!] chrootmgr -c \"sha512sum <URL of the checksum file> <the target file to be checked.>\" ---> Compare the sha512 checksum of the downloaded chroot and the official sha512 file."
     bklog "[!] If -p option is not specified, then the script will find the chroot path according to the app sharepreference."
 }
 
@@ -379,21 +379,21 @@ if [ ! $# -eq 0 ]; then
                     ;;
             esac
             ;;
-        checksha256)
+        checksha512)
             shift 1
             case $# in
                 2)
-                    # official link for chroot image -> https://images.offensive-security.com/nethunter/
+                    # official link for chroot image -> https://images.kali.org/nethunter/
                     # kalifs-arm64-full.tar.xz | kalifs-arm64-minimal.tar.xz
                     # kalifs-armhf-full.tar.xz | kalifs-armhf-minimal.tar.xz
                     local SHAFILE_URL_LINK=$1
                     local TARGET_FILE=$2
                     local CORRECT_SHA
                     local COMPUTED_SHA
-                    bklog "[!] Now checking the sha256 for $TARGET_FILE.."
+                    bklog "[!] Now checking the sha512 for $TARGET_FILE.."
                     CORRECT_SHA="$($BUSYBOX wget $SHAFILE_URL_LINK -q -O -)"
                     bklog "$CORRECT_SHA"
-                    COMPUTED_SHA="$($BUSYBOX sha256sum $TARGET_FILE | sed 's/ .*\//  /g')"
+                    COMPUTED_SHA="$($BUSYBOX sha512sum $TARGET_FILE | sed 's/ .*\//  /g')"
                     bklog "$COMPUTED_SHA"
                     if [ "$CORRECT_SHA" = "$COMPUTED_SHA" ]; then
                         bklog "[+] Checksum matches!"
