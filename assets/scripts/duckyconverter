@@ -12,9 +12,9 @@ SOURCE_PATH=${SCRIPT_PATH%/*}
 
 . ${SCRIPT_PATH%/*}/bootkali_env
 
-#########################
+##########################
 #### Define Variables ####
-#########################
+##########################
 
 ## Validate busybox path.
 if [ -z "$BUSYBOX" ]; then
@@ -2823,7 +2823,6 @@ function command_interpreter(){
             TMP_CONTENT=(${TMP_CONTENT//0a/ })
             ## loop each hex string and then pass it to convert_ducky function to do the match
             for TMP_HEX_CHAR in ${TMP_CONTENT[@]}; do
-                log -t "duckyconverter" "The char in hex is: $TMP_HEX_CHAR"
                 convert_ducky $TMP_HEX_CHAR
             done
         elif [ "$TMP_CMD" = "DELAY" ]; then
