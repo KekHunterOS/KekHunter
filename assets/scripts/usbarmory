@@ -133,12 +133,24 @@ function prepare_mass_storage(){
 function prepare_rndis(){
     if [ ! -d $DIR_ALL_FUNCS/gsi.rndis ]; then
         if ! mkdir $DIR_ALL_FUNCS/gsi.rndis > /dev/null 2>&1; then
-            bklog "[-] RNDIS is not supported on you device. Make sure your kernel has RNDIS feature patched and enabled."
-            return 1
+            if [ ! -d $DIR_ALL_FUNCS/rndis.gs4 ]; then
+                if ! mkdir $DIR_ALL_FUNCS/rndis.gs4 > /dev/null 2>&1; then
+                    bklog "[-] RNDIS is not supported on you device. Make sure your kernel has RNDIS feature patched and enabled."
+                    return 1
+                else
+                    REAL_RNDIS_NAME = rndis.gs4
+                    return 0
+                fi
+            else
+                REAL_RNDIS_NAME = rndis.gs4
+                return 0
+            fi
         else
+            REAL_RNDIS_NAME = gsi.rndis
             return 0
         fi
     else
+        REAL_RNDIS_NAME = gsi.rndis
         return 0
     fi
 }
@@ -282,19 +294,19 @@ function switch_funcs(){
                 ;;
             rndis)
                 IS_RNDIS_SELECTED=0
-                ln -s $DIR_ALL_FUNCS/gsi.rndis $DIR_CUR_FUNCS/$SYMLINK_FUNC_NAME
+                ln -s $DIR_ALL_FUNCS/$REAL_RNDIS_NAME $DIR_CUR_FUNCS/$SYMLINK_FUNC_NAME
                 inc_funcs_order
                 FUNCS_DESC+=('rndis')
                 ;;
             acm)
                 IS_ACM_SELECTED=0
-                ln -s $DIR_ALL_FUNCS/acm.0 $DIR_CUR_FUNCS/$SYMLINK_FUNC_NAME
+                ln -s $DIR_ALL_FUNCS/acm.usb0 $DIR_CUR_FUNCS/$SYMLINK_FUNC_NAME
                 inc_funcs_order
                 FUNCS_DESC+=('acm')
                 ;;
             ecm)
                 IS_ECM_SELECTED=0
-                ln -s $DIR_ALL_FUNCS/ecm.0 $DIR_CUR_FUNCS/$SYMLINK_FUNC_NAME
+                ln -s $DIR_ALL_FUNCS/ecm.usb0 $DIR_CUR_FUNCS/$SYMLINK_FUNC_NAME
                 inc_funcs_order
                 FUNCS_DESC+=('ecm')
                 ;;
@@ -334,7 +346,7 @@ function switch_funcs(){
                 ID_VENDOR="0x05ac"; ID_PRODUCT="0x0201"
             elif [ $IS_MASS_SELECTED -eq 0 ]; then
                 ID_VENDOR="0x0930"; ID_PRODUCT="0x6545"
-            elif [ $(($IS_ACM_SELECTED | $IS_ECM_SELEC)) -eq 0 ]; then
+            elif [ $(($IS_ACM_SELECTED | $IS_ECM_SELECTED)) -eq 0 ]; then
                 ID_VENDOR="0x1d6b"; ID_PRODUCT="0x0105"
             fi
             ;;
