@@ -267,15 +267,19 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
     private ArrayList<String> FetchFiles(String folder) {
 
         ArrayList<String> filenames = new ArrayList<String>();
-        String path = folder;
-        File directory = new File(path);
+        File directory = new File(folder);
 
         if (directory.exists()) {
-            File[] files = directory.listFiles();
-
-            for (int i = 0; i < files.length; i++) {
-                String file_name = files[i].getName();
-                filenames.add(file_name);
+            try {
+                File[] files = directory.listFiles();
+                assert files != null;
+                for (File file : files) {
+                    String file_name = file.getName();
+                    filenames.add(file_name);
+                }
+            } catch (NullPointerException e) {
+                Log.e(TAG, folder + " is an empty folder, filenames is returned as a empty String ArrayList.");
+                e.printStackTrace();
             }
         }
         return filenames;
