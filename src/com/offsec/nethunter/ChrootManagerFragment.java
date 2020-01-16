@@ -47,7 +47,7 @@ public class ChrootManagerFragment extends Fragment {
 
     public static final String TAG = "ChrootManager";
     private static final String ARG_SECTION_NUMBER = "section_number";
-    private static final String IMAGE_SERVER = "images.offensive-security.com";
+    private static final String IMAGE_SERVER = "images.kali.org";
     private static String ARCH = "";
     private static String MINORFULL = "";
     private TextView mountStatsTextView;

@@ -102,9 +102,9 @@ public class ChrootManagerAsynctask extends AsyncTask<Object, Integer, Void> {
                     output.close();
                     input.close();
                     exe.RunAsRootOutput("echo \"[+] Download completed.\"", ((TextView)objects[0]));
-                    resultCode = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/chrootmgr -c \"checksha256 " +
+                    resultCode = exe.RunAsRootOutput(NhPaths.APP_SCRIPTS_PATH + "/chrootmgr -c \"checksha512 " +
                             exe.RunAsRootOutput("ping -c 1 " + objects[1].toString() + " | head -n1 | sed 's/\\(^.*(\\)\\(.*\\)\\().*(.*$\\)/\\2/g'") +
-                            objects[2].toString() + ".sha256 " + objects[3].toString() + "\"", ((TextView)objects[0]));
+                            objects[2].toString().replace(".tar.xz","") + ".sha512sum " + objects[3].toString() + "\"", ((TextView)objects[0]));
                 } catch (Exception e) {
                     exe.RunAsRootOutput("echo \"[-]" + e.getMessage() + "\"", ((TextView)objects[0]));
                     resultCode = 1;

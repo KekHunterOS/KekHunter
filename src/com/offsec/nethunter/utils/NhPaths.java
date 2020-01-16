@@ -18,6 +18,7 @@ public class NhPaths implements SharedPreferences.OnSharedPreferenceChangeListen
     private SharedPreferences sharedPreferences;
 
     public static String APP_PATH;
+    public static String APP_DATABASE_PATH;
     public static String APP_INITD_PATH;
     public static String APP_SCRIPTS_PATH;
     public static String APP_SCRIPTS_BIN_PATH;
@@ -39,6 +40,7 @@ public class NhPaths implements SharedPreferences.OnSharedPreferenceChangeListen
         sharedPreferences = context.getApplicationContext().getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
         APP_PATH                        = context.getApplicationContext().getFilesDir().getPath();
+        APP_DATABASE_PATH               = APP_PATH.replace("/files", "/databases");
         APP_INITD_PATH                  = APP_PATH + "/etc/init.d";
         APP_SCRIPTS_PATH                = APP_PATH + "/scripts";
         APP_SCRIPTS_BIN_PATH            = APP_SCRIPTS_PATH + "/bin";

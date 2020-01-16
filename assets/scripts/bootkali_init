@@ -29,6 +29,7 @@ fi
 ######### CHECK IF WORKING CHROOT DIR EXISTS #########
 f_chk_chroot() {
     [ ! -d $MNT ] && bklog "[-] $MNT directory is not found." && return 1
+    [ ! -f $MNT$CHROOT_EXEC ] && bklog "[-] $CHROOT_EXEC not found." && return 1
     if ! $BUSYBOX chroot $MNT /bin/uname; then
         bklog "[-] No chroot file exists."
         return 1
@@ -78,6 +79,9 @@ f_mount_sdcard() {
 
 ######### [ MOUNTING AND BINDING FILESYSTEM ] #########
 f_mount_fs_to_kali() {
+
+    $BUSYBOX mount -o remount,suid /data
+    $BUSYBOX chmod +s $MNT$CHROOT_EXEC
 
     ######### SET FD, Thanks @feefik and @zer0conf ########
     if [ ! -e "/dev/fd" -o ! -e "/dev/stdin" -o ! -e "/dev/stdout" -o ! -e "/dev/stderr" ]; then

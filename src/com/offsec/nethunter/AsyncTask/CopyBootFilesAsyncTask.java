@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -14,6 +16,7 @@ import com.offsec.nethunter.BuildConfig;
 import com.offsec.nethunter.ChrootManagerFragment;
 import com.offsec.nethunter.utils.CheckForRoot;
 import com.offsec.nethunter.utils.NhPaths;
+import com.offsec.nethunter.utils.SharePrefTag;
 import com.offsec.nethunter.utils.ShellExecuter;
 
 import java.io.File;
@@ -59,7 +62,9 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
     @Override
     protected void onPreExecute() {
         // Check if it is a new build and inflates the nethunter files again if yes.
-        if (!prefs.getString(TAG, buildTime).equals(buildTime) || !sdCardDir.isDirectory() || !scriptsDir.isDirectory() || !etcDir.isDirectory()) {
+        // Added versionCode tag to shareprefence to check if the versionCode is different from previous install, this fix the new updated installation not copying files.
+        if (prefs.getInt(SharePrefTag.VERSION_CODE_TAG, 0) != BuildConfig.VERSION_CODE || !prefs.getString(TAG, buildTime).equals(buildTime) || !sdCardDir.isDirectory() || !scriptsDir.isDirectory() || !etcDir.isDirectory()) {
+            Log.d(TAG, "COPYING NEW FILES");
             ProgressDialog progressDialog = progressDialogRef.get();
             progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
             progressDialog.setTitle("New app build detected:");
@@ -105,6 +110,7 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
             if (_res.equals("1")) {
                 ed = prefs.edit();
                 ed.putBoolean(AppNavHomeActivity.CHROOT_INSTALLED_TAG, true);
+                ed.putInt(SharePrefTag.VERSION_CODE_TAG, BuildConfig.VERSION_CODE);
                 ed.commit();
                 publishProgress("Chroot Found!");
                 // @Re4son @kimocoder @yesimxev is it still necessnary to remount /data partition and chmod +s the chroot /usr/bin/sudo?
