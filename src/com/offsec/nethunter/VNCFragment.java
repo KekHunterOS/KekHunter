@@ -41,17 +41,21 @@ public class VNCFragment extends Fragment {
     private String localhostonly = "";
     private Context context;
     private Activity activity;
-    private NhPaths nh = new NhPaths();
     private static final String ARG_SECTION_NUMBER = "section_number";
     private String selected_res;
     private String selected_vncres;
     private String selected_vncresCMD = "";
     private String selected_disp;
     private String selected_ppi;
-    private File vncpasswd = new File(nh.CHROOT_PATH + "/root/.vnc/passwd");
+    private String selected_user;
+    private String selected_display;
+    private String vnc_passwd;
     private boolean showingAdvanced;
     private boolean localhost;
     private boolean confirm_res;
+    private Integer pos;
+    private Integer posd;
+    NhPaths nh = new NhPaths();
 
     public VNCFragment() {
     }
@@ -69,7 +73,6 @@ public class VNCFragment extends Fragment {
         super.onCreate(savedInstanceState);
         context = getContext();
         activity = getActivity();
-        nh = new NhPaths();
     }
 
     @Override
@@ -78,15 +81,14 @@ public class VNCFragment extends Fragment {
         View AdvancedView = rootView.findViewById(R.id.AdvancedView);
         Button Advanced = rootView.findViewById(R.id.AdvancedButton);
         CheckBox localhostCheckBox = rootView.findViewById(R.id.vnc_checkBox);
-        //    super.onActivityCreated(savedInstanceState);
-        SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+        SharedPreferences sharedpreferences = context.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
 
         confirm_res = sharedpreferences.getBoolean("confirm_res", false);
         if (confirm_res) {
             confirmDialog();
         }
-
         showingAdvanced = sharedpreferences.getBoolean("advanced_visible", false);
+
         localhost = sharedpreferences.getBoolean("localhost", true);
         if (!localhost) {
             localhostCheckBox.setChecked(false);
@@ -117,6 +119,8 @@ public class VNCFragment extends Fragment {
         Button StopVNCButton = rootView.findViewById(R.id.stop_vnc);
         Button OpenVNCButton = rootView.findViewById(R.id.vncClientStart);
         ImageButton RefreshKeX = rootView.findViewById(R.id.refreshKeX);
+        Button AddUserButton = rootView.findViewById(R.id.AddUserButton);
+        Button DelUserButton = rootView.findViewById(R.id.DelUserButton);
         Button ResetHDMIButton = rootView.findViewById(R.id.reset_hdmi);
         Button AddResolutionButton = rootView.findViewById(R.id.AddResolutionButton);
         Button DelResolutionButton = rootView.findViewById(R.id.DelResolutionButton);
@@ -130,11 +134,16 @@ public class VNCFragment extends Fragment {
 
         // Add device resolution to vnc-resolution (only first run)
         ShellExecuter exe = new ShellExecuter();
-        nh = new NhPaths();
         File vncResFile = new File(nh.APP_SD_FILES_PATH + "/configs/vnc-resolutions");
         String device_res = xwidth + "x" + xheight;
         if (vncResFile.length() == 0)
             exe.RunAsRoot(new String[]{"su -c echo \"Auto$'\n'" + device_res + "\" > " + vncResFile});
+
+        //Users
+        File passwd = new File(nh.CHROOT_PATH + "/etc/passwd");
+        String[] commandUSR = {"sh", "-c", "echo root && awk -F':' -v \"min=1000\" -v \"max=2000\" '{ if ( $3 >= min && $3 <= max ) print $0}' " + passwd + " | cut -d: -f1"};
+        String outputUSR = exe.Executer(commandUSR);
+        final String[] userArray = outputUSR.split("\n");
 
         //HDMI resolution
         File hdmiResFile = new File(nh.APP_SD_FILES_PATH + "/configs/hdmi-resolutions");
@@ -147,6 +156,11 @@ public class VNCFragment extends Fragment {
         String outputVNCRES = exe.Executer(commandVNCRES);
         final String[] vncresArray = outputVNCRES.split("\n");
 
+        //Users spinner
+        Spinner users = rootView.findViewById(R.id.user);
+        ArrayAdapter usersadapter = new ArrayAdapter<>(getContext(),android.R.layout.simple_list_item_1, userArray);
+        users.setAdapter(usersadapter);
+
         //HDMI Resolution spinner
         Spinner resolution = rootView.findViewById(R.id.resolution);
         ArrayAdapter adapter = new ArrayAdapter<>(getContext(),android.R.layout.simple_list_item_1, resArray);
@@ -156,6 +170,45 @@ public class VNCFragment extends Fragment {
         Spinner vncresolution = rootView.findViewById(R.id.vncresolution);
         ArrayAdapter vncadapter = new ArrayAdapter<>(getContext(),android.R.layout.simple_list_item_1, vncresArray);
         vncresolution.setAdapter(vncadapter);
+
+        //Display spinner
+        String[] displaylist = new String[]{"1","2","3","4","5","6","7","8","9","10"};
+        Spinner displays = rootView.findViewById(R.id.display);
+        ArrayAdapter displayadapter = new ArrayAdapter<>(getContext(),android.R.layout.simple_list_item_1, displaylist);
+        displays.setAdapter(displayadapter);
+        sharedpreferences.edit().putString("display", selected_display).apply();
+
+
+        //Last selected user and display
+        posd = sharedpreferences.getInt("display", 0);
+        displays.setSelection(posd);
+        pos = sharedpreferences.getInt("user", 0);
+        users.setSelection(pos);
+
+
+        //Select User
+        users.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int pos, long id) {
+                selected_user = parentView.getItemAtPosition(pos).toString();
+                sharedpreferences.edit().putInt("user", pos).apply();
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+            }
+        });
+
+        //Select Display
+        displays.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int posd, long id) {
+                selected_display = parentView.getItemAtPosition(posd).toString();
+                sharedpreferences.edit().putInt("display", posd).apply();
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+            }
+        });
 
         //Select HDMI resolution
         resolution.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -187,7 +240,7 @@ public class VNCFragment extends Fragment {
 
         //Immersion switch
         final Switch immersionSwitch = rootView.findViewById(R.id.immersionSwitch);
-        final String immersion = exe.RunAsRootOutput("su -c settings get global policy_control");
+        final String immersion = exe.RunAsRootOutput("settings get global policy_control");
         if (immersion.equals("null*"))
             immersionSwitch.setChecked(false);
         else
@@ -196,9 +249,9 @@ public class VNCFragment extends Fragment {
         immersionSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    exe.RunAsRoot(new String[]{"su -c settings put global policy_control immersive.full=*"});
+                    exe.RunAsRoot(new String[]{"settings put global policy_control immersive.full=*"});
                 } else {
-                    exe.RunAsRoot(new String[]{"su -c settings put global policy_control null*"});
+                    exe.RunAsRoot(new String[]{"settings put global policy_control null*"});
                 }
             }
         });
@@ -224,6 +277,7 @@ public class VNCFragment extends Fragment {
         File kex_init = new File(nh.APP_PATH + "/etc/init.d/99kex");
         final CheckBox vnc_serviceCheckBox = rootView.findViewById(R.id.vnc_serviceCheckBox);
         final String initfile = exe.RunAsRootOutput("su -c cat " + kex_init);
+
         if (initfile.contains("vncserver"))
             vnc_serviceCheckBox.setChecked(true);
         else
@@ -232,11 +286,12 @@ public class VNCFragment extends Fragment {
         vnc_serviceCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    String vnc_passwd = exe.RunAsRootOutput("su -c cat " + vncpasswd);
+                    File rootvncpasswd = new File(nh.CHROOT_PATH + "/root/.vnc/passwd");
+                    String vnc_passwd = exe.RunAsRootOutput("su -c cat " + rootvncpasswd);
                     if(!vnc_passwd.equals("")) {
                         String arch = System.getProperty("os.arch");
                         String shebang = "#!/system/bin/sh\n";
-                        String kex_prep = "\n# KeX architecture: " + arch + "\n# Commands to run at boot:\nexport HOME=/root\nexport USER=root";
+                        String kex_prep = "\n# KeX architecture: " + arch + "\n# Commands to run at boot:\nHOME=/root\nUSER=root";
                         String kex_cmd = "";
                         if(arch.equals("aarch64")) {
                             kex_cmd = "su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgcc_s.so.1 vncserver :1 " + localhostonly + " " + selected_vncresCMD + "'";
@@ -263,28 +318,41 @@ public class VNCFragment extends Fragment {
         RefreshKeX.setOnClickListener(v -> {
             refreshVNC(rootView);
         });
-        refreshVNC(rootView);
+        //refreshVNC(rootView);
 
         addClickListener(SetupVNCButton, v -> {
-            intentClickListener_NH("echo $'\n'\"Please enter your new VNC server password\" && vncpasswd && sleep 2 && exit"); // since is a kali command we can send it as is
+            intentClickListener_NH("echo -ne \"\\033]0;Setting up Server\\007\" && clear;echo $'\n'\"Please enter your new VNC server password\"$'\n' && sudo -u " + selected_user + " vncpasswd && sleep 2 && exit"); // since is a kali command we can send it as is
         });
         addClickListener(StartVNCButton, v -> {
-            String vnc_passwd = exe.RunAsRootOutput("su -c cat " + vncpasswd);
+            if(selected_user.equals("root")) {
+                File rootvncpasswd = new File(nh.CHROOT_PATH + "/root/.vnc/passwd");
+                vnc_passwd = exe.RunAsRootOutput("su -c cat " + rootvncpasswd);
+            } else {
+                File uservncpasswd = new File(nh.CHROOT_PATH + "/home/" + selected_user + "/.vnc/passwd");
+                vnc_passwd = exe.RunAsRootOutput("su -c cat " + uservncpasswd);
+            }
             if(vnc_passwd.equals("")) {
                 Toast.makeText(getActivity().getApplicationContext(), "Please setup local server first!", Toast.LENGTH_SHORT).show();
             } else {
                 String arch = System.getProperty("os.arch");
                 if(arch.equals("aarch64")) {
-                    intentClickListener_NH("export HOME=/root;export USER=root;LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgcc_s.so.1 nohup vncserver :1 " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + " >/dev/null 2>&1 </dev/null; sleep 2 && exit");
+                    if(selected_user.equals("root")) {
+                        intentClickListener_NH("echo -ne \"\\033]0;Starting Server\\007\" && clear;HOME=/root;USER=root;sudo -u root LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgcc_s.so.1 nohup vncserver :1 " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + " >/dev/null 2>&1 </dev/null; sleep 2 && exit");
+                    } else {
+                        intentClickListener_NH("echo -ne \"\\033]0;Starting Server\\007\" && clear;HOME=/home/" + selected_user + ";USER=" + selected_user + ";sudo -u " + selected_user + " LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgcc_s.so.1 nohup vncserver :" + selected_display + " " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + " >/dev/null 2>&1 </dev/null; sleep 2 && exit");
+                    }
                 } else {
-                    intentClickListener_NH("export HOME=/root;export USER=root;LD_PRELOAD=/usr/lib/arm-linux-gnueabihf/libgcc_s.so.1 nohup vncserver :1 " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + " >/dev/null 2>&1 </dev/null; sleep 2 && exit");
+                    if (selected_user.equals("root")) {
+                        intentClickListener_NH("echo -ne \"\\033]0;Starting Server\\007\" && clear;HOME=/root;export USER=root;sudo -u root LD_PRELOAD=/usr/lib/arm-linux-gnueabihf/libgcc_s.so.1 nohup vncserver :1 " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + " >/dev/null 2>&1 </dev/null; sleep 2 && exit");
+                    } else {
+                        intentClickListener_NH("echo -ne \"\\033]0;Starting Server\\007\" && clear;HOME=/home/" + selected_user + ";USER=" + selected_user + ";sudo -u " + selected_user + " LD_PRELOAD=/usr/lib/arm-linux-gnueabihf/libgcc_s.so.1 nohup vncserver :" + selected_display + " " + "-name \"NetHunter KeX\" " + selected_vncresCMD + " >/dev/null 2>&1 </dev/null; sleep 2 && exit");
+                    }
                 }
                 Log.d(TAG, localhostonly);
             }
         });
         addClickListener(StopVNCButton, v -> {
-            intentClickListener_NH("vncserver -kill :1 ;sleep 2 && exit"); // since is a kali command we can send it as is
-            refreshVNC(rootView);
+            intentClickListener_NH("echo -ne \"\\033]0;Killing Server\\007\" && clear;sudo -u " + selected_user + " vncserver -kill :" + selected_display + " ;sleep 2 && exit"); // since is a kali command we can send it as is
         });
         addClickListener(OpenVNCButton, v -> {
             intentClickListener_VNC(); // since is a kali command we can send it as is
@@ -300,6 +368,16 @@ public class VNCFragment extends Fragment {
                 Advanced.setText("SHOW ADVANCED SETTINGS");
                 showingAdvanced = false;
                 sharedpreferences.edit().putBoolean("advanced_visible", false).apply();
+            }
+        });
+        addClickListener(AddUserButton, v -> {
+            intentClickListener_NH("echo -ne \"\\033]0;New User\\007\" && clear;read -p \"Please enter your new username\"$'\n' USER && adduser $USER; adduser $USER sudo; adduser $USER inet && echo \"Please refresh your KeX manager, closing in 2 secs\" && sleep 2 && exit");
+        });
+        addClickListener(DelUserButton, v -> {
+            if (selected_user.contains("root")) {
+                Toast.makeText(getActivity().getApplicationContext(), "Can't remove root!", Toast.LENGTH_SHORT).show();
+            } else {
+                intentClickListener_NH("echo -ne \"\\033]0;Removing User\\007\" && clear;deluser -remove-home " + selected_user + " && sleep 2 && exit");
             }
         });
         addClickListener(ResetHDMIButton, v -> {
@@ -360,7 +438,7 @@ public class VNCFragment extends Fragment {
                 reload();
                 Toast.makeText(getActivity().getApplicationContext(), "Restore successful!", Toast.LENGTH_SHORT).show();
             }
-           });
+        });
         return rootView;
     }
 
@@ -384,16 +462,22 @@ public class VNCFragment extends Fragment {
         }
         else {
             KeXstatus.setText("RUNNING");
-            // The following looks a bit unelegant but works with the widest range of Android versions & devices
-            kex_userCmd = exe.RunAsRootOutput("su -c ps -p " + kex_statusCmd + "|grep Xtigervnc|awk '{print $1}'");
-            if (kex_userCmd.equals(""))
-                KeXuser.setText("None");
-            else
-                KeXuser.setText(kex_userCmd.replaceAll("\\s+", ""));
-            //Android cannot resolve Kali UID's and always returns system. Let's prettyfy it for now
-            if (!kex_userCmd.equals("root"))
-                KeXuser.setText("non-root");
+            kex_userCmd = exe.RunAsRootOutput("bootkali custom_cmd ps aux | grep /usr/bin/vncserver | head -n1 | awk '{print $1,$13;}'");
+            KeXuser.setText(kex_userCmd);
         }
+        File passwd = new File(nh.CHROOT_PATH + "/etc/passwd");
+        String[] commandUSR = {"sh", "-c", "echo root && awk -F':' -v \"min=1000\" -v \"max=2000\" '{ if ( $3 >= min && $3 <= max ) print $0}' " + passwd + " | cut -d: -f1"};
+        String outputUSR = exe.Executer(commandUSR);
+        final String[] userArray = outputUSR.split("\n");
+        Spinner users = VNCFragment.findViewById(R.id.user);
+        ArrayAdapter usersadapter = new ArrayAdapter<>(getContext(),android.R.layout.simple_list_item_1, userArray);
+        users.setAdapter(usersadapter);
+        SharedPreferences sharedpreferences = context.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
+        posd = sharedpreferences.getInt("display", 0);
+        Spinner displays = VNCFragment.findViewById(R.id.display);
+        displays.setSelection(posd);
+        pos = sharedpreferences.getInt("user", 0);
+        users.setSelection(pos);
     }
 
     private void openResolutionDialog() {
@@ -516,11 +600,11 @@ public class VNCFragment extends Fragment {
         try {
             if (getView() == null)
                 return;
-                Intent intent = context.getPackageManager().getLaunchIntentForPackage("com.offsec.nethunter.kex");
-                startActivity(intent);
+            Intent intent = context.getPackageManager().getLaunchIntentForPackage("com.offsec.nethunter.kex");
+            startActivity(intent);
         } catch (Exception e) {
             Log.d("errorLaunching", e.toString());
-            nh.showMessage(context, "NetHunter KeX client not found. Please install it from NetHunter Store!");
+            nh.showMessage(context, "NetHunter VNC not found!");
         }
     }
 
