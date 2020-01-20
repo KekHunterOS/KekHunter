@@ -14,6 +14,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.IBinder;
+import android.text.SpannableString;
+import android.text.method.LinkMovementMethod;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -267,18 +270,22 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
 
     private void showLicense() {
         // @binkybear here goes the changelog etc... \n\n%s
-        String readmeData = String.format("%s\n\n%s",
+        String readmeData = String.format("%s\n\n%s\n\n%s",
                 getResources().getString(R.string.licenseInfo),
-                getResources().getString(R.string.nhwarning));
+                getResources().getString(R.string.nhwarning),
+                getResources().getString(R.string.nhteam));
+        final SpannableString readmeText = new SpannableString(readmeData);
+        Linkify.addLinks(readmeText, Linkify.WEB_URLS);
 
         AlertDialog.Builder adb = new AlertDialog.Builder(this);
         adb.setTitle("README INFO")
-                .setMessage(readmeData)
+                .setMessage(readmeText)
                 .setNegativeButton("Close", (dialog, which) -> dialog.cancel()); //nhwarning
         AlertDialog ad = adb.create();
         ad.setCancelable(false);
         ad.getWindow().getAttributes().windowAnimations = R.style.DialogStyle;
         ad.show();
+        ((TextView)ad.findViewById(android.R.id.message)).setMovementMethod(LinkMovementMethod.getInstance());
     }
 
     /* if the chroot isn't set up, don't show the chroot options */
