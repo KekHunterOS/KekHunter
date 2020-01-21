@@ -21,6 +21,8 @@ import java.io.FileOutputStream;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class CustomCommandsSQL extends SQLiteOpenHelper {
     private static CustomCommandsSQL instance;
     private static final String DATABASE_NAME = "CustomCommandsFragment";
@@ -59,35 +61,34 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        if (new File(NhPaths.APP_DATABASE_PATH + "/KaliLaunchers").exists()) {
-            convertOldDBtoNewDB(db);
-            return;
-        }
         db.execSQL("CREATE TABLE " + TABLE_NAME + " (" + COLUMNS.get(0) + " INTEGER, " +
                 COLUMNS.get(1) + " TEXT, " + COLUMNS.get(2) +  " TEXT, " +
                 COLUMNS.get(3) + " TEXT, " + COLUMNS.get(4) + " TEXT, " +
                 COLUMNS.get(5) + " INTEGER)");
-        ContentValues initialValues = new ContentValues();
-        db.beginTransaction();
-        for (String[] data: customcommandsData){
-            initialValues.put(COLUMNS.get(0), data[0]);
-            initialValues.put(COLUMNS.get(1), data[1]);
-            initialValues.put(COLUMNS.get(2), data[2]);
-            initialValues.put(COLUMNS.get(3), data[3]);
-            initialValues.put(COLUMNS.get(4), data[4]);
-            initialValues.put(COLUMNS.get(5), data[5]);
-            db.insert(TABLE_NAME, null, initialValues);
+        // For devices update from db version 2 to 3 only;
+        if (new File(NhPaths.APP_DATABASE_PATH + "/KaliLaunchers").exists()) {
+            convertOldDBtoNewDB(db);
+        // else create default value;
+        } else {
+            ContentValues initialValues = new ContentValues();
+            db.beginTransaction();
+            for (String[] data : customcommandsData) {
+                initialValues.put(COLUMNS.get(0), data[0]);
+                initialValues.put(COLUMNS.get(1), data[1]);
+                initialValues.put(COLUMNS.get(2), data[2]);
+                initialValues.put(COLUMNS.get(3), data[3]);
+                initialValues.put(COLUMNS.get(4), data[4]);
+                initialValues.put(COLUMNS.get(5), data[5]);
+                db.insert(TABLE_NAME, null, initialValues);
+            }
+            db.setTransactionSuccessful();
+            db.endTransaction();
         }
-        db.setTransactionSuccessful();
-        db.endTransaction();
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (oldVersion > 3) {
-            db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
-            this.onCreate(db);
-        }
+
     }
 
     public ArrayList<CustomCommandsModel> bindData(ArrayList<CustomCommandsModel> customCommandsModelArrayList) {
@@ -303,9 +304,8 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
         SQLiteDatabase tempDB = SQLiteDatabase.openDatabase(storedDBpath, null, SQLiteDatabase.OPEN_READWRITE);
         try {
             SQLiteDatabase currentDB = this.getWritableDatabase();
-            currentDB.beginTransaction();
-            currentDB.execSQL("DELETE FROM " + TABLE_NAME + ";");
             currentDB.execSQL("ATTACH DATABASE ? AS oldDB",new String[]{storedDBpath});
+            currentDB.execSQL("DELETE FROM " + TABLE_NAME + ";");
             currentDB.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMNS.get(0) + "," +
                     COLUMNS.get(1) + "," + COLUMNS.get(2) + "," +
                     COLUMNS.get(3) + "," + COLUMNS.get(4) + "," +
@@ -313,8 +313,7 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
                     " FROM oldDB.LAUNCHERS;");
             currentDB.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(3) + " = LOWER(" + COLUMNS.get(3) + ");");
             currentDB.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(4) + " = LOWER(" + COLUMNS.get(4) + ");");
-            currentDB.setTransactionSuccessful();
-            currentDB.endTransaction();
+            currentDB.execSQL("DETACH DATABASE oldDB;");
             tempDB.close();
             currentDB.close();
             return true;
@@ -327,13 +326,7 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
     }
 
     private void convertOldDBtoNewDB(SQLiteDatabase currentDB) {
-        currentDB.beginTransaction();
-        currentDB.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
-        currentDB.execSQL("CREATE TABLE " + TABLE_NAME + " (" + COLUMNS.get(0) + " INTEGER, " +
-                COLUMNS.get(1) + " TEXT, " + COLUMNS.get(2) +  " TEXT, " +
-                COLUMNS.get(3) + " TEXT, " + COLUMNS.get(4) + " TEXT, " +
-                COLUMNS.get(5) + " INTEGER)");
-        currentDB.execSQL("ATTACH DATABASE ? AS oldDB",new String[]{NhPaths.APP_DATABASE_PATH + "/KaliLaunchers"});
+        currentDB.execSQL("ATTACH DATABASE ? AS oldDB", new String[]{NhPaths.APP_DATABASE_PATH + "/KaliLaunchers"});
         currentDB.execSQL("INSERT INTO " + TABLE_NAME + "(" + COLUMNS.get(0) + "," +
                 COLUMNS.get(1) + "," + COLUMNS.get(2) + "," +
                 COLUMNS.get(3) + "," + COLUMNS.get(4) + "," +
@@ -341,19 +334,17 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
                 " FROM oldDB.LAUNCHERS;");
         currentDB.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(3) + " = LOWER(" + COLUMNS.get(3) + ");");
         currentDB.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(4) + " = LOWER(" + COLUMNS.get(4) + ");");
-        currentDB.setTransactionSuccessful();
-        currentDB.endTransaction();
         SQLiteDatabase.deleteDatabase(new File(NhPaths.APP_DATABASE_PATH + "/KaliLaunchers"));
     }
 
     private boolean ifTableExists (SQLiteDatabase tempDB, String tableName) {
-        Cursor c = null;
         boolean tableExists = false;
         try {
-            c = tempDB.rawQuery("SELECT name FROM sqlite_master WHERE type='table' AND name='" + tableName + "'", null);
+            Cursor c = tempDB.rawQuery("SELECT name FROM sqlite_master WHERE type='table' AND name='" + tableName + "'", null);
             if (c.getCount()==1) {
                 tableExists = true;
             }
+            c.close();
         } catch (Exception e) {
             Log.e(TAG, e.toString());
         }
