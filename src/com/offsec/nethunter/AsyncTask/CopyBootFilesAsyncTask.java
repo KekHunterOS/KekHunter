@@ -102,6 +102,7 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
             disableMagiskNotification();
             SharedPreferences.Editor ed = prefs.edit();
             ed.putString(TAG, buildTime);
+            ed.putInt(SharePrefTag.VERSION_CODE_TAG, BuildConfig.VERSION_CODE);
             ed.apply();
 
             publishProgress("Checking for chroot....");
@@ -110,7 +111,6 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
             if (_res.equals("1")) {
                 ed = prefs.edit();
                 ed.putBoolean(AppNavHomeActivity.CHROOT_INSTALLED_TAG, true);
-                ed.putInt(SharePrefTag.VERSION_CODE_TAG, BuildConfig.VERSION_CODE);
                 ed.commit();
                 publishProgress("Chroot Found!");
                 // @Re4son @kimocoder @yesimxev is it still necessnary to remount /data partition and chmod +s the chroot /usr/bin/sudo?
