@@ -30,12 +30,12 @@ public class NethunterSQL extends SQLiteOpenHelper {
     private static ArrayList<String> COLUMNS = new ArrayList<>();
     private static final String[][] nethunterData = {
             {"1", "Kernel Version", "uname -a", "\\n", "1"},
-            {"2", "Busybox Version", "." + NhPaths.BUSYBOX + " | head -n1", "\\n", "1"},
+            {"2", "Busybox Version", NhPaths.BUSYBOX + " | head -n1", "\\n", "1"},
             {"3", "Root Status", "su -v", "\\n", "1"},
             {"4", "HID status", "ls /dev/hidg* || echo \"HID interface not found.\"", "\\n", "1"},
             {"5", "Nethunter Terminal Status", "[ \"$(pm list packages | grep 'com.offsec.nhterm')\" ] && echo \"Nethunter Terminal is installed.\" || echo \"Nethunter Terminal is NOT yet installed.\"", "\\n", "1"},
-            {"6", "Network Interface Status", "." + NhPaths.BUSYBOX + " ip -o addr show | awk '{print $2, $3, $4}'", "\\n", "1"},
-            {"7", "External IP", "." + NhPaths.BUSYBOX + " wget -qO - icanhazip.com", "\\n", "0"}
+            {"6", "Network Interface Status", " ip -o addr show | " + NhPaths.BUSYBOX + " awk '{print $2, $3, $4}'", "\\n", "1"},
+            {"7", "External IP", NhPaths.BUSYBOX + " wget -qO - icanhazip.com", "\\n", "0"}
     };
 
     public synchronized static NethunterSQL getInstance(Context context){
