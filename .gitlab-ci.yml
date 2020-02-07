@@ -1,0 +1,22 @@
+image: jangrewe/gitlab-ci-android
+
+before_script:
+- export GRADLE_USER_HOME=$(pwd)/.gradle
+- chmod +x ./gradlew
+
+cache:
+  key: ${CI_PROJECT_ID}
+  paths:
+  - .gradle/
+
+stages:
+- build
+
+assembleDebug:
+  stage: build
+  script:
+  - ./gradlew assembleDebug
+  artifacts:
+    paths:
+    - ./build/outputs/apk/debug/kali-nethunter-app-debug.apk
+    expire_in: 1 week
