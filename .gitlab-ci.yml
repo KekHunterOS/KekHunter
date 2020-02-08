@@ -18,32 +18,37 @@ before_script:
 
 # Jobs to build debug and unsigned release apk in accordance with the NetHunter Store naming conventions (<app id>_<version_code>.apk)
 # The artifacts are named <branch name>-<commit short sha>-<job name>.zip 
+# To execute a job using local runners, run "mkdir ./result" and one of the following:
+# sudo gitlab-runner exec docker .assembleDebug --docker-volumes `pwd`/result:/tmp/result
+# sudo gitlab-runner exec docker .assembleRelease --docker-volumes `pwd`/result:/tmp/result
 .assembleDebug:
   stage: build
   script:
   - ./gradlew assembleDebug
-  - mkdir -p result
-  - mv ./build/outputs/apk/debug/kali-nethunter-app-debug.apk result/${APK_NAME}-debug.apk
-  - ls result/
+  - mkdir -p /tmp/result
+  - ls ./build/outputs/apk/debug/ 
+  - mv ./build/outputs/apk/debug/kali-nethunter-app-debug.apk /tmp/result/${APK_NAME}-debug.apk || mv ./build/outputs/apk/debug/*-debug.apk /tmp/result/${APK_NAME}-debug.apk
+  - ls /tmp/result/
   
   artifacts:
     name: "$CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA-$CI_JOB_NAME"
     paths:
-    - ./result/*.apk
+    - /tmp/result/*.apk
     expire_in: 1 week
 
 .assembleRelease:
   stage: build
   script:
   - ./gradlew assembleRelease
-  - mkdir -p result
-  - mv ./build/outputs/apk/release/kali-nethunter-app-release-unsigned.apk result/${APK_NAME}.apk
-  - ls result/
+  - mkdir -p /tmp/result
+  - ls ./build/outputs/apk/release/
+  - mv ./build/outputs/apk/release/kali-nethunter-app-release-unsigned.apk /tmp/result/${APK_NAME}.apk || mv ./build/outputs/apk/release/*-release-unsigned.apk /tmp/result/${APK_NAME}.apk
+  - ls /tmp/result/
   
   artifacts:
     name: "$CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA-$CI_JOB_NAME"
     paths:
-    - ./result/*.apk
+    - /tmp/result/*.apk
     expire_in: 1 week
 
 
