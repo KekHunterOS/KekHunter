@@ -22,7 +22,7 @@ assembleDebug:
   - ./gradlew assembleRelease
   - mkdir -p result
   - mv ./build/outputs/apk/debug/kali-nethunter-app-debug.apk result/$PACKAGE_$VERSION_CODE-debug.apk
-  - mv ./build/outputs/apk/release/kali-nethunter-app.apk result/$PACKAGE_$VERSION_CODE.apk
+  - mv ./build/outputs/apk/release/kali-nethunter-app-release-unsigned.apk result/$PACKAGE_$VERSION_CODE.apk
   artifacts:
     paths:
     - ./result/$PACKAGE_$VERSION_CODE-debug.apk
