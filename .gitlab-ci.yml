@@ -2,6 +2,9 @@ image: jangrewe/gitlab-ci-android
 
 before_script:
 - export GRADLE_USER_HOME=$(pwd)/.gradle
+- export PACKAGE=`egrep '^[[:blank:]]+package' ./AndroidManifest.xml | awk -F'[=>]' '{print $2}' | sed s/\"//g`
+- export VERSION_NAME=`egrep '^[[:blank:]]+versionName[[:blank:]]' ./build.gradle | awk '{print $2}' | sed s/\"//g`
+- export VERSION_CODE=`egrep '^[[:blank:]]+versionCode[[:blank:]]' ./build.gradle | awk '{print $2}' | sed s/\"//g`
 - chmod +x ./gradlew
 
 cache:
@@ -16,9 +19,11 @@ assembleDebug:
   stage: build
   script:
   - ./gradlew assembleDebug
+  - ./gradlew assembleRelease
   - mkdir -p result
-  - mv ./build/outputs/apk/debug/kali-nethunter-app-debug.apk result/kali-nethunter-app-debug-$CI_COMMIT_BRANCH.apk
+  - mv ./build/outputs/apk/debug/kali-nethunter-app-debug.apk result/$PACKAGE_$VERSION_CODE-debug.apk
+  - mv ./build/outputs/apk/release/kali-nethunter-app.apk result/$PACKAGE_$VERSION_CODE.apk
   artifacts:
     paths:
-    - ./result/kali-nethunter-app-debug-$CI_COMMIT_BRANCH.apk
+    - ./result/$PACKAGE_$VERSION_CODE-debug.apk
     expire_in: 1 week
