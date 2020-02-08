@@ -6,6 +6,9 @@ before_script:
 - export VERSION_NAME=`egrep '^[[:blank:]]+versionName[[:blank:]]' ./build.gradle | awk '{print $2}' | sed s/\"//g`
 - export VERSION_CODE=`egrep '^[[:blank:]]+versionCode[[:blank:]]' ./build.gradle | awk '{print $2}' | sed s/\"//g`
 - chmod +x ./gradlew
+- echo $PACKAGE
+- echo $VERSION_NAME
+- echo $VERSION_CODE
 
 cache:
   key: ${CI_PROJECT_ID}
@@ -15,7 +18,7 @@ cache:
 stages:
 - build
 
-assembleDebug:
+assembleAll:
   stage: build
   script:
   - ./gradlew assembleDebug
@@ -23,7 +26,9 @@ assembleDebug:
   - mkdir -p result
   - mv ./build/outputs/apk/debug/kali-nethunter-app-debug.apk result/$PACKAGE_$VERSION_CODE-debug.apk
   - mv ./build/outputs/apk/release/kali-nethunter-app-release-unsigned.apk result/$PACKAGE_$VERSION_CODE.apk
+  - ls result/
   artifacts:
     paths:
     - ./result/$PACKAGE_$VERSION_CODE-debug.apk
+    - ./result/$PACKAGE_$VERSION_CODE.apk
     expire_in: 1 week
