@@ -16,7 +16,9 @@ assembleDebug:
   stage: build
   script:
   - ./gradlew assembleDebug
+  - mkdir -p result
+  - mv ./build/outputs/apk/debug/kali-nethunter-app-debug.apk result/kali-nethunter-app-debug-$CI_COMMIT_BRANCH.apk
   artifacts:
     paths:
-    - ./build/outputs/apk/debug/kali-nethunter-app-debug.apk
+    - ./result/kali-nethunter-app-debug-$CI_COMMIT_BRANCH.apk
     expire_in: 1 week
