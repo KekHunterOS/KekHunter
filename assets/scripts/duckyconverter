@@ -2844,6 +2844,23 @@ function command_interpreter(){
                 command_interpreter "$CMD" "${CONTENT[@]}"
             done
             LAST_CMD="$CMD ${CONTENT[@]}"
+        elif [ "$TMP_CMD" = "COMBO" ]; then
+            TMP_CONTENT=(${TMP_CONTENT[@]})
+            local FULL_CMD
+            FULL_CMD=()
+            for i in "${TMP_CONTENT[@]}"; do
+                ERROR_CODE=1
+                local KEY="`tr '[:upper:]' '[:lower:]' <<< $i`"
+                for j in "${COMBO_KEYS[@]}"; do
+                    if [ "$j" = "$KEY" ]; then
+                        ERROR_CODE=0
+                        break
+                    fi
+                done
+                [ $ERROR_CODE -eq 1 ] && echo "$i is not a valid key combination, please check." | tee $OUTFILE && exit 1
+                FULL_CMD+=($(translate_combo_key $KEY))
+            done
+            write_kb_code_bin "${FULL_CMD[@]}"
         elif [ "$TMP_CMD" = "MOUSE" ]; then
             write_mouse_code ${TMP_CONTENT}
         else
