@@ -37,6 +37,43 @@
         <item>background</item>
     </string-array>
 
+    <!-- USB Armory -->
+    <string name="drawertitleusbarmory">USB Armory</string>
+    <string name="usbarmory_hint1_imagemounter">*Place all your .img or .iso files in "/sdcard/nh_files/diskimage/"</string>
+    <string name="usbarmory_current_usb_state">Current USB state: </string>
+    <string-array name="usbarmory_target_platform">
+        <item>Windows</item>
+        <item>Linux</item>
+        <item>Mac OS</item>
+    </string-array>
+    <string-array name="usbarmory_usb_states_win_lin">
+        <item>reset</item>
+        <item>hid</item>
+        <item>mass_storage</item>
+        <item>rndis</item>
+        <item>hid,mass_storage</item>
+        <item>rndis,hid</item>
+        <item>rndis,mass_storage</item>
+        <item>rndis,hid,mass_storage</item>
+    </string-array>
+    <string-array name="usbarmory_usb_states_mac">
+        <item>reset</item>
+        <item>hid</item>
+        <item>mass_storage</item>
+        <item>acm,ecm</item>
+        <item>hid,mass_storage</item>
+        <item>acm,ecm,hid</item>
+        <item>acm,ecm,mass_storage</item>
+        <item>acm,ecm,hid,mass_storage</item>
+    </string-array>
+    <string-array name="usbarmory_usb_adb">
+        <item>Enable</item>
+        <item>Disable</item>
+    </string-array>
+    <string-array name="usbarmory_usb_network_attack_mode">
+        <item>Network Tethering Only</item>
+    </string-array>
+
     <!-- Bad USB -->
     <string name="badusb_label">BadUSB MITM Attack</string>
     <string name="badusb_description">This is our implementation of the BadUSB attack as demonstrated at Black Hat USA 2014. Enabling this USB gadget mode will allow your device to act as a USB network interface when plugged into a target computer. Connecting the USB cable to a PC will force all traffic from that PC (Windows or Linux) through the NetHunter device, where the traffic can be MITM\'ed.</string>

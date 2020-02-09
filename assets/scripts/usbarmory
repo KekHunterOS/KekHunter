@@ -41,14 +41,14 @@ FUNCS_NAME_PREFIX=$(echo ${ORI_FUNCS[0]} | $BUSYBOX sed 's/\(^.*\)\(\/\([a-zA-Z]
 FUNCS_NAME_ORDER=$(echo ${ORI_FUNCS[0]} | $BUSYBOX sed 's/\(^.*\)\(\/[a-zA-Z]\{1,\}\([0-9]\{1,\}\)$\)/\3/g')
 
 ## Define the first function name that will be symlinked to $DIR_CUR_FUNCS
-SYMLINK_FUNC_NAME="$FUNCS_NAME_PREFIX$FUNCS_NAME_ORDER"
+SYMLINK_FUNC_NAME="${FUNCS_NAME_PREFIX}${FUNCS_NAME_ORDER}"
 
 ################################
 #### Define shell functions ####
 ################################
 
 function print_usage(){
-    bklog "[!] Usage: usbarmory -t <Target OS> -f <USB Functions>"
+    bklog "[!] Usage: usbarmory -t <Target OS> -f <USB Functions> -v <idVendor value> -p <idProduct value> [mPs]"
     bklog "[!] Available target OS: [win|lnx|mac]; win => Windows; lnx => Linux; mac => Mac OS"
     bklog "[!] Available configfs functions: [reset] or [adb,hid,mass_storage,rndis,acm,ecm]"
     bklog "[!] reset => enable adb only."
@@ -56,9 +56,9 @@ function print_usage(){
     bklog "[!] mass_storage => enable mass storage only."
     bklog "[!] rndis => enable RNDIS only, usually target on Windows or Linux."
     bklog "[!] acm,ecm => enable network card simulation on Mac OS when these two are enabled together.\n"
-    bklog "[!] e.g. 'usbarmory -t win -f reset'"
-    bklog "[!] e.g. 'usbarmory -t win -f adb,hid,mass_storage,rndis' "
-    bklog "[!] e.g. 'usbarmory -t mac -f adb,hid,mass_storage,acm,ecm'"
+    bklog "[!] e.g. \"usbarmory -t win -f reset -v '0x18d1' -p '0x4ee7'\""
+    bklog "[!] e.g. \"usbarmory -t win -f adb,hid,mass_storage,rndis -v '0x18d1' -p '0x4a4a'\""
+    bklog "[!] e.g. \"usbarmory -t mac -f adb,hid,mass_storage,acm,ecm -v '0x18d1' -p '0x4b4b'\""
 }
 
 function clear_funcs(){
@@ -80,6 +80,8 @@ function revert_to_ori_state(){
     if [ ! -e $DIR_CUR_FUNCS/$SYMLINK_FUNC_NAME ]; then
         ln -s $DIR_ALL_FUNCS/ffs.adb $DIR_CUR_FUNCS/$SYMLINK_FUNC_NAME
     fi
+    echo "$ID_VENDOR" > $DIR_CONFIGFS/idVendor
+    echo "$ID_PRODUCT" > $DIR_CONFIGFS/idProduct
     fireup_funcs
 }
 
@@ -138,19 +140,19 @@ function prepare_rndis(){
                     bklog "[-] RNDIS is not supported on you device. Make sure your kernel has RNDIS feature patched and enabled."
                     return 1
                 else
-                    REAL_RNDIS_NAME = rndis.gs4
+                    REAL_RNDIS_NAME=rndis.gs4
                     return 0
                 fi
             else
-                REAL_RNDIS_NAME = rndis.gs4
+                REAL_RNDIS_NAME=rndis.gs4
                 return 0
             fi
         else
-            REAL_RNDIS_NAME = gsi.rndis
+            REAL_RNDIS_NAME=gsi.rndis
             return 0
         fi
     else
-        REAL_RNDIS_NAME = gsi.rndis
+        REAL_RNDIS_NAME=gsi.rndis
         return 0
     fi
 }
@@ -315,50 +317,53 @@ function switch_funcs(){
 
     ## Last work to do ##
     ## 1. Setup the idProduct, idVendor, manufacturer, product, serialnumber
-    case "$TARGET_OS" in
-        win|lnx)
-            if [ $(($IS_HID_SELECTED | $IS_MASS_SELECTED | $IS_RNDIS_SELECTED)) -eq 0 ]; then
-                ID_VENDOR="0x0525"; ID_PRODUCT="0xa4a8"
-            elif [ $(($IS_HID_SELECTED | $IS_MASS_SELECTED)) -eq 0 ]; then
-                ID_VENDOR="0x046d"; ID_PRODUCT="0xc318"
-            elif [ $(($IS_HID_SELECTED | $IS_RNDIS_SELECTED)) -eq 0 ]; then
-                ID_VENDOR="0x0525"; ID_PRODUCT="0xa4a6"
-            elif [ $(($IS_MASS_SELECTED | $IS_RNDIS_SELECTED)) -eq 0 ]; then
-                ID_VENDOR="0x0525"; ID_PRODUCT="0xa4a4"
-            elif [ $IS_HID_SELECTED -eq 0 ]; then
-                ID_VENDOR="0x046d"; ID_PRODUCT="0xc316"
-            elif [ $IS_MASS_SELECTED -eq 0 ]; then
-                ID_VENDOR="0x9051"; ID_PRODUCT="0x168a"
-            elif [ $IS_RNDIS_SELECTED -eq 0 ]; then
-                ID_VENDOR="0x0525"; ID_PRODUCT="0xa4a2"
-            fi
-            ;;
-        mac)
-            if [ $(($IS_HID_SELECTED | $IS_MASS_SELECTED | $IS_ACM_SELECTED | $IS_ECM_SELECTED)) -eq 0 ]; then
-                ID_VENDOR="0x05ac"; ID_PRODUCT="0x0201"
-            elif [ $(($IS_HID_SELECTED | $IS_MASS_SELECTED)) -eq 0 ]; then
-                ID_VENDOR="0x05ac"; ID_PRODUCT="0x0201"
-            elif [ $(($IS_HID_SELECTED | $IS_ACM_SELECTED | $IS_ECM_SELECTED)) -eq 0 ]; then
-                ID_VENDOR="0x05ac"; ID_PRODUCT="0x0201"
-            elif [ $(($IS_MASS_SELECTED | $IS_ACM_SELECTED | $IS_ECM_SELECTED)) -eq 0 ]; then
-                ID_VENDOR="0x1d6b"; ID_PRODUCT="0x0105"
-            elif [ $IS_HID_SELECTED -eq 0 ]; then
-                ID_VENDOR="0x05ac"; ID_PRODUCT="0x0201"
-            elif [ $IS_MASS_SELECTED -eq 0 ]; then
-                ID_VENDOR="0x0930"; ID_PRODUCT="0x6545"
-            elif [ $(($IS_ACM_SELECTED | $IS_ECM_SELECTED)) -eq 0 ]; then
-                ID_VENDOR="0x1d6b"; ID_PRODUCT="0x0105"
-            fi
-            ;;
-    esac
+    #if [ -z "$ID_VENDOR" -o -z "$ID_PRODUCT" ]; then
+    #    case "$TARGET_OS" in
+    #        win|lnx)
+    #            if [ $(($IS_HID_SELECTED | $IS_MASS_SELECTED | $IS_RNDIS_SELECTED)) -eq 0 ]; then
+    #                ID_VENDOR="0x0525"; ID_PRODUCT="0xa4a8"
+    #            elif [ $(($IS_HID_SELECTED | $IS_MASS_SELECTED)) -eq 0 ]; then
+    #                ID_VENDOR="0x046d"; ID_PRODUCT="0xc318"
+    #            elif [ $(($IS_HID_SELECTED | $IS_RNDIS_SELECTED)) -eq 0 ]; then
+    #                ID_VENDOR="0x0525"; ID_PRODUCT="0xa4a6"
+    #            elif [ $(($IS_MASS_SELECTED | $IS_RNDIS_SELECTED)) -eq 0 ]; then
+    #                ID_VENDOR="0x0525"; ID_PRODUCT="0xa4a4"
+    #            elif [ $IS_HID_SELECTED -eq 0 ]; then
+    #                ID_VENDOR="0x046d"; ID_PRODUCT="0xc316"
+    #            elif [ $IS_MASS_SELECTED -eq 0 ]; then
+    #                ID_VENDOR="0x9051"; ID_PRODUCT="0x168a"
+    #            elif [ $IS_RNDIS_SELECTED -eq 0 ]; then
+    #                ID_VENDOR="0x0525"; ID_PRODUCT="0xa4a2"
+    #            fi
+    #            ;;
+    #        mac)
+    #            if [ $(($IS_HID_SELECTED | $IS_MASS_SELECTED | $IS_ACM_SELECTED | $IS_ECM_SELECTED)) -eq 0 ]; then
+    #                ID_VENDOR="0x05ac"; ID_PRODUCT="0x0201"
+    #            elif [ $(($IS_HID_SELECTED | $IS_MASS_SELECTED)) -eq 0 ]; then
+    #                ID_VENDOR="0x05ac"; ID_PRODUCT="0x0201"
+    #            elif [ $(($IS_HID_SELECTED | $IS_ACM_SELECTED | $IS_ECM_SELECTED)) -eq 0 ]; then
+    #                ID_VENDOR="0x05ac"; ID_PRODUCT="0x0201"
+    #            elif [ $(($IS_MASS_SELECTED | $IS_ACM_SELECTED | $IS_ECM_SELECTED)) -eq 0 ]; then
+    #                ID_VENDOR="0x1d6b"; ID_PRODUCT="0x0105"
+    #            elif [ $IS_HID_SELECTED -eq 0 ]; then
+    #                ID_VENDOR="0x05ac"; ID_PRODUCT="0x0201"
+    #            elif [ $IS_MASS_SELECTED -eq 0 ]; then
+    #                ID_VENDOR="0x0930"; ID_PRODUCT="0x6545"
+    #            elif [ $(($IS_ACM_SELECTED | $IS_ECM_SELECTED)) -eq 0 ]; then
+    #                ID_VENDOR="0x1d6b"; ID_PRODUCT="0x0105"
+    #            fi
+    #            ;;
+    #    esac
+    #fi
+
     echo "$ID_VENDOR" > $DIR_CONFIGFS/idVendor
     echo "$ID_PRODUCT" > $DIR_CONFIGFS/idProduct
 
     ## Changing manufacturer, product, serialnumber may make your PC fail to authen your device again, ##
     ## so this part is disabled now until further experiment. ##
-    ##[ -f $DIR_CONFIGFS/strings/0x409/manufacturer ] && echo "Kali" > $DIR_CONFIGFS/strings/0x409/manufacturer
-    ##[ -f $DIR_CONFIGFS/strings/0x409/product ]      && echo "Nethunter" > $DIR_CONFIGFS/strings/0x409/product
-    ##[ -f $DIR_CONFIGFS/strings/0x409/serialnumber ] && echo "$(cat /dev/urandom | $BUSYBOX tr -dc 'A-Z0-9' | $BUSYBOX fold -w 10 | $BUSYBOX head -n1)" > $DIR_CONFIGFS/strings/0x409/serialnumber
+    [ ! -z "$MANUFACTURER" ] && [ -f $DIR_CONFIGFS/strings/0x409/manufacturer ] && echo "$MANUFACTURER" > $DIR_CONFIGFS/strings/0x409/manufacturer
+    [ ! -z "$PRODUCT" ]      && [ -f $DIR_CONFIGFS/strings/0x409/product ]      && echo "$PRODUCT" > $DIR_CONFIGFS/strings/0x409/product
+    [ ! -z "$SERIALNUMBER" ] && [ -f $DIR_CONFIGFS/strings/0x409/serialnumber ] && echo "$SERIALNUMBER" > $DIR_CONFIGFS/strings/0x409/serialnumber
 
     ## 2. Fireup the usb functions ##
     if [ $IS_ADB_SELECTED -eq 0 ]; then
@@ -392,16 +397,21 @@ function switch_funcs(){
 ###################
 
 ## Parse the args first. ##
-while getopts "t:f:" OPTS; do
+while getopts "t:f:v:p:m:P:s:" OPTS; do
     case $OPTS in
         t) TARGET_OS=$OPTARG;;
         f) TARGET_FUNCS=$OPTARG;;
+        v) ID_VENDOR=$OPTARG;;
+        p) ID_PRODUCT=$OPTARG;;
+        m) MANUFACTURER=$OPTARG;;
+        P) PRODUCT=$OPTARG;;
+        s) SERIALNUMBER=$OPTARG;;
         *) print_usage; exit 1;;
     esac
 done
 
 ## The number of args should be exactly 4 ##
-if [ ! $# -eq 4 ]; then
+if [ -z "$TARGET_OS" -o -z "$TARGET_FUNCS" -o -z "$ID_VENDOR" -o -z "$ID_PRODUCT" ]; then
     print_usage; exit 1
 fi
 

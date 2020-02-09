@@ -1,0 +1,23 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <group
+        android:id="@+id/f_usbarmory_menu_group1">
+        <item
+            android:id="@+id/f_usbarmory_menu_backupDB"
+            android:orderInCategory="100"
+            android:title="Backup DB"
+            app:showAsAction="never" />
+        <item
+            android:id="@+id/f_usbarmory_menu_restoreDB"
+            android:orderInCategory="100"
+            android:title="Restore DB"
+            app:showAsAction="never" />
+        <item
+            android:id="@+id/f_usbarmory_menu_ResetToDefault"
+            android:orderInCategory="100"
+            android:title="Reset to Default"
+            app:showAsAction="never" />
+    </group>
+
+</menu>

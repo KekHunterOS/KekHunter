@@ -32,6 +32,7 @@ import com.offsec.nethunter.AsyncTask.CopyBootFilesAsyncTask;
 import com.offsec.nethunter.SQL.CustomCommandsSQL;
 import com.offsec.nethunter.SQL.KaliServicesSQL;
 import com.offsec.nethunter.SQL.NethunterSQL;
+import com.offsec.nethunter.SQL.USBArmorySQL;
 import com.offsec.nethunter.gps.KaliGPSUpdates;
 import com.offsec.nethunter.gps.LocationUpdateService;
 import com.offsec.nethunter.service.CompatCheckService;
@@ -41,6 +42,7 @@ import com.offsec.nethunter.utils.PermissionCheck;
 import com.offsec.nethunter.utils.SharePrefTag;
 import com.winsontan520.wversionmanager.library.WVersionManager;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.Stack;
@@ -123,6 +125,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                 NethunterSQL.getInstance(getApplicationContext());
                 KaliServicesSQL.getInstance(getApplicationContext());
                 CustomCommandsSQL.getInstance(getApplicationContext());
+                USBArmorySQL.getInstance(getApplicationContext());
 
                 // Setup the default SharePreference value.
                 setDefaultSharePreference();
@@ -428,6 +431,13 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                             break;
                         case R.id.duckhunter_item:
                             changeFragment(fragmentManager, DuckHunterFragment.newInstance(itemId));
+                            break;
+                        case R.id.usbarmory_item:
+                            if (new File("/config/usb_gadget/g1").exists()) {
+                                changeFragment(fragmentManager, USBArmoryFragment.newInstance(itemId));
+                            } else {
+                                showWarningDialog("", "Your kernel doesn't support USB ConfigFS!.", false);
+                            }
                             break;
                         case R.id.badusb_item:
                             changeFragment(fragmentManager, BadusbFragment.newInstance(itemId));
