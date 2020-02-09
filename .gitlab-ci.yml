@@ -29,7 +29,7 @@ before_script:
   - ls ./build/outputs/apk/debug/ 
   - mv ./build/outputs/apk/debug/kali-nethunter-app-debug.apk result/${APK_NAME}-debug.apk || mv ./build/outputs/apk/debug/*-debug.apk result/${APK_NAME}-debug.apk
   - ls result/
-  - test -d /tmp/result && cp result/* /tmp/result # Copy it to host if run locally 
+  - if [ -d /tmp/result ]; then cp result/* /tmp/result; fi # Copy it to host if run locally 
   
   artifacts:
     name: "$CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA-$CI_JOB_NAME"
@@ -45,7 +45,7 @@ before_script:
   - ls ./build/outputs/apk/release/
   - mv ./build/outputs/apk/release/kali-nethunter-app-release-unsigned.apk result/${APK_NAME}.apk || mv ./build/outputs/apk/release/*-release-unsigned.apk result/${APK_NAME}.apk
   - ls result/
-  - test -d /tmp/result && cp result/* /tmp/result # Copy it to host if run locally 
+  - if [ -d /tmp/result ]; then cp result/* /tmp/result; fi # Copy it to host if run locally 
   
   artifacts:
     name: "$CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA-$CI_JOB_NAME"
