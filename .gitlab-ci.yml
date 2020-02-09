@@ -25,30 +25,32 @@ before_script:
   stage: build
   script:
   - ./gradlew assembleDebug
-  - mkdir -p /tmp/result
+  - mkdir -p result
   - ls ./build/outputs/apk/debug/ 
-  - mv ./build/outputs/apk/debug/kali-nethunter-app-debug.apk /tmp/result/${APK_NAME}-debug.apk || mv ./build/outputs/apk/debug/*-debug.apk /tmp/result/${APK_NAME}-debug.apk
-  - ls /tmp/result/
+  - mv ./build/outputs/apk/debug/kali-nethunter-app-debug.apk result/${APK_NAME}-debug.apk || mv ./build/outputs/apk/debug/*-debug.apk result/${APK_NAME}-debug.apk
+  - ls result/
+  - test -d /tmp/result && cp result/* /tmp/result # Copy it to host if run locally 
   
   artifacts:
     name: "$CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA-$CI_JOB_NAME"
     paths:
-    - /tmp/result/*.apk
+    - ./result/*.apk
     expire_in: 1 week
 
 .assembleRelease:
   stage: build
   script:
   - ./gradlew assembleRelease
-  - mkdir -p /tmp/result
+  - mkdir -p result
   - ls ./build/outputs/apk/release/
-  - mv ./build/outputs/apk/release/kali-nethunter-app-release-unsigned.apk /tmp/result/${APK_NAME}.apk || mv ./build/outputs/apk/release/*-release-unsigned.apk /tmp/result/${APK_NAME}.apk
-  - ls /tmp/result/
+  - mv ./build/outputs/apk/release/kali-nethunter-app-release-unsigned.apk result/${APK_NAME}.apk || mv ./build/outputs/apk/release/*-release-unsigned.apk result/${APK_NAME}.apk
+  - ls result/
+  - test -d /tmp/result && cp result/* /tmp/result # Copy it to host if run locally 
   
   artifacts:
     name: "$CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA-$CI_JOB_NAME"
     paths:
-    - /tmp/result/*.apk
+    - ./result/*.apk
     expire_in: 1 week
 
 
