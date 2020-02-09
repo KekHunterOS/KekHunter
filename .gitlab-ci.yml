@@ -1,0 +1,84 @@
+image: jangrewe/gitlab-ci-android
+
+stages:
+- build
+
+before_script:
+- export GRADLE_USER_HOME=$(pwd)/.gradle
+- export PACKAGE=`egrep '^[[:blank:]]+package' ./AndroidManifest.xml | awk -F'[=>]' '{print $2}' | sed s/\"//g`
+- export VERSION_NAME=`egrep '^[[:blank:]]+versionName[[:blank:]]' ./build.gradle | awk '{print $2}' | sed s/\"//g`
+- export VERSION_CODE=`egrep '^[[:blank:]]+versionCode[[:blank:]]' ./build.gradle | awk '{print $2}' | sed s/\"//g`
+- export APK_NAME="${PACKAGE}_${VERSION_CODE}"
+- chmod +x ./gradlew
+- echo $PACKAGE
+- echo $VERSION_NAME
+- echo $VERSION_CODE
+- echo $APK_NAME
+
+
+# Jobs to build debug and unsigned release apk in accordance with the NetHunter Store naming conventions (<app id>_<version_code>.apk)
+# The artifacts are named <branch name>-<commit short sha>-<job name>.zip 
+# To execute a job using local runners, run "mkdir ./result" and one of the following:
+# sudo gitlab-runner exec docker .assembleDebug --docker-volumes `pwd`/result:/tmp/result
+# sudo gitlab-runner exec docker .assembleRelease --docker-volumes `pwd`/result:/tmp/result
+.assembleDebug:
+  stage: build
+  script:
+  - ./gradlew assembleDebug
+  - mkdir -p result
+  - ls ./build/outputs/apk/debug/ 
+  - mv ./build/outputs/apk/debug/kali-nethunter-app-debug.apk result/${APK_NAME}-debug.apk || mv ./build/outputs/apk/debug/*-debug.apk result/${APK_NAME}-debug.apk
+  - ls result/
+  - if [ -d /tmp/result ]; then cp -f result/* /tmp/result; fi # Copy it to host if run locally 
+  
+  artifacts:
+    name: "$CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA-$CI_JOB_NAME"
+    paths:
+    - ./result/*.apk
+    expire_in: 1 week
+
+.assembleRelease:
+  stage: build
+  script:
+  - ./gradlew assembleRelease
+  - mkdir -p result
+  - ls ./build/outputs/apk/release/
+  - mv ./build/outputs/apk/release/kali-nethunter-app-release-unsigned.apk result/${APK_NAME}.apk || mv ./build/outputs/apk/release/*-release-unsigned.apk result/${APK_NAME}.apk
+  - ls result/
+  - if [ -d /tmp/result ]; then cp -f result/* /tmp/result; fi # Copy it to host if run locally 
+  
+  artifacts:
+    name: "$CI_COMMIT_REF_NAME-$CI_COMMIT_SHORT_SHA-$CI_JOB_NAME"
+    paths:
+    - ./result/*.apk
+    expire_in: 1 week
+
+
+# Rules to build automatically:
+# Debug builds in all branches except "master"
+# Release builds in the "master" branch 
+# Both debug and release apk can be build manually in any branch
+assembleDebugAuto:
+    extends: .assembleDebug
+    only:
+    - branches
+    except:
+    - master
+    
+assembleDebugManual:
+    extends: .assembleDebug
+    when: manual
+
+assembleReleaseAuto:
+    extends: .assembleRelease
+    only:
+    - master
+    
+assembleReleaseManual:
+    extends: .assembleRelease
+    when: manual
+    
+cache:
+  key: ${CI_PROJECT_ID}
+  paths:
+  - .gradle/
