@@ -33,6 +33,7 @@ public class NhPaths implements SharedPreferences.OnSharedPreferenceChangeListen
     public static String CHROOT_INITD_SCRIPT_PATH;
     public static String CHROOT_SYMLINK_PATH;
     public static String APP_SD_SQLBACKUP_PATH;
+    public static String APP_SD_FILES_IMG_PATH;
     public static String BUSYBOX;
     public static String MAGISK_DB_PATH;
 
@@ -47,6 +48,7 @@ public class NhPaths implements SharedPreferences.OnSharedPreferenceChangeListen
         SD_PATH                         = getSdcardPath();
         NH_SD_FOLDER_NAME               = "nh_files";
         APP_SD_FILES_PATH               = SD_PATH + "/" + NH_SD_FOLDER_NAME;
+        APP_SD_FILES_IMG_PATH           = APP_SD_FILES_PATH + "/diskimage";
         APP_SD_SQLBACKUP_PATH           = APP_SD_FILES_PATH + "/nh_sql_backups";
         BASE_PATH                       = "/data/local";
         NH_SYSTEM_PATH                  = BASE_PATH + "/nhsystem";
