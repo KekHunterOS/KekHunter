@@ -113,13 +113,11 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
                 ed.putBoolean(AppNavHomeActivity.CHROOT_INSTALLED_TAG, true);
                 ed.commit();
                 publishProgress("Chroot Found!");
-                // @Re4son @kimocoder @yesimxev is it still necessnary to remount /data partition and chmod +s the chroot /usr/bin/sudo?
-                // @simonpunk thinks it is no need to do so.
 
-                // Mount suid /data && fix sudo
-                /*publishProgress(exe.RunAsRootOutput(NhPaths.BUSYBOX + " mount -o remount,suid /data && chmod +s " +
+                // Mount suid /data && fix sudo - this is definitely needed as of 02/2020, Re4son
+                publishProgress(exe.RunAsRootOutput(NhPaths.BUSYBOX + " mount -o remount,suid /data && chmod +s " +
                         NhPaths.CHROOT_PATH() + "/usr/bin/sudo" +
-                        " && echo \"Initial setup done!\""));*/
+                        " && echo \"Initial setup done!\""));
             } else {
                 publishProgress("Chroot not Found, install it in Chroot Manager");
             }
