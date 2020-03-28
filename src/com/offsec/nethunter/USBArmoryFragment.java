@@ -334,10 +334,12 @@ public class USBArmoryFragment extends Fragment {
                                 usbArmoryHandlerThread.getHandler().sendMessage(msg); }
                         } else {
                             is_init_exists = false;
-                            usbFuncWinArrayAdapter.clear();
-                            usbFuncWinArrayAdapter.addAll(getResources().getStringArray(R.array.usbarmory_usb_states_win_lin));
-                            usbFuncMACArrayAdapter.clear();
-                            usbFuncMACArrayAdapter.addAll(getResources().getStringArray(R.array.usbarmory_usb_states_mac));
+                            uiHandler.post(() -> {
+                                usbFuncWinArrayAdapter.clear();
+                                usbFuncWinArrayAdapter.addAll(getResources().getStringArray(R.array.usbarmory_usb_states_win_lin));
+                                usbFuncMACArrayAdapter.clear();
+                                usbFuncMACArrayAdapter.addAll(getResources().getStringArray(R.array.usbarmory_usb_states_mac));
+                            });
                         }
                         break;
                     case USBArmoryHandlerThread.RETRIEVE_USB_FUNCS:
