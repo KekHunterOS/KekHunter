@@ -87,7 +87,7 @@ public class KaliServicesAsyncTask extends AsyncTask<List<KaliServicesModel>, Vo
 				kaliServicesModelList = copyOfkaliServicesModelList[0];
 				if (kaliServicesModelList != null){
 					for (int i = 0; i < kaliServicesModelList.size(); i++) {
-						kaliServicesModelList.get(i).setStatus(new ShellExecuter().RunAsRootReturnValue(NhPaths.BUSYBOX + " ps -o pid,comm | grep '" + kaliServicesModelList.get(i).getCommandforCheckServiceStatus() + "'") == 0?"[+] Service is running":"[-] Service is NOT running");
+						kaliServicesModelList.get(i).setStatus(new ShellExecuter().RunAsRootReturnValue(NhPaths.BUSYBOX + " ps | grep '" + kaliServicesModelList.get(i).getCommandforCheckServiceStatus() + "'") == 0?"[+] Service is running":"[-] Service is NOT running");
 					}
 				}
 				break;
