@@ -35,7 +35,7 @@ public class NethunterSQL extends SQLiteOpenHelper {
             {"4", "HID status", "ls /dev/hidg* || echo \"HID interface not found.\"", "\\n", "1"},
             {"5", "Nethunter Terminal Status", "[ \"$(pm list packages | grep 'com.offsec.nhterm')\" ] && echo \"Nethunter Terminal is installed.\" || echo \"Nethunter Terminal is NOT yet installed.\"", "\\n", "1"},
             {"6", "Network Interface Status", " ip -o addr show | " + NhPaths.BUSYBOX + " awk '{print $2, $3, $4}'", "\\n", "1"},
-            {"7", "External IP", NhPaths.BUSYBOX + " wget -qO - icanhazip.com", "\\n", "0"}
+            {"7", "External IP", NhPaths.BUSYBOX + " wget -qO - icanhazip.com || curl ipv4.icanhazip.com", "\\n", "0"}
     };
 
     public synchronized static NethunterSQL getInstance(Context context){

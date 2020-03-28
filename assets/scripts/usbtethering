@@ -73,6 +73,9 @@ function dep_check() {
             bklog "[+] Attempting to install...."
             chroot $MNT /usr/bin/sudo apt-get -y install ${i}
         fi
+        ## Let's check if it really has $i installed ##
+        PKG_OK=$(chroot $MNT /usr/bin/dpkg-query -W --showformat='${Status}\n' ${i}|grep "install ok installed")
+        [ "$PKG_OK" = "" ] && bklog "[-] $i not installed." && exit 1 || bklog "[+] $i is installed."
     done
 }
 
@@ -161,13 +164,28 @@ function calc_net_addr() {
     IP_NET_ADDR="${IP_GW_OCTET_ARRAY[0]}.${IP_GW_OCTET_ARRAY[1]}.${IP_GW_OCTET_ARRAY[2]}.${IP_GW_OCTET_ARRAY[3]}"
 }
 
+function octet_to_cdir(){
+    local INPUT=$1
+    local BITSET
+    local OUTPUT
+    local _TEMP_INPUT
+    BITSET=(128 64 32 16 8 4 2 1)
+    if ! echo "$INPUT" | grep -E -q "^[0-9]+$"; then bklog "[-] $INPUT is not an integer."; exit 1; fi
+    [ $INPUT -gt 255 ] && bklog "[-] $INPUT is not a valid octet as it is larger than 255" && exit 1
+    for i in $(seq 0 $((${#BITSET[@]} -1))); do
+        _TEMP_INPUT=$INPUT
+        INPUT=$(($INPUT % ${BITSET[$i]}))
+        [ $_TEMP_INPUT -eq $INPUT ] && OUTPUT[$i]=0 || OUTPUT[$i]=1
+    done
+    echo "${OUTPUT[@]}" | $BUSYBOX tr -d ' '
+}
+
 function is_valid_subnetmask() {
     local SUBNET_MASK_OCTET_ARRAY
     local SUBNET_MASK_OCTET_BINARY
     IFS='.'; SUBNET_MASK_OCTET_ARRAY=($1); unset IFS
     for i in $(seq 0 3); do
-        SUBNET_MASK_OCTET_ARRAY[$i]="`echo \"ibase=10;obase=2;${SUBNET_MASK_OCTET_ARRAY[$i]}\" | bc`"
-        [ "${SUBNET_MASK_OCTET_ARRAY[$i]}" = "0" ] && SUBNET_MASK_OCTET_ARRAY[$i]="00000000"
+        SUBNET_MASK_OCTET_ARRAY[$i]=$(octet_to_cdir ${SUBNET_MASK_OCTET_ARRAY[$i]})
     done
     SUBNET_MASK_OCTET_BINARY=${SUBNET_MASK_OCTET_ARRAY[0]}${SUBNET_MASK_OCTET_ARRAY[1]}${SUBNET_MASK_OCTET_ARRAY[2]}${SUBNET_MASK_OCTET_ARRAY[3]}
     if [ ${#SUBNET_MASK_OCTET_BINARY} -ne 32 ] || ! echo "$SUBNET_MASK_OCTET_BINARY" | grep -E -q "^[1]*[0]*$"; then
@@ -179,7 +197,7 @@ function is_valid_subnetmask() {
 }
 
 function is_valid_ip_format() {
-    for tmp_ip in $@; do
+    for tmp_ip in "$@"; do
         if ! echo $tmp_ip | grep -q -E '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$'; then
             bklog "[-] $tmp_ip is not a valid IP address format."
             print_usage; exit 1
@@ -188,7 +206,7 @@ function is_valid_ip_format() {
 }
 
 function args_check() {
-    for args in $@; do
+    for args in "$@"; do
         if [ "$(eval echo \$$args)" = "" ]; then
             bklog "[-] $args is not specified."
             print_usage; exit 1
@@ -221,7 +239,7 @@ done
 
 ## Check if user wants to kill process ##
 if [ ! -z $WANT_TO_KILL ]; then
-    if [ ! -z $UPSTREAM_IFACE -a ! -z $USB_IFACE ]; then
+    if [ ! -z $UPSTREAM_IFACE ] && [ ! -z $USB_IFACE ]; then
         kill_proc
     else
         print_usage; exit 1

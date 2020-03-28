@@ -30,6 +30,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
+import com.google.common.base.Predicates;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 import com.offsec.nethunter.HandlerThread.USBArmoryHandlerThread;
 import com.offsec.nethunter.SQL.USBArmorySQL;
 import com.offsec.nethunter.models.USBArmoryUSBNetworkModel;
@@ -38,6 +41,8 @@ import com.offsec.nethunter.utils.NhPaths;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class USBArmoryFragment extends Fragment {
 
@@ -47,6 +52,7 @@ public class USBArmoryFragment extends Fragment {
     private Activity activity;
     private USBArmoryHandlerThread usbArmoryHandlerThread = new USBArmoryHandlerThread();
     private Handler uiHandler = new Handler(Looper.getMainLooper());
+    private static boolean is_init_exists = true;
     //private Message msg = new Message();
     private TextView usbStatusTextView;
     private TextView mountedImageTextView;
@@ -115,7 +121,7 @@ public class USBArmoryFragment extends Fragment {
         usbNetworkTetheringHintTextView     = view.findViewById(R.id.f_usbarmory_ll_tv_usbnetworktethering_hint);
         imageMounterLL                      = view.findViewById(R.id.f_usbarmory_ll_imageMounter_sub2);
         usbNetworkTetheringLL               = view.findViewById(R.id.f_usbarmory_ll_usbnetworktethering_sub2);
-        
+
         usbSwitchInfoEditTextGroup[0] = view.findViewById(R.id.f_usbarmory_et_idvendor);
         usbSwitchInfoEditTextGroup[1] = view.findViewById(R.id.f_usbarmory_et_idproduct);
         usbSwitchInfoEditTextGroup[2] = view.findViewById(R.id.f_usbarmory_et_manufacturer);
@@ -127,8 +133,14 @@ public class USBArmoryFragment extends Fragment {
         usbNetworkInfoEditTextGroup[3] = view.findViewById(R.id.f_usbarmory_et_usbnetwork_gatewayip);
         usbNetworkInfoEditTextGroup[4] = view.findViewById(R.id.f_usbarmory_et_usbnetwork_ipsubnetmask);
 
-        ArrayAdapter<String> usbFuncWinArrayAdapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_item, getResources().getStringArray(R.array.usbarmory_usb_states_win_lin));
-        ArrayAdapter<String> usbFuncMACArrayAdapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_item, getResources().getStringArray(R.array.usbarmory_usb_states_mac));
+
+        { Message msg = new Message();
+            msg.what = USBArmoryHandlerThread.IS_INIT_EXIST;
+            msg.obj = "[ -f /init.nethunter.rc ]";
+            usbArmoryHandlerThread.getHandler().sendMessage(msg); }
+
+        ArrayAdapter<String> usbFuncWinArrayAdapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_item, new ArrayList<>());
+        ArrayAdapter<String> usbFuncMACArrayAdapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_item, new ArrayList<>());
         ArrayAdapter<String> usbNetworkAttackModeArrayAdapter = new ArrayAdapter<>(activity, android.R.layout.simple_spinner_item, getResources().getStringArray(R.array.usbarmory_usb_network_attack_mode));
         usbFuncWinArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         usbFuncMACArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -154,7 +166,7 @@ public class USBArmoryFragment extends Fragment {
         usbFuncSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (position == 0) {
+                if (position == 0 || is_init_exists) {
                     adbSpinner.setSelection(1);
                     adbSpinner.setEnabled(false);
                 } else {
@@ -210,7 +222,7 @@ public class USBArmoryFragment extends Fragment {
 
                 Message msg = new Message();
                 msg.what = USBArmoryHandlerThread.SETUSBIFACE;
-                msg.obj = NhPaths.APP_SCRIPTS_PATH + "/usbarmory -t '" + target + "' -f '" + functions + "'" + adbEnable + idVendor + idProduct + manufacturer + product + serialnumber;
+                msg.obj = "[ -f /init.nethunter.rc ] && setprop sys.usb.config " + functions + " || " + NhPaths.APP_SCRIPTS_PATH + "/usbarmory -t '" + target + "' -f '" + functions + "'" + adbEnable + idVendor + idProduct + manufacturer + product + serialnumber;
                 usbArmoryHandlerThread.getHandler().sendMessage(msg);
             }
         });
@@ -220,12 +232,12 @@ public class USBArmoryFragment extends Fragment {
             intent.addCategory(Intent.CATEGORY_DEFAULT);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.putExtra("com.offsec.nhterm.iInitialCommand",
-            "usbtethering -o " + usbNetworkInfoEditTextGroup[0].getText().toString() +
-                    " -i " + usbNetworkInfoEditTextGroup[1].getText().toString() +
-                    " -A " + usbNetworkInfoEditTextGroup[2].getText().toString() +
-                    " -B " + usbNetworkInfoEditTextGroup[2].getText().toString() +
-                    " -C " + usbNetworkInfoEditTextGroup[3].getText().toString() +
-                    " -D " + usbNetworkInfoEditTextGroup[4].getText().toString());
+                    "usbtethering -o " + usbNetworkInfoEditTextGroup[0].getText().toString() +
+                            " -i " + usbNetworkInfoEditTextGroup[1].getText().toString() +
+                            " -A " + usbNetworkInfoEditTextGroup[2].getText().toString() +
+                            " -B " + usbNetworkInfoEditTextGroup[2].getText().toString() +
+                            " -C " + usbNetworkInfoEditTextGroup[3].getText().toString() +
+                            " -D " + usbNetworkInfoEditTextGroup[4].getText().toString());
             context.startActivity(intent);
         });
 
@@ -273,10 +285,10 @@ public class USBArmoryFragment extends Fragment {
 
         saveUSBFunctionConfigButton.setOnClickListener(v -> {
             if (!usbSwitchInfoEditTextGroup[0].getText().toString().matches("0x[0-9a-fA-F]{4}") ||
-                !usbSwitchInfoEditTextGroup[1].getText().toString().matches("0x[0-9a-fA-F]{4}")) {
+                    !usbSwitchInfoEditTextGroup[1].getText().toString().matches("0x[0-9a-fA-F]{4}")) {
                 new AlertDialog.Builder(context).setTitle("Invalid Format").setMessage("The regex must be 0x[0-9a-fA-F]{4}").create().show();
-            } else if (!usbSwitchInfoEditTextGroup[2].getText().toString().matches("\\w+|^$") || 
-                !usbSwitchInfoEditTextGroup[3].getText().toString().matches("\\w+|^$")) {
+            } else if (!usbSwitchInfoEditTextGroup[2].getText().toString().matches("\\w+|^$") ||
+                    !usbSwitchInfoEditTextGroup[3].getText().toString().matches("\\w+|^$")) {
                 new AlertDialog.Builder(context).setTitle("Invalid Format").setMessage("The regex must be \\w*|^$").create().show();
             } else if (!usbSwitchInfoEditTextGroup[4].getText().toString().matches("[0-9A-Z]{10}|^$")) {
                 new AlertDialog.Builder(context).setTitle("Invalid Format").setMessage("The regex must be [0-9A-Z]{10}|^$").create().show();
@@ -311,100 +323,137 @@ public class USBArmoryFragment extends Fragment {
         });
 
         usbArmoryHandlerThread.setOnShellExecuterFinishedListener((resultObject, actionCode) -> {
-            switch (actionCode){
-                case USBArmoryHandlerThread.SETUSBIFACE:
-                    uiHandler.post(() -> {
-                        if ((int)resultObject != 0){
-                            NhPaths.showMessage(context, "Failed to set USB Function.");
+            if (getView() != null) {
+                switch (actionCode){
+                    case USBArmoryHandlerThread.IS_INIT_EXIST:
+                        if ((int)resultObject == 0) {
+                            is_init_exists = true;
+                            { Message msg = new Message();
+                                msg.what = USBArmoryHandlerThread.RETRIEVE_USB_FUNCS;
+                                msg.obj = "cat /init.nethunter.rc | grep -E -o 'sys.usb.config=([a-zA-Z,_]+)' | sed 's/sys.usb.config=//' | sort | uniq";
+                                usbArmoryHandlerThread.getHandler().sendMessage(msg); }
                         } else {
-                            NhPaths.showMessage(context, "USB Function has been changed successfully.");
-                            reloadUSBStateImageButton.performClick();
+                            is_init_exists = false;
+                            uiHandler.post(() -> {
+                                usbFuncWinArrayAdapter.clear();
+                                usbFuncWinArrayAdapter.addAll(getResources().getStringArray(R.array.usbarmory_usb_states_win_lin));
+                                usbFuncMACArrayAdapter.clear();
+                                usbFuncMACArrayAdapter.addAll(getResources().getStringArray(R.array.usbarmory_usb_states_mac));
+                            });
                         }
-                        setUSBIfaceButton.setEnabled(true);
-                    });
-                    break;
-                case USBArmoryHandlerThread.RELOAD_USBIFACE:
-                    uiHandler.post(() -> {
-                        if (resultObject.toString().equals("")) {
-                            usbStatusTextView.setText("No any USB Function is configured.");
-                            imageMounterLL.setVisibility(View.GONE);
-                            mountedImageHintTextView.setVisibility(View.VISIBLE);
-                        } else {
-                            usbStatusTextView.setText(resultObject.toString()
-                                    .replaceAll("/config/usb_gadget/g1/functions/", "")
-                                    .replaceAll("/config/usb_gadget/g1/functions","gsi.rndis")
-                                    .replaceAll(" ", "\n"));
-                            if (usbStatusTextView.getText().toString().contains("mass_storage")){
-                                imageMounterLL.setVisibility(View.VISIBLE);
-                                mountedImageHintTextView.setVisibility(View.GONE);
-                                getImageFiles();
+                        break;
+                    case USBArmoryHandlerThread.RETRIEVE_USB_FUNCS:
+                        uiHandler.post(() -> {
+                            ArrayList<String> usbFuncArray = new ArrayList<>(Arrays.asList(resultObject.toString().split("\\n")));
+                            List<String> usbFuncWinArray = Lists.newArrayList(Collections2.filter(usbFuncArray,
+                                    Predicates.containsPattern("win")));
+                            List<String> usbFuncMacArray = Lists.newArrayList(Collections2.filter(usbFuncArray,
+                                    Predicates.containsPattern("mac")));
+                            usbFuncWinArrayAdapter.clear();
+                            usbFuncWinArrayAdapter.addAll(usbFuncWinArray);
+                            usbFuncMACArrayAdapter.clear();
+                            usbFuncMACArrayAdapter.addAll(usbFuncMacArray);
+                            for (EditText infoEditText: usbSwitchInfoEditTextGroup) {
+                                infoEditText.setEnabled(false);
+                            }
+                            saveUSBFunctionConfigButton.setEnabled(false);
+                            adbSpinner.setEnabled(false);
+                        });
+                        break;
+                    case USBArmoryHandlerThread.SETUSBIFACE:
+                        uiHandler.post(() -> {
+                            if ((int)resultObject != 0){
+                                NhPaths.showMessage(context, "Failed to set USB Function.");
                             } else {
+                                NhPaths.showMessage(context, "USB Function has been changed successfully.");
+                                reloadUSBStateImageButton.performClick();
+                            }
+                            setUSBIfaceButton.setEnabled(true);
+                        });
+                        break;
+                    case USBArmoryHandlerThread.RELOAD_USBIFACE:
+                        uiHandler.post(() -> {
+                            if (resultObject.toString().equals("")) {
+                                usbStatusTextView.setText("No any USB Function is configured.");
                                 imageMounterLL.setVisibility(View.GONE);
                                 mountedImageHintTextView.setVisibility(View.VISIBLE);
-                            }
-                            if (usbStatusTextView.getText().toString().contains("rndis") ||
-                                usbStatusTextView.getText().toString().contains("acm")){
-                                usbNetworkTetheringLL.setVisibility(View.VISIBLE);
-                                usbNetworkTetheringHintTextView.setVisibility(View.GONE);
-                                refreshUSBNetworkInfos(getusbNetWorkModeSpinnerPosition());
                             } else {
-                                usbNetworkTetheringLL.setVisibility(View.GONE);
-                                usbNetworkTetheringHintTextView.setVisibility(View.VISIBLE);
+                                usbStatusTextView.setText(resultObject.toString()
+                                        .replaceAll("/config/usb_gadget/g1/functions/", "")
+                                        .replaceAll("/config/usb_gadget/g1/functions","gsi.rndis")
+                                        .replaceAll(" ", "\n"));
+                                if (usbStatusTextView.getText().toString().contains("mass_storage")){
+                                    imageMounterLL.setVisibility(View.VISIBLE);
+                                    mountedImageHintTextView.setVisibility(View.GONE);
+                                    getImageFiles();
+                                } else {
+                                    imageMounterLL.setVisibility(View.GONE);
+                                    mountedImageHintTextView.setVisibility(View.VISIBLE);
+                                }
+                                if (usbStatusTextView.getText().toString().contains("rndis") ||
+                                        usbStatusTextView.getText().toString().contains("acm")){
+                                    usbNetworkTetheringLL.setVisibility(View.VISIBLE);
+                                    usbNetworkTetheringHintTextView.setVisibility(View.GONE);
+                                    refreshUSBNetworkInfos(getusbNetWorkModeSpinnerPosition());
+                                } else {
+                                    usbNetworkTetheringLL.setVisibility(View.GONE);
+                                    usbNetworkTetheringHintTextView.setVisibility(View.VISIBLE);
+                                }
                             }
-                        }
-                    });
-                    break;
-                case USBArmoryHandlerThread.RELOAD_MOUNTSTATUS:
-                    uiHandler.post(() -> {
-                       if (resultObject.toString().equals("")){ mountedImageTextView.setText("No image is mounted."); }
-                       else {mountedImageTextView.setText(resultObject.toString());}
-                    });
-                    break;
-                case USBArmoryHandlerThread.MOUNT_IMAGE:
-                    uiHandler.post(() -> {
-                        if ((int)resultObject == 0){
-                            NhPaths.showMessage(context, imgFileSpinner.getSelectedItem().toString() + " has been mounted.");
-                        } else {
-                            NhPaths.showMessage(context, "Fail to mount image " + imgFileSpinner.getSelectedItem().toString());
-                        }
-                        reloadMountStateButton.performClick();
-                        mountImgButton.setEnabled(true);
-                        unmountImgButton.setEnabled(true);
-                    });
-                    break;
-                case USBArmoryHandlerThread.UNMOUNT_IMAGE:
-                    uiHandler.post(() -> {
-                        if ((int)resultObject == 0){
-                            NhPaths.showMessage(context, imgFileSpinner.getSelectedItem().toString() + " has been unmounted.");
+                        });
+                        break;
+                    case USBArmoryHandlerThread.RELOAD_MOUNTSTATUS:
+                        uiHandler.post(() -> {
+                            if (resultObject.toString().equals("")){ mountedImageTextView.setText("No image is mounted."); }
+                            else {mountedImageTextView.setText(resultObject.toString());}
+                        });
+                        break;
+                    case USBArmoryHandlerThread.MOUNT_IMAGE:
+                        uiHandler.post(() -> {
+                            if ((int)resultObject == 0){
+                                NhPaths.showMessage(context, imgFileSpinner.getSelectedItem().toString() + " has been mounted.");
+                            } else {
+                                NhPaths.showMessage(context, "Fail to mount image " + imgFileSpinner.getSelectedItem().toString());
+                            }
                             reloadMountStateButton.performClick();
-                        } else {
-                            NhPaths.showMessage_long(context, "Fail to unmount image " + imgFileSpinner.getSelectedItem().toString() +
-                                    ". Your drive may be still being used by the host, please eject your drive on the host first," +
-                                    "and then try to umount the image again.");
-                        }
-                        reloadMountStateButton.performClick();
-                        mountImgButton.setEnabled(true);
-                        unmountImgButton.setEnabled(true);
-                    });
-                    break;
-                case USBArmoryHandlerThread.GET_USBSWITCH_SQL_DATA:
-                    uiHandler.post(() -> {
-                        usbSwitchInfoEditTextGroup[0].setText(((USBArmoryUSBSwitchModel)resultObject).getidVendor());
-                        usbSwitchInfoEditTextGroup[1].setText(((USBArmoryUSBSwitchModel)resultObject).getidProduct());
-                        usbSwitchInfoEditTextGroup[2].setText(((USBArmoryUSBSwitchModel)resultObject).getmanufacturer());
-                        usbSwitchInfoEditTextGroup[3].setText(((USBArmoryUSBSwitchModel)resultObject).getproduct());
-                        usbSwitchInfoEditTextGroup[4].setText(((USBArmoryUSBSwitchModel)resultObject).getserialnumber());
-                    });
-                    break;
-                case USBArmoryHandlerThread.GET_USBNETWORK_SQL_DATA:
-                    uiHandler.post(() -> {
-                        usbNetworkInfoEditTextGroup[0].setText(((USBArmoryUSBNetworkModel)resultObject).getupstream_iface());
-                        usbNetworkInfoEditTextGroup[1].setText(((USBArmoryUSBNetworkModel)resultObject).getusb_iface());
-                        usbNetworkInfoEditTextGroup[2].setText(((USBArmoryUSBNetworkModel)resultObject).getip_address_for_target());
-                        usbNetworkInfoEditTextGroup[3].setText(((USBArmoryUSBNetworkModel)resultObject).getip_gateway());
-                        usbNetworkInfoEditTextGroup[4].setText(((USBArmoryUSBNetworkModel)resultObject).getip_subnetmask());
-                    });
-                    break;
+                            mountImgButton.setEnabled(true);
+                            unmountImgButton.setEnabled(true);
+                        });
+                        break;
+                    case USBArmoryHandlerThread.UNMOUNT_IMAGE:
+                        uiHandler.post(() -> {
+                            if ((int)resultObject == 0){
+                                NhPaths.showMessage(context, imgFileSpinner.getSelectedItem().toString() + " has been unmounted.");
+                                reloadMountStateButton.performClick();
+                            } else {
+                                NhPaths.showMessage_long(context, "Fail to unmount image " + imgFileSpinner.getSelectedItem().toString() +
+                                        ". Your drive may be still being used by the host, please eject your drive on the host first," +
+                                        "and then try to umount the image again.");
+                            }
+                            reloadMountStateButton.performClick();
+                            mountImgButton.setEnabled(true);
+                            unmountImgButton.setEnabled(true);
+                        });
+                        break;
+                    case USBArmoryHandlerThread.GET_USBSWITCH_SQL_DATA:
+                        uiHandler.post(() -> {
+                            usbSwitchInfoEditTextGroup[0].setText(((USBArmoryUSBSwitchModel)resultObject).getidVendor());
+                            usbSwitchInfoEditTextGroup[1].setText(((USBArmoryUSBSwitchModel)resultObject).getidProduct());
+                            usbSwitchInfoEditTextGroup[2].setText(((USBArmoryUSBSwitchModel)resultObject).getmanufacturer());
+                            usbSwitchInfoEditTextGroup[3].setText(((USBArmoryUSBSwitchModel)resultObject).getproduct());
+                            usbSwitchInfoEditTextGroup[4].setText(((USBArmoryUSBSwitchModel)resultObject).getserialnumber());
+                        });
+                        break;
+                    case USBArmoryHandlerThread.GET_USBNETWORK_SQL_DATA:
+                        uiHandler.post(() -> {
+                            usbNetworkInfoEditTextGroup[0].setText(((USBArmoryUSBNetworkModel)resultObject).getupstream_iface());
+                            usbNetworkInfoEditTextGroup[1].setText(((USBArmoryUSBNetworkModel)resultObject).getusb_iface());
+                            usbNetworkInfoEditTextGroup[2].setText(((USBArmoryUSBNetworkModel)resultObject).getip_address_for_target());
+                            usbNetworkInfoEditTextGroup[3].setText(((USBArmoryUSBNetworkModel)resultObject).getip_gateway());
+                            usbNetworkInfoEditTextGroup[4].setText(((USBArmoryUSBNetworkModel)resultObject).getip_subnetmask());
+                        });
+                        break;
+                }
             }
         });
     }
@@ -522,13 +571,9 @@ public class USBArmoryFragment extends Fragment {
         usbFuncSpinner = null;
         usbNetworkAttackModeSpinner = null;
         adbSpinner = null;
-        for (int i = 0; i < usbSwitchInfoEditTextGroup.length; i++) {
-            usbSwitchInfoEditTextGroup[i] = null;
-        }
+        Arrays.fill(usbSwitchInfoEditTextGroup, null);
         usbSwitchInfoEditTextGroup = null;
-        for (int i = 0; i < usbNetworkInfoEditTextGroup.length; i++) {
-            usbNetworkInfoEditTextGroup[i] = null;
-        }
+        Arrays.fill(usbNetworkInfoEditTextGroup, null);
         usbNetworkInfoEditTextGroup = null;
     }
 
@@ -569,8 +614,11 @@ public class USBArmoryFragment extends Fragment {
     }
 
     private String getusbFuncSpinnerString() {
-        return usbFuncSpinner.getSelectedItem().toString() +
-                (adbSpinner.getSelectedItem().equals("Enable")?",adb":"");
+        if (usbFuncSpinner.getSelectedItem() != null) {
+            return usbFuncSpinner.getSelectedItem().toString() +
+                    (adbSpinner.getSelectedItem().equals("Enable")?",adb":"");
+        }
+        return "reset";
     }
 
     private String gettargetOSSpinnerString() {
@@ -582,25 +630,27 @@ public class USBArmoryFragment extends Fragment {
     }
 
     private boolean isAllUSBInfosValid() {
-        if (!usbSwitchInfoEditTextGroup[0].getText().toString().matches("^0x[0-9a-fA-F]{4}$")) {
-            new AlertDialog.Builder(context).setTitle("Invalid Format").setMessage("The regex must be ^0x[0-9a-fA-F]{4}$").create().show();
-            return false;
-        }
-        if (!usbSwitchInfoEditTextGroup[1].getText().toString().matches("^0x[0-9a-fA-F]{4}$")) {
-            new AlertDialog.Builder(context).setTitle("Invalid Format").setMessage("The regex must be ^0x[0-9a-fA-F]{4}$").create().show();
-            return false;
-        }
-        if (!usbSwitchInfoEditTextGroup[2].getText().toString().matches("^\\w+$|^$")) {
-            new AlertDialog.Builder(context).setTitle("Invalid Format").setMessage("The regex must be ^\\w+$|^$").create().show();
-            return false;
-        }
-        if (!usbSwitchInfoEditTextGroup[3].getText().toString().matches("^\\w+$|^$")) {
-            new AlertDialog.Builder(context).setTitle("Invalid Format").setMessage("The regex must be ^\\w+$|^$").create().show();
-            return false;
-        }
-        if (!usbSwitchInfoEditTextGroup[4].getText().toString().matches("^[0-9A-Z]{10}$|^$")) {
-            new AlertDialog.Builder(context).setTitle("Invalid Format").setMessage("The regex must be ^[0-9A-Z]{10}$|^$").create().show();
-            return false;
+        if (!is_init_exists){
+            if (!usbSwitchInfoEditTextGroup[0].getText().toString().matches("^0x[0-9a-fA-F]{4}$")) {
+                new AlertDialog.Builder(context).setTitle("Invalid Format").setMessage("The regex must be ^0x[0-9a-fA-F]{4}$").create().show();
+                return false;
+            }
+            if (!usbSwitchInfoEditTextGroup[1].getText().toString().matches("^0x[0-9a-fA-F]{4}$")) {
+                new AlertDialog.Builder(context).setTitle("Invalid Format").setMessage("The regex must be ^0x[0-9a-fA-F]{4}$").create().show();
+                return false;
+            }
+            if (!usbSwitchInfoEditTextGroup[2].getText().toString().matches("^\\w+$|^$")) {
+                new AlertDialog.Builder(context).setTitle("Invalid Format").setMessage("The regex must be ^\\w+$|^$").create().show();
+                return false;
+            }
+            if (!usbSwitchInfoEditTextGroup[3].getText().toString().matches("^\\w+$|^$")) {
+                new AlertDialog.Builder(context).setTitle("Invalid Format").setMessage("The regex must be ^\\w+$|^$").create().show();
+                return false;
+            }
+            if (!usbSwitchInfoEditTextGroup[4].getText().toString().matches("^[0-9A-Z]{10}$|^$")) {
+                new AlertDialog.Builder(context).setTitle("Invalid Format").setMessage("The regex must be ^[0-9A-Z]{10}$|^$").create().show();
+                return false;
+            }
         }
         return true;
     }

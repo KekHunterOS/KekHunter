@@ -17,13 +17,15 @@ import com.offsec.nethunter.utils.ShellExecuter;
 public class USBArmoryHandlerThread extends HandlerThread {
 
     private Handler handler;
-    public static final int SETUSBIFACE = 1;
-    public static final int RELOAD_USBIFACE = 2;
-    public static final int RELOAD_MOUNTSTATUS = 3;
-    public static final int MOUNT_IMAGE = 4;
-    public static final int UNMOUNT_IMAGE = 5;
-    public static final int GET_USBSWITCH_SQL_DATA = 6;
-    public static final int GET_USBNETWORK_SQL_DATA = 7;
+    public static final int IS_INIT_EXIST = 1;
+    public static final int RETRIEVE_USB_FUNCS = 2;
+    public static final int SETUSBIFACE = 3;
+    public static final int RELOAD_USBIFACE = 4;
+    public static final int RELOAD_MOUNTSTATUS = 5;
+    public static final int MOUNT_IMAGE = 6;
+    public static final int UNMOUNT_IMAGE = 7;
+    public static final int GET_USBSWITCH_SQL_DATA = 8;
+    public static final int GET_USBNETWORK_SQL_DATA = 9;
     private USBArmoryListener listener;
     private Object resultObject = new Object();
     private ShellExecuter exe = new ShellExecuter();
@@ -40,6 +42,12 @@ public class USBArmoryHandlerThread extends HandlerThread {
             public void handleMessage(@NonNull Message msg) {
                 super.handleMessage(msg);
                 switch (msg.what) {
+                    case IS_INIT_EXIST:
+                        resultObject = exe.RunAsRootReturnValue(msg.obj.toString());
+                        break;
+                    case RETRIEVE_USB_FUNCS:
+                        resultObject = exe.RunAsRootOutput(msg.obj.toString());
+                        break;
                     case SETUSBIFACE:
                         resultObject = exe.RunAsRootReturnValue(msg.obj.toString());
                         break;
