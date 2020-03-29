@@ -32,6 +32,10 @@
              android:id="@+id/vnc_item"
              android:icon="@drawable/ic_action_home"
              android:title="@string/drawertitlevncmanager" />
+        <item
+            android:id="@+id/usbarmory_item"
+            android:icon="@drawable/ic_action_keyboard"
+            android:title="@string/drawertitleusbarmory" />
          <item
              android:id="@+id/hid_item"
              android:icon="@drawable/ic_action_keyboard"
@@ -40,10 +44,6 @@
              android:id="@+id/duckhunter_item"
              android:icon="@drawable/ic_action_keyboard"
              android:title="@string/drawertitleduckhunter" />
-         <item
-             android:id="@+id/usbarmory_item"
-             android:icon="@drawable/ic_action_keyboard"
-             android:title="@string/drawertitleusbarmory" />
          <item
              android:id="@+id/badusb_item"
              android:icon="@drawable/ic_action_usb"

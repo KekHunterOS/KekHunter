@@ -248,7 +248,7 @@ public class USBArmorySQL extends SQLiteOpenHelper {
         SQLiteDatabase tempDB = SQLiteDatabase.openDatabase(storedDBpath, null, SQLiteDatabase.OPEN_READONLY);
         if (tempDB.getVersion() > this.getReadableDatabase().getVersion()) {
             tempDB.close();
-            return "db cannot be restored.\nReason: the db version of your backup db is larger than the current db version.";
+            return "db cannot be restored.\nReason: the db version of your backup db is newer than the current db version.";
         }
         tempDB.close();
 

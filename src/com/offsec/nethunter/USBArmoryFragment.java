@@ -365,7 +365,7 @@ public class USBArmoryFragment extends Fragment {
                             if ((int)resultObject != 0){
                                 NhPaths.showMessage(context, "Failed to set USB Function.");
                             } else {
-                                NhPaths.showMessage(context, "USB Function has been changed successfully.");
+                                NhPaths.showMessage(context, "USB Function set successfully.");
                                 reloadUSBStateImageButton.performClick();
                             }
                             setUSBIfaceButton.setEnabled(true);
@@ -374,7 +374,7 @@ public class USBArmoryFragment extends Fragment {
                     case USBArmoryHandlerThread.RELOAD_USBIFACE:
                         uiHandler.post(() -> {
                             if (resultObject.toString().equals("")) {
-                                usbStatusTextView.setText("No any USB Function is configured.");
+                                usbStatusTextView.setText("No USB Function has been enabled");
                                 imageMounterLL.setVisibility(View.GONE);
                                 mountedImageHintTextView.setVisibility(View.VISIBLE);
                             } else {
@@ -413,7 +413,7 @@ public class USBArmoryFragment extends Fragment {
                             if ((int)resultObject == 0){
                                 NhPaths.showMessage(context, imgFileSpinner.getSelectedItem().toString() + " has been mounted.");
                             } else {
-                                NhPaths.showMessage(context, "Fail to mount image " + imgFileSpinner.getSelectedItem().toString());
+                                NhPaths.showMessage(context, "Failed to mount image " + imgFileSpinner.getSelectedItem().toString());
                             }
                             reloadMountStateButton.performClick();
                             mountImgButton.setEnabled(true);
@@ -426,8 +426,8 @@ public class USBArmoryFragment extends Fragment {
                                 NhPaths.showMessage(context, imgFileSpinner.getSelectedItem().toString() + " has been unmounted.");
                                 reloadMountStateButton.performClick();
                             } else {
-                                NhPaths.showMessage_long(context, "Fail to unmount image " + imgFileSpinner.getSelectedItem().toString() +
-                                        ". Your drive may be still being used by the host, please eject your drive on the host first," +
+                                NhPaths.showMessage_long(context, "Failed to unmount image " + imgFileSpinner.getSelectedItem().toString() +
+                                        ". Your drive may be still be in use by the host, please eject your drive on the host first," +
                                         "and then try to umount the image again.");
                             }
                             reloadMountStateButton.performClick();
@@ -501,7 +501,7 @@ public class USBArmoryFragment extends Fragment {
                     buttonOK.setOnClickListener(v -> {
                         String returnedResult = USBArmorySQL.getInstance(context).backupData(storedpathEditText.getText().toString());
                         if (returnedResult == null){
-                            NhPaths.showMessage(context, "db is successfully backup to " + storedpathEditText.getText().toString());
+                            NhPaths.showMessage(context, "db successfully backed up to " + storedpathEditText.getText().toString());
                         } else {
                             dialog.dismiss();
                             new AlertDialog.Builder(context).setTitle("Failed to backup the DB.").setMessage(returnedResult).create().show();

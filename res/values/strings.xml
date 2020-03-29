@@ -41,6 +41,14 @@
     <string name="drawertitleusbarmory">USB Armory</string>
     <string name="usbarmory_hint1_imagemounter">*Place all your .img or .iso files in "/sdcard/nh_files/diskimage/"</string>
     <string name="usbarmory_current_usb_state">Current USB state: </string>
+    <string name="usbarmory_description">The USB Armory is awesome</string>
+    <string name="usbarmory_header">USB Function Selector</string>
+    <string name="usbarmory_enabledfunctions">USB functions currently enabled:</string>
+    <string name="usbarmory_nofunctionsenabled">No USB function is currently enabled</string>
+    <string name="usbarmory_imagemounter_header">Image Mounter</string>
+    <string name="usbarmory_imagemounter_description">Image Mounter can be used only if the USB function \"mass_storage\" has been enabled</string>
+    <string name="usbarmory_networktethering_header">USB Network Tethering</string>
+    <string name="usbarmory_networktethering_description">USB NetWork Tethering can be used only if the USB function \"rndis\" or \"acmecm\" has been enabled</string>
     <string-array name="usbarmory_target_platform">
         <item>Windows</item>
         <item>Linux</item>
@@ -386,7 +394,7 @@
     <!-- SearchSploit -->
     <string name="searchsploit_searchbar">Search Exploits</string>
 
-    <!-- Custom Launhcer -->
+    <!-- Custom Launcher -->
     <string name="add_lauchner_btn_label">Label: </string>
     <string name="add_lauchner_btn_command">Command: </string>
     <string name="toast_input_error_launcher">Invalid arguments given!</string>
@@ -446,6 +454,8 @@
     </string-array>
     <string name="nmap_udpscan">UDP Scan</string>
     <!-- End NMAP -->
+
+
     <!-- Start PineappleFragment -->
     <string name="pineapple_description">The pineapple connector is used in conjunction with the Hak5 Pineapple Nano and a USB OTG cable.   This helper will connect the Pineapple Nano over ethernet and upstream your wifi connection.</string>
     <string name="pineapple_gateway">Pineapple Gateway/Web Interface IP</string>
