@@ -363,9 +363,9 @@ public class USBArmoryFragment extends Fragment {
                     case USBArmoryHandlerThread.SETUSBIFACE:
                         uiHandler.post(() -> {
                             if ((int)resultObject != 0){
-                                NhPaths.showMessage(context, "Failed to set USB Function.");
+                                NhPaths.showMessage(context, "Failed to set USB function.");
                             } else {
-                                NhPaths.showMessage(context, "USB Function set successfully.");
+                                NhPaths.showMessage(context, "USB function set successfully.");
                                 reloadUSBStateImageButton.performClick();
                             }
                             setUSBIfaceButton.setEnabled(true);
@@ -374,7 +374,7 @@ public class USBArmoryFragment extends Fragment {
                     case USBArmoryHandlerThread.RELOAD_USBIFACE:
                         uiHandler.post(() -> {
                             if (resultObject.toString().equals("")) {
-                                usbStatusTextView.setText("No USB Function has been enabled");
+                                usbStatusTextView.setText("No USB function has been enabled");
                                 imageMounterLL.setVisibility(View.GONE);
                                 mountedImageHintTextView.setVisibility(View.VISIBLE);
                             } else {

@@ -52,7 +52,7 @@ android {
         minSdkVersion 17
         targetSdkVersion 29
         versionCode 2020020700
-        versionName "2020.2-rc8"
+        versionName "2020.2-rc9"
         multiDexEnabled true
     }
 
