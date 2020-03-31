@@ -436,7 +436,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                             if (new File("/config/usb_gadget/g1").exists()) {
                                 changeFragment(fragmentManager, USBArmoryFragment.newInstance(itemId));
                             } else {
-                                showWarningDialog("", "Your kernel doesn't support USB ConfigFS!.", false);
+                                showWarningDialog("", "Your kernel does not support USB ConfigFS!", false);
                             }
                             break;
                         case R.id.badusb_item:

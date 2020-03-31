@@ -180,7 +180,11 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
                 File dir = new File(fullPath);
                 if (!dir.exists() && pathIsAllowed(path, copyType)) { // copy those dirs
                     if (!dir.mkdirs()) {
-                        Log.i(TAG, "could not create dir " + fullPath);
+                        ShellExecuter create = new ShellExecuter();
+                        create.RunAsRoot(new String[]{"mkdir " + fullPath});
+                        if (!dir.exists()) {
+                            Log.i(TAG, "could not create dir " + fullPath);
+                        }
                     }
                 }
                 for (String asset : assets) {
@@ -226,6 +230,10 @@ public class CopyBootFilesAsyncTask extends AsyncTask<String, String, String>{
         } catch (Exception e) {
             Log.e(TAG, "Exception in copyFile() of " + newFileName);
             Log.e(TAG, "Exception in copyFile() " + e.toString());
+            Log.e(TAG, "Trying to copy as root next");
+            // Trying runasroot
+            ShellExecuter copy = new ShellExecuter();
+            copy.RunAsRoot(new String[]{"cp " + filename + " " + TARGET_BASE_PATH});
         }
 
     }

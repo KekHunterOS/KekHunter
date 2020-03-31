@@ -51,8 +51,8 @@ android {
     defaultConfig {
         minSdkVersion 17
         targetSdkVersion 29
-        versionCode 2020021000
-        versionName "2020.2-pre1"
+        versionCode 2020021100
+        versionName "2020.2-pre2"
         multiDexEnabled true
     }
 
