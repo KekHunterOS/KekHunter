@@ -418,7 +418,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.6"
-                        android:text="Attack Mode(Network Tethering only for now):"
+                        android:text="Attack Mode:"
                         android:textSize="18sp" />
                     <Spinner
                         android:id="@+id/f_usbarmory_spr_networkattackmode"
@@ -439,7 +439,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.6"
-                        android:text="Upstream Interface(e.g. wlan0, rmnet_data0):"
+                        android:text="Upstream Interface\n(e.g. wlan0, rmnet_data0):"
                         android:textSize="18sp" />
                     <EditText
                         android:id="@+id/f_usbarmory_et_usbnetwork_upstreamiface"
@@ -458,7 +458,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_weight="0.6"
-                        android:text="USB network interface(e.g. rndis0, usb0):"
+                        android:text="USB network interface\n(e.g. rndis0, usb0):"
                         android:textSize="18sp" />
 
                     <EditText

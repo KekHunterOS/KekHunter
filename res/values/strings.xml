@@ -38,10 +38,10 @@
     </string-array>
 
     <!-- USB Armory -->
-    <string name="drawertitleusbarmory">USB Armory</string>
+    <string name="drawertitleusbarmory">USB Arsenal</string>
     <string name="usbarmory_hint1_imagemounter">*Place all your .img or .iso files in "/sdcard/nh_files/diskimage/"</string>
     <string name="usbarmory_current_usb_state">Current USB state: </string>
-    <string name="usbarmory_description">The USB Armory is awesome</string>
+    <string name="usbarmory_description">The USB Arsenal is awesome</string>
     <string name="usbarmory_header">USB Function Selector</string>
     <string name="usbarmory_enabledfunctions">USB functions currently enabled:</string>
     <string name="usbarmory_nofunctionsenabled">No USB function is currently enabled</string>
