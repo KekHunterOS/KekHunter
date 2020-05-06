@@ -20,7 +20,6 @@ public class PineappleFragment extends Fragment {
 
     private static final String TAG = "PineappleFragment";
 
-    private NhPaths nh;
     private String start_type = "start ";
     private String proxy_type;
     private Context context;
@@ -41,15 +40,14 @@ public class PineappleFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = getContext();
-        nh = new NhPaths();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.pineapple, container, false);
-        SharedPreferences sharedpreferences = context.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+        SharedPreferences sharedpreferences = context.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
 
-        Log.d(TAG, nh.APP_SCRIPTS_PATH);
+        Log.d(TAG, NhPaths.APP_SCRIPTS_PATH);
 
         // Checkbox for No Upstream
         final CheckBox noupCheckbox = rootView.findViewById(R.id.pineapple_noup);
@@ -77,22 +75,22 @@ public class PineappleFragment extends Fragment {
         addClickListener(R.id.pineapple_start_button, v -> {
             new Thread(() -> {
                 ShellExecuter exe = new ShellExecuter();
-                String command = "su -c '" + nh.APP_SCRIPTS_PATH + "/pine-nano " + start_type + startConnection(rootView) + proxy_type + "'";
+                String command = "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/pine-nano " + start_type + startConnection(rootView) + proxy_type + "'";
                 Log.d(TAG, command);
                 exe.RunAsRootOutput(command);
             }).start();
-            nh.showMessage(context, "Starting eth0 connection");
+            NhPaths.showMessage(context, "Starting eth0 connection");
         }, rootView);
 
         // Stop|Close Button
         addClickListener(R.id.pineapple_close_button, v -> {
             new Thread(() -> {
                 ShellExecuter exe = new ShellExecuter();
-                String command = "su -c '" + nh.APP_SCRIPTS_PATH + "/pine-nano stop'";
+                String command = "su -c '" + NhPaths.APP_SCRIPTS_PATH + "/pine-nano stop'";
                 Log.d(TAG, command);
                 exe.RunAsRootOutput(command);
             }).start();
-            nh.showMessage(context, "Bringing down eth0 conneciton");
+            NhPaths.showMessage(context, "Bringing down eth0 conneciton");
         }, rootView);
 
         return rootView;

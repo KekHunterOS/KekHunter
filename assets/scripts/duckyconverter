@@ -10,19 +10,16 @@
 SCRIPT_PATH=$(readlink -f $0)
 SOURCE_PATH=${SCRIPT_PATH%/*}
 
-#########################
-#### Define Variables ####
-#########################
+. ${SCRIPT_PATH%/*}/bootkali_env
 
-## Setup BUSYBOX path.
-BUSYBOX=`which busybox | head -n1`
+##########################
+#### Define Variables ####
+##########################
+
+## Validate busybox path.
 if [ -z "$BUSYBOX" ]; then
-    if [ -x /sbin/.magisk/busybox/busybox ]; then
-        BUSYBOX=/sbin/.magisk/busybox/busybox
-    else
-        echo "[-] No busybox is installed or busybox is not granted execute permission, if you did have it installed, please symlink it to /system/bin and grant it the permission."
-        exit 1
-    fi
+    bklog "[-] No busybox_nh is installed or busybox_nh is not granted execute permission, if you did have it installed, please symlink it to /system/bin or /system/xbin and grant it the permission."
+    exit 1
 fi
 
 ## Check if hid binary existed.
@@ -2826,15 +2823,14 @@ function command_interpreter(){
             TMP_CONTENT=(${TMP_CONTENT//0a/ })
             ## loop each hex string and then pass it to convert_ducky function to do the match
             for TMP_HEX_CHAR in ${TMP_CONTENT[@]}; do
-                log -t "BBBB" "The char in hex is: $TMP_HEX_CHAR"
                 convert_ducky $TMP_HEX_CHAR
             done
         elif [ "$TMP_CMD" = "DELAY" ]; then
-            if ! echo "$TMP_CONTENT" | $BUSYBOX grep -q -E "^[0-9]*\.?[0-9]*$"; then
-                echo "Invalid DELAY format, should be like: [123], [.123], [1.23] and [123.]"
+            if ! echo "$TMP_CONTENT" | $BUSYBOX grep -q -E "^[0-9]*$"; then
+                echo "Invalid DELAY format, should be an integer >= 0."
                 exit 1
             fi
-            echo "sleep $TMP_CONTENT" >> $OUTFILE
+            echo "$BUSYBOX usleep ${TMP_CONTENT}000" >> $OUTFILE
         elif [ "$TMP_CMD" = "REM" ]; then
             echo "#### \"${TMP_CONTENT[@]}\" ####" >> $OUTFILE
         elif [ "$TMP_CMD" = "REPEAT" ]; then
@@ -2848,6 +2844,23 @@ function command_interpreter(){
                 command_interpreter "$CMD" "${CONTENT[@]}"
             done
             LAST_CMD="$CMD ${CONTENT[@]}"
+        elif [ "$TMP_CMD" = "COMBO" ]; then
+            TMP_CONTENT=(${TMP_CONTENT[@]})
+            local FULL_CMD
+            FULL_CMD=()
+            for i in "${TMP_CONTENT[@]}"; do
+                ERROR_CODE=1
+                local KEY="`tr '[:upper:]' '[:lower:]' <<< $i`"
+                for j in "${COMBO_KEYS[@]}"; do
+                    if [ "$j" = "$KEY" ]; then
+                        ERROR_CODE=0
+                        break
+                    fi
+                done
+                [ $ERROR_CODE -eq 1 ] && echo "$i is not a valid key combination, please check." | tee $OUTFILE && exit 1
+                FULL_CMD+=($(translate_combo_key $KEY))
+            done
+            write_kb_code_bin "${FULL_CMD[@]}"
         elif [ "$TMP_CMD" = "MOUSE" ]; then
             write_mouse_code ${TMP_CONTENT}
         else

@@ -1,0 +1,313 @@
+#!/system/bin/sh
+
+SCRIPT_PATH=$(readlink -f $0)
+. ${SCRIPT_PATH%/*}/bootkali_log
+. ${SCRIPT_PATH%/*}/bootkali_env
+
+#########################################
+#### Define default global variables ####
+#########################################
+DNS_SERVER1=$(getprop net.dns1)
+TIMEOUT=120
+DEPS=(isc-dhcp-server isc-dhcp-common)
+
+################################
+#### Define shell functions ####
+################################
+function print_usage() {
+    bklog "[!] Usage: usbtethering [OPTIONS]"
+    bklog "      -o(required)    upstream interface"
+    bklog "      -i(required)    usb network interface"
+    bklog "      -c              timeout in seconds when target not able to get the assigned ip address."
+    bklog "      -A(required)    The BEGIN of DHCP IP address"
+    bklog "      -B(required)    The END of DCHP IP address"
+    bklog "      -C(required)    The Gateway IP of usb network interface"
+    bklog "      -D(required)    The IP subnet mask address in octet format"
+    bklog "      -k              Perform clean up process. Used with -o and -i option only."
+    bklog ""
+    bklog "    e.g. usbtethering -o wlan0 -i rndis0 -A 192.168.100.10 -B 192.168.100.15 -C 192.168.100.1 -D 255.255.255.0"
+    bklog "    e.g. usbtethering -o wlan0 -i rndis0 -k"
+}
+
+function kill_proc() {
+    bklog "[!] Bringing down $USB_IFACE and reverting the iptables."
+
+    ## Kill the dhcpd process ##
+    pkill dhcpd
+
+    ## Remove dhcpd stuff. ##
+    rm -f $MNT/var/lib/dhcp/dhcpd.leases
+    rm $MNT/tmp/auto_share_network.conf
+    rm $MNT/run/dhcpd.pid
+
+    ## Disable ip forward ##
+    echo 0 > /proc/sys/net/ipv4/ip_forward
+
+    ## Revert iptables setting dumped from kernel log. ##
+    if [ ! "$UPSTREAM_IFACE" = "$USB_IFACE" ]; then
+        iptables -t filter -D FORWARD -i $USB_IFACE -o $UPSTREAM_IFACE -j ACCEPT
+        iptables -t filter -D FORWARD -i $UPSTREAM_IFACE -o $USB_IFACE -j ACCEPT
+        iptables -t nat -D POSTROUTING -o $UPSTREAM_IFACE -j MASQUERADE
+        ip rule del from all iif $USB_IFACE lookup $UPSTREAM_IFACE
+    else
+        iptables -t filter -D FORWARD -i $USB_IFACE -o $USB_IFACE -j ACCEPT
+        iptables -t nat -D POSTROUTING -o $UPSTREAM_IFACE -j MASQUERADE
+    fi
+
+    ## Bringing down the usb interface ##
+    ip link set $USB_IFACE down
+    ip addr flush dev $USB_IFACE
+    $BUSYBOX ifconfig $USB_IFACE down
+
+    bklog "[+] Done."
+    exit 0
+}
+
+function dep_check() {
+    for i in "${DEPS[@]}"
+    do
+        PKG_OK=$(chroot $MNT /usr/bin/dpkg-query -W --showformat='${Status}\n' ${i}|grep "install ok installed")
+        bklog "[+] Checking for installed dependency: ${i}"
+        if [ "$PKG_OK" = "" ]; then
+            bklog "[-] Missing dependency: ${i}"
+            bklog "[+] Attempting to install...."
+            chroot $MNT /usr/bin/sudo apt-get -y install ${i}
+        fi
+        ## Let's check if it really has $i installed ##
+        PKG_OK=$(chroot $MNT /usr/bin/dpkg-query -W --showformat='${Status}\n' ${i}|grep "install ok installed")
+        [ "$PKG_OK" = "" ] && bklog "[-] $i not installed." && exit 1 || bklog "[+] $i is installed."
+    done
+}
+
+## dnsnasq is somehow not working as expected, use dhcpd in kali chroot instead. ##
+function start_dnsmasq() {
+    dnsmasq --keep-in-foreground --no-resolv --no-poll --dhcp-authoritative \
+    --dhcp-option-force=43,ANDROID_METERED --pid-file --listen-mark 0xf0063 \
+    --user dns_tether --interface=$USB_IFACE --dhcp-range=${IP_BEGIN},${IP_END},${IP_SUB_OCTET},12h \
+    --server=${DNS_SERVER1} &
+    #iptables-restore --noflush -w -v
+}
+
+function config_ip() {
+    ## Setup the usb interface first. The ip, gateway, subnet mask.. ##
+    ip link set $USB_IFACE down
+    ip addr flush dev $USB_IFACE
+    ip addr add $IP_GW/$IP_SUB_CDIR dev $USB_IFACE
+    ip link set $USB_IFACE up
+
+    ## Config ip route, ip rule & ip tables ##
+    if [ ! "$UPSTREAM_IFACE" = "$USB_IFACE" ]; then
+        ip route append $IP_NET_ADDR/$IP_SUB_CDIR dev $USB_IFACE src $IP_GW proto kernel scope link table $(ip rule list | head -n1 | sed -n -e 's/^.*lookup \(.*$\)/\1/p')
+        ip rule add from all iif $USB_IFACE lookup $UPSTREAM_IFACE
+        iptables -t filter -I FORWARD 1 -i $USB_IFACE -o $UPSTREAM_IFACE -j ACCEPT
+        iptables -t filter -I FORWARD 2 -i $UPSTREAM_IFACE -o $USB_IFACE -j ACCEPT
+        iptables -t nat -I POSTROUTING 1 -o $UPSTREAM_IFACE -j MASQUERADE
+    else
+        ip route append $IP_NET_ADDR/$IP_SUB_CDIR dev $USB_IFACE src $IP_GW proto kernel scope link table $(ip rule list | head -n1 | sed -n -e 's/^.*lookup \(.*$\)/\1/p')
+        iptables -t filter -I FORWARD 1 -i $USB_IFACE -o $USB_IFACE -j ACCEPT
+        iptables -t nat -I POSTROUTING 1 -o $UPSTREAM_IFACE -j MASQUERADE
+    fi
+
+    ## Enable ip forwording ##
+    echo 1 > /proc/sys/net/ipv4/ip_forward
+}
+
+function start_dhcpd() {
+    ## Remove all previous leases, pid and conf files ##
+    [ -s $MNT/var/lib/dhcp/dhcpd.leases ] && rm -f $MNT/var/lib/dhcp/dhcpd.leases
+    [ -s $MNT/tmp/auto_share_network.conf ] && rm $MNT/tmp/auto_share_network.conf
+    [ -s $MNT/run/dhcpd.pid ] && rm $MNT/run/dhcpd.pid
+
+    ## Recreate leases file ##
+    touch $MNT/var/lib/dhcp/dhcpd.leases
+
+    ## Create custom dhcpd.conf ##
+    cat << EOF > $MNT/tmp/auto_share_network.conf
+ddns-update-style none;
+default-lease-time 6000;
+max-lease-time 7200;
+authoritative;
+log-facility local7;
+subnet $IP_NET_ADDR netmask $IP_SUB_OCTET {
+  range $IP_BEGIN $IP_END;
+  option routers $IP_GW;
+  option domain-name "local";
+  #option domain-name-servers $IP_GW;
+  option domain-name-servers $DNS_SERVER1;
+  option domain-name-servers 8.8.8.8;
+  option domain-name-servers 8.8.4.4;
+}
+EOF
+
+    ## Start dhcpd ##
+    chroot $MNT /usr/sbin/dhcpd -cf /tmp/auto_share_network.conf -q
+}
+
+function calc_net_addr() {
+    local IP_BEGIN_OCTET_ARRAY
+    local IP_END_OCTET_ARRAY
+    local IP_GW_OCTET_ARRAY
+    local IP_SUB_OCTET_ARRAY
+    IFS='.'; IP_BEGIN_OCTET_ARRAY=(${IP_BEGIN[@]}); unset IFS
+    IFS='.'; IP_END_OCTET_ARRAY=(${IP_END[@]}); unset IFS
+    IFS='.'; IP_GW_OCTET_ARRAY=(${IP_GW[@]}); unset IFS
+    IFS='.'; IP_SUB_OCTET_ARRAY=(${IP_SUB_OCTET[@]}); unset IFS
+    for i in $(seq 0 3); do
+        IP_BEGIN_OCTET_ARRAY[$i]=$((${IP_BEGIN_OCTET_ARRAY[$i]} & ${IP_SUB_OCTET_ARRAY[$i]}))
+        IP_END_OCTET_ARRAY[$i]=$((${IP_END_OCTET_ARRAY[$i]} & ${IP_SUB_OCTET_ARRAY[$i]}))
+        IP_GW_OCTET_ARRAY[$i]=$((${IP_GW_OCTET_ARRAY[$i]} & ${IP_SUB_OCTET_ARRAY[$i]}))
+        if [ ${IP_BEGIN_OCTET_ARRAY[$i]} -ne ${IP_END_OCTET_ARRAY[$i]} -o ${IP_BEGIN_OCTET_ARRAY[$i]} -ne ${IP_GW_OCTET_ARRAY[$i]} ]; then
+            bklog "[-] Subnet mask not matching with the Gateway of Target IP address."
+            exit 1
+        fi
+    done
+    IP_NET_ADDR="${IP_GW_OCTET_ARRAY[0]}.${IP_GW_OCTET_ARRAY[1]}.${IP_GW_OCTET_ARRAY[2]}.${IP_GW_OCTET_ARRAY[3]}"
+}
+
+function octet_to_cdir(){
+    local INPUT=$1
+    local BITSET
+    local OUTPUT
+    local _TEMP_INPUT
+    BITSET=(128 64 32 16 8 4 2 1)
+    if ! echo "$INPUT" | grep -E -q "^[0-9]+$"; then bklog "[-] $INPUT is not an integer."; exit 1; fi
+    [ $INPUT -gt 255 ] && bklog "[-] $INPUT is not a valid octet as it is larger than 255" && exit 1
+    for i in $(seq 0 $((${#BITSET[@]} -1))); do
+        _TEMP_INPUT=$INPUT
+        INPUT=$(($INPUT % ${BITSET[$i]}))
+        [ $_TEMP_INPUT -eq $INPUT ] && OUTPUT[$i]=0 || OUTPUT[$i]=1
+    done
+    echo "${OUTPUT[@]}" | $BUSYBOX tr -d ' '
+}
+
+function is_valid_subnetmask() {
+    local SUBNET_MASK_OCTET_ARRAY
+    local SUBNET_MASK_OCTET_BINARY
+    IFS='.'; SUBNET_MASK_OCTET_ARRAY=($1); unset IFS
+    for i in $(seq 0 3); do
+        SUBNET_MASK_OCTET_ARRAY[$i]=$(octet_to_cdir ${SUBNET_MASK_OCTET_ARRAY[$i]})
+    done
+    SUBNET_MASK_OCTET_BINARY=${SUBNET_MASK_OCTET_ARRAY[0]}${SUBNET_MASK_OCTET_ARRAY[1]}${SUBNET_MASK_OCTET_ARRAY[2]}${SUBNET_MASK_OCTET_ARRAY[3]}
+    if [ ${#SUBNET_MASK_OCTET_BINARY} -ne 32 ] || ! echo "$SUBNET_MASK_OCTET_BINARY" | grep -E -q "^[1]*[0]*$"; then
+        bklog "[-] Invalid subnet mask address."
+        exit 1
+    fi
+    IP_SUB_CDIR=`echo $SUBNET_MASK_OCTET_BINARY | grep -E -o "^[1]*"`
+    IP_SUB_CDIR=${#IP_SUB_CDIR}
+}
+
+function is_valid_ip_format() {
+    for tmp_ip in "$@"; do
+        if ! echo $tmp_ip | grep -q -E '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$'; then
+            bklog "[-] $tmp_ip is not a valid IP address format."
+            print_usage; exit 1
+        fi
+    done
+}
+
+function args_check() {
+    for args in "$@"; do
+        if [ "$(eval echo \$$args)" = "" ]; then
+            bklog "[-] $args is not specified."
+            print_usage; exit 1
+        fi
+    done
+}
+
+###################
+#### Main Part ####
+###################
+## Print help if args = --help ##
+if [ "$1" = "--help" ]; then
+    print_usage; exit 1
+fi
+
+## Parse the args first. ##
+while getopts "o:i:c:A:B:C:D:k" OPTS; do
+    case $OPTS in
+        o) UPSTREAM_IFACE=$OPTARG;;
+        i) USB_IFACE=$OPTARG;;
+        c) TIMEOUT=$OPTARG;;
+        A) IP_BEGIN=$OPTARG;;
+        B) IP_END=$OPTARG;;
+        C) IP_GW=$OPTARG;;
+        D) IP_SUB_OCTET=$OPTARG;;
+        k) WANT_TO_KILL=1;;
+        *) print_usage; exit 1;;
+    esac
+done
+
+## Check if user wants to kill process ##
+if [ ! -z $WANT_TO_KILL ]; then
+    if [ ! -z $UPSTREAM_IFACE ] && [ ! -z $USB_IFACE ]; then
+        kill_proc
+    else
+        print_usage; exit 1
+    fi
+fi
+
+## Check if specific args is empty or not, if it is empty then print the usage. ##
+args_check UPSTREAM_IFACE USB_IFACE IP_BEGIN IP_END IP_GW IP_SUB_OCTET
+
+## Check if the upstream interface and usb network interface really exist. ##
+if ! ip addr show $UPSTREAM_IFACE > /dev/null 2>&1; then
+    bklog "[-] $UPSTREAM_IFACE interface not found."
+    exit 1
+fi
+if ! ip addr show $USB_IFACE > /dev/null 2>&1; then
+    bklog "[-] $USB_IFACE interface not found."
+    exit 1
+fi
+
+## Check if all the specified ip variables are valid ip address format. ##
+is_valid_ip_format $IP_BEGIN $IP_END $IP_GW $IP_SUB_OCTET
+is_valid_subnetmask $IP_SUB_OCTET
+
+## Calculate the IP net address ##
+calc_net_addr
+
+## Echo the input ##
+bklog "[!] UPSTREAM_IFACE: $UPSTREAM_IFACE"
+bklog "[!] USB_IFACE: $USB_IFACE"
+bklog "[!] TIMEOUT: $TIMEOUT"
+bklog "[!] IP_BEGIN: $IP_BEGIN"
+bklog "[!] IP_END: $IP_END"
+bklog "[!] IP_GW: $IP_GW"
+bklog "[!] IP_SUB_OCTET: $IP_SUB_OCTET"
+bklog "[!] IP_NET_ADDR: $IP_NET_ADDR"
+
+## Let's get party! ##
+dep_check
+config_ip
+trap kill_proc INT
+start_dhcpd
+
+## Get target's IP and PC name ##
+## loop over the lease file to see if target has been given the ip address and internet access. ##
+while true; do
+    echo "[!] Assigning address to target, timeout: $TIMEOUT"
+    TARGET_ADDR=$(cat $MNT/var/lib/dhcp/dhcpd.leases | grep "^lease" | awk 'NR==1{print $2}');
+    if [ -z "$TARGET_ADDR" ]; then
+        if [ $TIMEOUT -eq 0 ]; then  ## breaks loop if it takes more than x seconds
+            bklog "[-] No ip address is assigned to the target."
+            kill_proc
+        fi
+        sleep 1
+        ((TIMEOUT--))
+        echo -ne "\033[1A"
+        echo -ne "\033[K"
+    else
+        bklog "[+] Target ip address: $TARGET_ADDR"
+        TARGET_PC_NAME=$(cat $MNT/var/lib/dhcp/dhcpd.leases | grep "client-hostname" | awk 'NR==1{print $2}' | tr -d "\"\;")
+        bklog "[+] Target PC name: $TARGET_PC_NAME"
+        break
+    fi
+done
+
+## Enter to kill program ##
+bklog "[+] BRING IT ON !! LETS ROCK & ROLL !!"
+bklog "[!] And DONT Forget to Hit 'ENTER' button to Kill Me"
+read
+
+## Shutdown and Job Done! ##
+kill_proc

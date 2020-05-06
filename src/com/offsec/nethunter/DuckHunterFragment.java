@@ -18,8 +18,11 @@ import android.view.ViewGroup;
 
 import com.offsec.nethunter.AsyncTask.DuckHuntAsyncTask;
 import com.offsec.nethunter.utils.NhPaths;
+import com.offsec.nethunter.utils.SharePrefTag;
+
 import java.util.HashMap;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
@@ -28,21 +31,17 @@ import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 public class DuckHunterFragment extends Fragment {
-
-    private ViewPager mViewPager;
     private static SharedPreferences sharedpreferences;
-
     // Language vars
     private static HashMap<String, String> map = new HashMap<>();
     public static String lang = "us"; // Set US as default language
     private static String[] keyboardLayoutString;
     private static final String ARG_SECTION_NUMBER = "section_number";
     private static final String TAG = "DuckHunterFragment";
-    private DuckHuntAsyncTask duckHuntAsyncTask;
     private Context context;
     private Activity activity;
-    private NhPaths nh;
     private Menu menu;
+    private ViewPager mViewPager;
     private String duckyInputFile ;
     private String duckyOutputFile;
     private boolean isReceiverRegistered;
@@ -60,11 +59,10 @@ public class DuckHunterFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.context = getContext();
-        this.activity = getActivity();
-        nh = new NhPaths();
-        duckyInputFile = nh.APP_SD_FILES_PATH + "/modules/ducky_in.txt";
-        duckyOutputFile = nh.APP_SD_FILES_PATH + "/modules/ducky_out.sh";
+        context = getContext();
+        activity = getActivity();
+        duckyInputFile = NhPaths.APP_SD_FILES_PATH + "/modules/ducky_in.txt";
+        duckyOutputFile = NhPaths.APP_SD_FILES_PATH + "/modules/ducky_out.sh";
         map.put("American English", "us");
         map.put("Turkish", "tr");
         map.put("Swedish", "sv");
@@ -107,12 +105,22 @@ public class DuckHunterFragment extends Fragment {
             }
         });
 
-        sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
+        sharedpreferences = activity.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
+
+        if (!sharedpreferences.contains("DuckHunterLanguageIndex")){
+            for (int i = 0; i < keyboardLayoutString.length; i++){
+                if ("us".equals(map.get(keyboardLayoutString[i]))) {
+                    sharedpreferences.edit().putInt("DuckHunterLanguageIndex", i).apply();
+                    break;
+                }
+            }
+        }
+
         return rootView;
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
         this.menu = menu;
         inflater.inflate(R.menu.duck_hunter, menu);
         menu.findItem(R.id.duckConvertAttack).setVisible(false);
@@ -120,19 +128,20 @@ public class DuckHunterFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
+        DuckHuntAsyncTask duckHuntAsyncTask;
         switch (item.getItemId()) {
             case R.id.duckConvertAttack:
                 duckHuntAsyncTask = new DuckHuntAsyncTask(DuckHuntAsyncTask.ATTACK);
                 duckHuntAsyncTask.setListener(new DuckHuntAsyncTask.DuckHuntAsyncTaskListener(){
                     @Override
                     public void onAsyncTaskPrepare() {
-                        nh.showMessage(context, "Launching Attack");
+                        NhPaths.showMessage(context, "Launching Attack");
                     }
 
                     @Override
                     public void onAsyncTaskFinished(Object result) {
                         if (!(boolean)result){
-                            nh.showMessage_long(context, "HID interfaces are not enabled or something wrong with the permission of /dev/hidg*, make sure they are enabled and permissions are granted as 666");
+                            NhPaths.showMessage_long(context, "HID interfaces are not enabled or something wrong with the permission of /dev/hidg*, make sure they are enabled and permissions are granted as 666");
                         }
                     }
                 });
@@ -164,6 +173,13 @@ public class DuckHunterFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        menu = null;
+        mViewPager = null;
+    }
+
     private static void setLang() {
         int keyboardLayoutIndex = sharedpreferences.getInt("DuckHunterLanguageIndex", 0);
         lang = map.get(keyboardLayoutString[keyboardLayoutIndex]);
@@ -185,7 +201,7 @@ public class DuckHunterFragment extends Fragment {
         builder.setSingleChoiceItems(keyboardLayoutString, keyboardLayoutIndex, (dialog, which) -> {
             Editor editor = sharedpreferences.edit();
             editor.putInt("DuckHunterLanguageIndex", which);
-            //editor.putString("DuckHunterLanguage", map.get(keyboardLayoutString[which]));
+            editor.putString(SharePrefTag.DUCKHUNTER_LANG_SHAREPREF_TAG, map.get(keyboardLayoutString[which]));
             editor.apply();
         });
         builder.show();

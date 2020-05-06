@@ -59,8 +59,8 @@ public class VNCFragment extends Fragment {
     private Integer posd = 0;
     private static final int MIN_UID = 100000;
     private static final int MAX_UID = 101000;
-    NhPaths nh = new NhPaths();
-    String BUSYBOX_NH= nh.whichBusybox();
+    NhPaths nh; //= new NhPaths();
+    String BUSYBOX_NH= nh.getBusyboxPath();
 
     public VNCFragment() {
     }
@@ -142,9 +142,10 @@ public class VNCFragment extends Fragment {
         File vncResFile = new File(nh.APP_SD_FILES_PATH + "/configs/vnc-resolutions");
         String device_res = xwidth + "x" + xheight;
         if (vncResFile.length() == 0)
-            exe.RunAsRoot(new String[]{"su -c echo \"Auto$'\n'" + device_res + "\" > " + vncResFile});
+            //exe.RunAsRoot(new String[]{"su -c \'echo \"Auto$'\n'" + device_res + "\" > " + vncResFile + "\'"});
+            exe.RunAsRoot(new String[]{"su -c \'echo \"Auto\"$\"\n\"" + device_res + " > " + vncResFile + "\'"});
 
-        //HDMI resolution
+        //HDMI resolution\
         File hdmiResFile = new File(nh.APP_SD_FILES_PATH + "/configs/hdmi-resolutions");
         String[] commandRES = {"sh", "-c", "cat " + hdmiResFile};
         String outputRES = exe.Executer(commandRES);
@@ -166,7 +167,7 @@ public class VNCFragment extends Fragment {
         vncresolution.setAdapter(vncadapter);
 
         //Users
-        File passwd = new File(nh.CHROOT_PATH + "/etc/passwd");
+        File passwd = new File(nh.CHROOT_PATH() + "/etc/passwd");
         String commandUSR = ("echo root && " + BUSYBOX_NH + " awk -F':' -v \"min=" + MIN_UID + "\" -v \"max=" + MAX_UID + "\" '{ if ( $3 >= min && $3 <= max ) print $0}' " + passwd + " | " + BUSYBOX_NH + " cut -d: -f1");
         String outputUSR = exe.RunAsRootOutput(commandUSR);
         final String[] userArray = outputUSR.split("\n");
@@ -222,8 +223,8 @@ public class VNCFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int pos, long id) {
                 selected_res = parentView.getItemAtPosition(pos).toString();
-                selected_disp = exe.RunAsRootOutput("su -c echo " + selected_res + " | cut -d : -f 1");
-                selected_ppi = exe.RunAsRootOutput("su -c echo " + selected_res + " | cut -d : -f 2 | sed 's/ppi//g'");
+                selected_disp = exe.RunAsRootOutput("su -c \'echo " + selected_res + " | cut -d : -f 1\'");
+                selected_ppi = exe.RunAsRootOutput("su -c \'echo " + selected_res + " | cut -d : -f 2 | sed 's/ppi//g'\'");
             }
             @Override
             public void onNothingSelected(AdapterView<?> parentView) {
@@ -283,7 +284,7 @@ public class VNCFragment extends Fragment {
         //VNC service checkbox
         File kex_init = new File(nh.APP_PATH + "/etc/init.d/99kex");
         final CheckBox vnc_serviceCheckBox = rootView.findViewById(R.id.vnc_serviceCheckBox);
-        final String initfile = exe.RunAsRootOutput("su -c cat " + kex_init);
+        final String initfile = exe.RunAsRootOutput("su -c \'cat " + kex_init + "\'");
 
         if (initfile.contains("vncserver"))
             vnc_serviceCheckBox.setChecked(true);
@@ -293,18 +294,18 @@ public class VNCFragment extends Fragment {
         vnc_serviceCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    File rootvncpasswd = new File(nh.CHROOT_PATH + "/root/.vnc/passwd");
-                    String vnc_passwd = exe.RunAsRootOutput("su -c cat " + rootvncpasswd);
+                    File rootvncpasswd = new File(nh.CHROOT_PATH() + "/root/.vnc/passwd");
+                    String vnc_passwd = exe.RunAsRootOutput("su -c \'cat " + rootvncpasswd + "\'");
                     if(!vnc_passwd.equals("")) {
                         String arch = System.getProperty("os.arch");
                         String shebang = "#!/system/bin/sh\n";
                         String kex_prep = "\n# KeX architecture: " + arch + "\n# Commands to run at boot:\nHOME=/root\nUSER=root";
                         String kex_cmd = "";
                         if(arch.equals("aarch64")) {
-                            kex_cmd = "su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgcc_s.so.1 vncserver :1 " + localhostonly + " " + selected_vncresCMD + "'";
+                            kex_cmd = "su -c \'" + nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgcc_s.so.1 vncserver :1 " + localhostonly + " " + selected_vncresCMD + "\'";
                         }
                         else {
-                            kex_cmd = "su -c '" + nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd LD_PRELOAD=/usr/lib/arm-linux-gnueabihf/libgcc_s.so.1 vncserver :1 " + localhostonly + " " + selected_vncresCMD + "'";
+                            kex_cmd = "su -c \'" + nh.APP_SCRIPTS_PATH + "/bootkali custom_cmd LD_PRELOAD=/usr/lib/arm-linux-gnueabihf/libgcc_s.so.1 vncserver :1 " + localhostonly + " " + selected_vncresCMD + "\'";
                         }
                         String fileContents = shebang + "\n" + kex_prep + "\n" + kex_cmd;
                         exe.RunAsRoot(new String[]{
@@ -332,11 +333,11 @@ public class VNCFragment extends Fragment {
         });
         addClickListener(StartVNCButton, v -> {
             if(selected_user.equals("root")) {
-                File rootvncpasswd = new File(nh.CHROOT_PATH + "/root/.vnc/passwd");
-                vnc_passwd = exe.RunAsRootOutput("su -c cat " + rootvncpasswd);
+                File rootvncpasswd = new File(nh.CHROOT_PATH() + "/root/.vnc/passwd");
+                vnc_passwd = exe.RunAsRootOutput("su -c \'cat " + rootvncpasswd + "\'");
             } else {
-                File uservncpasswd = new File(nh.CHROOT_PATH + "/home/" + selected_user + "/.vnc/passwd");
-                vnc_passwd = exe.RunAsRootOutput("su -c cat " + uservncpasswd);
+                File uservncpasswd = new File(nh.CHROOT_PATH() + "/home/" + selected_user + "/.vnc/passwd");
+                vnc_passwd = exe.RunAsRootOutput("su -c \'cat " + uservncpasswd + "\'");
             }
             if(vnc_passwd.equals("")) {
                 Toast.makeText(getActivity().getApplicationContext(), "Please setup local server first!", Toast.LENGTH_SHORT).show();
@@ -344,15 +345,15 @@ public class VNCFragment extends Fragment {
                 String arch = System.getProperty("os.arch");
                 if(arch.equals("aarch64")) {
                     if(selected_user.equals("root")) {
-                        intentClickListener_NH("echo -ne \"\\033]0;Starting Server\\007\" && clear;HOME=/root;USER=root;sudo -u root LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgcc_s.so.1 nohup vncserver :" + selected_display + " " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + " >/dev/null 2>&1 </dev/null; sleep 2 && exit");
+                        intentClickListener_NH("echo -ne \"\\033]0;Starting Server\\007\" && clear;HOME=/root;USER=root;sudo -u root LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgcc_s.so.1 nohup vncserver :" + selected_display + " " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + " >/dev/null 2>&1 </dev/null;echo \"Server started! Closing terminal..\" && sleep 2 && exit");
                     } else {
-                        intentClickListener_NH("echo -ne \"\\033]0;Starting Server\\007\" && clear;HOME=/home/" + selected_user + ";USER=" + selected_user + ";sudo -u " + selected_user + " LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgcc_s.so.1 nohup vncserver :" + selected_display + " " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + " >/dev/null 2>&1 </dev/null; sleep 2 && exit");
+                        intentClickListener_NH("echo -ne \"\\033]0;Starting Server\\007\" && clear;HOME=/home/" + selected_user + ";USER=" + selected_user + ";sudo -u " + selected_user + " LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgcc_s.so.1 nohup vncserver :" + selected_display + " " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + " >/dev/null 2>&1 </dev/null;echo \"Server started! Closing terminal..\" && sleep 2 && exit");
                     }
                 } else {
                     if (selected_user.equals("root")) {
-                        intentClickListener_NH("echo -ne \"\\033]0;Starting Server\\007\" && clear;HOME=/root;export USER=root;sudo -u root LD_PRELOAD=/usr/lib/arm-linux-gnueabihf/libgcc_s.so.1 nohup vncserver :" + selected_display + " " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + " >/dev/null 2>&1 </dev/null; sleep 2 && exit");
+                        intentClickListener_NH("echo -ne \"\\033]0;Starting Server\\007\" && clear;HOME=/root;export USER=root;sudo -u root LD_PRELOAD=/usr/lib/arm-linux-gnueabihf/libgcc_s.so.1 nohup vncserver :" + selected_display + " " + localhostonly + "-name \"NetHunter KeX\" " + selected_vncresCMD + " >/dev/null 2>&1 </dev/null;echo \"Server started! Closing terminal..\" && sleep 2 && exit");
                     } else {
-                        intentClickListener_NH("echo -ne \"\\033]0;Starting Server\\007\" && clear;HOME=/home/" + selected_user + ";USER=" + selected_user + ";sudo -u " + selected_user + " LD_PRELOAD=/usr/lib/arm-linux-gnueabihf/libgcc_s.so.1 nohup vncserver :" + selected_display + " " + "-name \"NetHunter KeX\" " + selected_vncresCMD + " >/dev/null 2>&1 </dev/null; sleep 2 && exit");
+                        intentClickListener_NH("echo -ne \"\\033]0;Starting Server\\007\" && clear;HOME=/home/" + selected_user + ";USER=" + selected_user + ";sudo -u " + selected_user + " LD_PRELOAD=/usr/lib/arm-linux-gnueabihf/libgcc_s.so.1 nohup vncserver :" + selected_display + " " + "-name \"NetHunter KeX\" " + selected_vncresCMD + " >/dev/null 2>&1 </dev/null;echo \"Server started! Closing terminal..\" && sleep 2 && exit");
                     }
                 }
                 Log.d(TAG, localhostonly);
@@ -392,15 +393,15 @@ public class VNCFragment extends Fragment {
             sharedpreferences.edit().putBoolean("confirm_res", false).apply();
         });
         addClickListener(BackupHDMI, v -> {
-            exe.RunAsRoot(new String[]{"su -c cp " + hdmiResFile + " " + nh.SD_PATH});
+            exe.RunAsRoot(new String[]{"su -c \'cp " + hdmiResFile + " " + nh.SD_PATH +"\'"});
             Toast.makeText(getActivity().getApplicationContext(), "Backup successful!", Toast.LENGTH_SHORT).show();
         });
         addClickListener(RestoreHDMI, v -> {
-            String hdmibackup = exe.RunAsRootOutput("su -c cat " + nh.SD_PATH + "/hdmi-resolutions");
+            String hdmibackup = exe.RunAsRootOutput("su -c \'cat " + nh.SD_PATH + "/hdmi-resolutions\'");
             if(hdmibackup.equals("")) {
                 Toast.makeText(getActivity().getApplicationContext(), "Backup file not found!", Toast.LENGTH_SHORT).show();
             } else {
-                exe.RunAsRoot(new String[]{"su -c cp " + nh.SD_PATH + "/hdmi-resolutions " + hdmiResFile});
+                exe.RunAsRoot(new String[]{"su -c \'cp " + nh.SD_PATH + "/hdmi-resolutions " + hdmiResFile + "\'"});
                 reload();
                 Toast.makeText(getActivity().getApplicationContext(), "Restore successful!", Toast.LENGTH_SHORT).show();
             }
@@ -414,7 +415,7 @@ public class VNCFragment extends Fragment {
         });
         addClickListener(DelResolutionButton, v -> {
             if (!selected_res.equals("1080x1920:300ppi")) {
-                exe.RunAsRoot(new String[]{"su -c sed -i '/^" + selected_res + "$/d' " + hdmiResFile});
+                exe.RunAsRoot(new String[]{"su -c \'sed -i '/^" + selected_res + "$/d' " + hdmiResFile + "\'"});
                 reload();
             } else
                 Toast.makeText(getActivity().getApplicationContext(), "Can't remove default resolution!", Toast.LENGTH_SHORT).show();
@@ -428,20 +429,20 @@ public class VNCFragment extends Fragment {
             } else if (selected_vncres.equals(device_res)) {
                 Toast.makeText(getActivity().getApplicationContext(), "Can't remove device resolution!", Toast.LENGTH_SHORT).show();
             } else {
-                exe.RunAsRoot(new String[]{"su -c sed -i '/^" + selected_vncres + "$/d' " + vncResFile});
+                exe.RunAsRoot(new String[]{"su -c \'sed -i '/^" + selected_vncres + "$/d' " + vncResFile +"\'"});
                 reload();
             }
         });
         addClickListener(BackupVNC, v -> {
-            exe.RunAsRoot(new String[]{"su -c cp " + vncResFile + " " + nh.SD_PATH});
+            exe.RunAsRoot(new String[]{"su -c \'cp " + vncResFile + " " + nh.SD_PATH + "\'"});
             Toast.makeText(getActivity().getApplicationContext(), "Backup successful!", Toast.LENGTH_SHORT).show();
         });
         addClickListener(RestoreVNC, v -> {
-            String vncbackup = exe.RunAsRootOutput("su -c cat " + nh.SD_PATH + "/vnc-resolutions");
+            String vncbackup = exe.RunAsRootOutput("su -c \'cat " + nh.SD_PATH + "/vnc-resolutions\'");
             if(vncbackup.equals("")) {
                 Toast.makeText(getActivity().getApplicationContext(), "Backup file not found!", Toast.LENGTH_SHORT).show();
             } else {
-                exe.RunAsRoot(new String[]{"su -c cp " + nh.SD_PATH + "/vnc-resolutions " + vncResFile});
+                exe.RunAsRoot(new String[]{"su -c \'cp " + nh.SD_PATH + "/vnc-resolutions " + vncResFile + "\'"});
                 reload();
                 Toast.makeText(getActivity().getApplicationContext(), "Restore successful!", Toast.LENGTH_SHORT).show();
             }
@@ -461,8 +462,8 @@ public class VNCFragment extends Fragment {
         final TextView KeXstatus = VNCFragment.findViewById(R.id.KeXstatus);
         final TextView KeXuser = VNCFragment.findViewById(R.id.KeXuser);
         ShellExecuter exe = new ShellExecuter();
-                String kex_userCmd = "";
-        String kex_statusCmd = exe.RunAsRootOutput("su -c pidof Xtigervnc");
+        String kex_userCmd = "";
+        String kex_statusCmd = exe.RunAsRootOutput("su -c \'pidof Xtigervnc\'");
         if (kex_statusCmd.equals("")) {
             KeXstatus.setText("STOPPED");
             KeXuser.setText("None");
@@ -472,7 +473,7 @@ public class VNCFragment extends Fragment {
             kex_userCmd = exe.RunAsRootOutput(BUSYBOX_NH + " ps -w | grep Xtigervnc | grep Xauthority | " + BUSYBOX_NH + " awk '{gsub(/home/,\"\")} {gsub(/\\//,\"\")} {gsub(/.Xauthority/,\"\")} {print $11 $6}'");
             KeXuser.setText(kex_userCmd);
         }
-        File passwd = new File(nh.CHROOT_PATH + "/etc/passwd");
+        File passwd = new File(nh.CHROOT_PATH() + "/etc/passwd");
         String commandUSR = ("echo root && " + BUSYBOX_NH + " awk -F':' -v \"min=" + MIN_UID + "\" -v \"max=" + MAX_UID + "\" '{ if ( $3 >= min && $3 <= max ) print $0}' " + passwd + " | " + BUSYBOX_NH + " cut -d: -f1");
         String outputUSR = exe.RunAsRootOutput(commandUSR);
         final String[] userArray = outputUSR.split("\n");
@@ -514,7 +515,7 @@ public class VNCFragment extends Fragment {
                     builder2.setMessage("Bigger width is usually only for tablets. Misconfiguration can render the device unresponsive");
                     builder2.setPositiveButton("Keep", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog2, int which) {
-                            exe.RunAsRoot(new String[]{"su -c echo " + add_width + "x" + add_height + ":" + add_density + "ppi >> " + hdmiResFile});
+                            exe.RunAsRoot(new String[]{"su -c \'echo " + add_width + "x" + add_height + ":" + add_density + "ppi >> " + hdmiResFile + "\'"});
                             reload();
                         }
                     });
@@ -523,7 +524,7 @@ public class VNCFragment extends Fragment {
                     });
                     builder2.show();
                 } else {
-                    exe.RunAsRoot(new String[]{"su -c echo " + add_width + "x" + add_height + ":" + add_density + "ppi >> " + hdmiResFile});
+                    exe.RunAsRoot(new String[]{"su -c \'echo " + add_width + "x" + add_height + ":" + add_density + "ppi >> " + hdmiResFile + "\'"});
                     reload();
                 }
             }
@@ -551,7 +552,7 @@ public class VNCFragment extends Fragment {
                     Toast.makeText(getActivity().getApplicationContext(), "Please enter the values!", Toast.LENGTH_SHORT).show();
                     openResolutionDialog();
                 } else {
-                    exe.RunAsRoot(new String[]{"su -c echo " + add_width + "x" + add_height + " >> " + vncResFile});
+                    exe.RunAsRoot(new String[]{"su -c \'echo " + add_width + "x" + add_height + " >> " + vncResFile + "\'"});
                     reload();
                 }
             }
@@ -586,7 +587,7 @@ public class VNCFragment extends Fragment {
             @Override
             public void onFinish() {
                 ShellExecuter exe = new ShellExecuter();
-                exe.RunAsRoot(new String[]{"su -c wm size reset; wm density reset"});
+                exe.RunAsRoot(new String[]{"su -c \'wm size reset; wm density reset\'"});
                 sharedpreferences.edit().putBoolean("confirm_res", false).apply();
             }
         }.start();

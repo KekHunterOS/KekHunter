@@ -3,22 +3,86 @@
     <string name="app_name">NetHunter</string>
     <string name="app_nav_home_label">NetHunter</string>
 
-
     <string name="hometitle">System Information</string>
-    <string name="nethunter_description">Welcome to Kali Linux NetHunter by Offensive Security! This application is designed to make it easier to execute attacks and control services. The navigation menu contains links to useful commands, settings, macros, and attack configuration pages. Most configurations work out of the box but some may require some minimal tweaking.</string>
+    <!--string name="nethunter_description">Welcome to Kali Linux NetHunter by Offensive Security! This application is designed to make it easier to execute attacks and control services. The navigation menu contains links to useful commands, settings, macros, and attack configuration pages. Most configurations work out of the box but some may require some minimal tweaking.</string-->
+    <string name="nethunter_description">You can ADD, DELETE, MOVE, SEARCH, BACKUP, RESTORE and RESET your custom command item. You can also long click on the item label to EDIT the item.</string>
     <string name="nethunter_current_interfaces">Network Interfaces</string>
     <string name="nethunter_external_ip">External IP</string>
     <string name="nethunter_hid_detect">HID Interfaces</string>
     <string name="nethunter_busybox_detect">Busybox Version</string>
     <string name="nethunter_kernelver_detect">Kernel Version</string>
     <string name="nethunter_terminal_detect">Nethunter Terminal Status</string>
+    <string name="nethunter_howtouse_cmd">Put your own command string here, it will be run in Android environment to get the output displayed.</string>
+    <string name="nethunter_howtouse_delimiter">Put your desired delimiter string if you want to split the output into lines, default is "\\n".</string>
+    <string name="nethunter_howtouse_runoncreate">To get the output upon the fragment is created, check this option. Otherwise you have to click RUN button manually to get the output.</string>
 
-
-    <string name="kali_services_description">Various Kali network services can be started and stopped via the buttons in this part of the interface.</string>
     <string name="hid_powersploit_description">The Powersploit payload provides you a choice of reverse meterpreter HTTP/S payloads. "URL to payload" should be a URL accessible to the victim machine where the larger payload is downloaded to.</string>
     <string name="hid_windows_cmd_description">This Windows CMD payload allows you to enter raw commands to a Windows command prompt. Hitting the list menu will allow you to choose keyboard layout or UAC bypass options. </string>
 
+    <!-- KaliServices -->
+    <string name="kali_services_description">Kali Chroot services can be started and stopped via the switch toggle buttons, you can also ADD, DELETE, MOVE, SEARCH, BACKUP, RESTORE and RESET your own service item, and long click on the item label to EDIT the item as well.</string>
+    <string name="kaliservices_howto_startservice">To START a service in kali, a command will be run INSIDE KaliChroot that looks like this:\n\nbusybox chroot &lt;chroot_folder> /usr/bin/sudo &lt;command_to_start_service>\n\nService is considered STARTED if the return value is 0 and vice versa.</string>
+    <string name="kaliservices_howto_stopservice">To STOP a service in kali, a command will be run INSIDE KaliChroot that looks like this:\n\nbusybox chroot &lt;chroot_folder> /usr/bin/sudo &lt;command_to_stop_service>\n\nService is considered STOPPED if the return value is 0 and vice versa.</string>
+    <string name="kaliservices_howto_checkservice">To Check if a service in kali is up or not, a command will be run OUTSIDE KaliChroot that looks like this:\n\nbusybox ps -o pid,comm | grep \'&lt;service_name>\'\n\nService is considered UP if the return value is 0 and vice versa.</string>
+    <string name="kaliservices_howto_runServiceOnBoot">To automacticailly start the service after Kali Chroot is up, check this option.</string>
 
+    <!-- CustomCommands -->
+    <string name="custom_commands_description">You can ADD, DELETE, MOVE, SEARCH, BACKUP, RESTORE and RESET your custom command item. You can also long click on the item label to EDIT the item.</string>
+    <string-array name="custom_commands_sendto_array">
+        <item>android</item>
+        <item>kali</item>
+    </string-array>
+    <string-array name="custom_commands_execmode_array">
+        <item>interactive</item>
+        <item>background</item>
+    </string-array>
+
+    <!-- USB Armory -->
+    <string name="drawertitleusbarmory">USB Arsenal</string>
+    <string name="usbarmory_hint1_imagemounter">*Place all your .img or .iso files in "/sdcard/nh_files/diskimage/"</string>
+    <string name="usbarmory_current_usb_state">Current USB state: </string>
+    <string name="usbarmory_description">The USB Arsenal is awesome</string>
+    <string name="usbarmory_header">USB Function Selector</string>
+    <string name="usbarmory_enabledfunctions">USB functions currently enabled:</string>
+    <string name="usbarmory_nofunctionsenabled">No USB function is currently enabled</string>
+    <string name="usbarmory_imagemounter_header">Image Mounter</string>
+    <string name="usbarmory_imagemounter_description">Image Mounter can be used only if the USB function \"mass_storage\" has been enabled</string>
+    <string name="usbarmory_networktethering_header">USB Network Tethering</string>
+    <string name="usbarmory_networktethering_description">USB NetWork Tethering can be used only if the USB function \"rndis\" or \"acmecm\" has been enabled</string>
+    <string-array name="usbarmory_target_platform">
+        <item>Windows</item>
+        <item>Linux</item>
+        <item>Mac OS</item>
+    </string-array>
+    <string-array name="usbarmory_usb_states_win_lin">
+        <item>reset</item>
+        <item>hid</item>
+        <item>mass_storage</item>
+        <item>rndis</item>
+        <item>hid,mass_storage</item>
+        <item>rndis,hid</item>
+        <item>rndis,mass_storage</item>
+        <item>rndis,hid,mass_storage</item>
+    </string-array>
+    <string-array name="usbarmory_usb_states_mac">
+        <item>reset</item>
+        <item>hid</item>
+        <item>mass_storage</item>
+        <item>acm,ecm</item>
+        <item>hid,mass_storage</item>
+        <item>acm,ecm,hid</item>
+        <item>acm,ecm,mass_storage</item>
+        <item>acm,ecm,hid,mass_storage</item>
+    </string-array>
+    <string-array name="usbarmory_usb_adb">
+        <item>Enable</item>
+        <item>Disable</item>
+    </string-array>
+    <string-array name="usbarmory_usb_network_attack_mode">
+        <item>Network Tethering Only</item>
+    </string-array>
+
+    <!-- Bad USB -->
     <string name="badusb_label">BadUSB MITM Attack</string>
     <string name="badusb_description">This is our implementation of the BadUSB attack as demonstrated at Black Hat USA 2014. Enabling this USB gadget mode will allow your device to act as a USB network interface when plugged into a target computer. Connecting the USB cable to a PC will force all traffic from that PC (Windows or Linux) through the NetHunter device, where the traffic can be MITM\'ed.</string>
 
@@ -86,6 +150,7 @@
     <string name="choose_language">Keyboard Layout</string>
     <string name="reset_usb">Reset USB</string>
 
+    <!-- Macchanger -->
     <string name="iface">Interface</string>
     <string name="payload">Payload</string>
     <string name="loading_service">Loading service state</string>
@@ -100,7 +165,7 @@
     <string name="toast_install_terminal">Error launching intent. Install Android Terminal!</string>
     <string name="descriptiontext" />
 
-    <string name="macchanger_description">Change the MAC of any network interface.\n\nIt can be randomly generated or manually typed. \n\nThe MAC must contain 6 pair of combinations using the charset: [0–9|a-f] something like:\n\n 00:11:22:ab:cd:ef </string>
+    <string name="macchanger_description">**Important: Android 10 has MAC Randomization provided already, but if you still want to set a custom mac address yourself, the following criteria are required:\n1. Enable the \'Use randomised MAC\' on each SSID you connect to.\n2. The AP you want to connect to must be connected with a correct password before.\nAs Manually connect to a AP will lose the changed mac.</string>
     <string name="interface_select">Pick an interface:</string>
     <string name="macchanger_select">Select macchanger mode:</string>
     <string name="reset_mac">Reset wlan0 MAC address</string>
@@ -108,6 +173,7 @@
     <string name="TwoMACDigits">XX</string>
     <string name="macSeparator">:</string>
     <string name="changeMAC">Change MAC</string>
+    <string name="resetMAC">Reset MAC</string>
     <string name="reloadMAC">Reload MAC</string>
     <string name="randomMAC">Random MAC</string>
     <string name="customMAC">Custom MAC</string>
@@ -125,6 +191,8 @@
         <item>rndis0 (USB > Ethernet)</item>
         <item>usb0 (USB > Ethernet Nexus7 2013 when tethering | badusb)</item>
     </string-array>
+
+    <!-- USB Army(Not in use yet) -->
     <string-array name="usb_states">
         <item>Reset</item>
         <item>mtp,hid</item>
@@ -147,7 +215,6 @@
 
     <!-- KeX -->
     <string name="kex_description">Welcome to the Kali NetHunter Desktop Experience.\nYou can start multiple sessions as different users, add, save, and restore your own custom resolutions, start KeX at boot, and even output KeX to HDMI.</string>
-
     <!-- MITMf -->
     <string name="mitmf_description">Written by @byt3bl33d3r, MITMf aims to provide a one-stop-shop for Man-In-The-Middle and network attacks while updating and improving existing attacks and techniques.</string>
     <string-array name="mitmf_interface_array">
@@ -207,6 +274,15 @@
 
 
     <!-- chroot stuff -->
+    <array name="f_chrootmanager_build_chroot_arm_opts">
+        <item>arm64</item>
+        <item>armhf</item>
+    </array>
+    <array name="f_chrootmanager_build_chroot_full_or_min">
+        <item>full</item>
+        <item>min</item>
+    </array>
+
     <string name="thechroottitle">The Kali chroot</string>
     <string name="installkalichrootbutton">Install Kali Chroot</string>
     <string name="removekalichrootbutton">Remove Chroot</string>
@@ -232,15 +308,13 @@
     <string name="unzippinguntarringdone">Unzipping &amp; untarring done.</string>
     <string name="unzippinganduntarring">Unzipping and untarring....</string>
     <string name="downloadfailscheck">Something went wrong verifying the downloaded file.  Whoops.  Try again.</string>
-    <string name="aboutchroot">The \"chroot\" is a full installation of Kali Linux that shares processing, networking, storage, and other resources with Android. It resides in your internal app storage area and requires about 400MB for the minimal core installation.</string>
+    <string name="aboutchroot">This is Chroot Manager for Kali. The \"chroot\" is a full installation of Kali Linux that shares processing, networking, storage, and other resources with Android. It resides in your internal app storage area and is required to have at least 8 Gb free space for the minimal or full installation, just to make sure it won\'t break your system.</string>
     <string name="extractinganddeploying">Extracting and Deploying</string>
-
     <string name="nhwarning">WARNING:\nNethunter installs and uses a standard Kali Linux distribution \"under the hood\".  To support this functionality, some <u>standard Android security features such as Security Enhanced Linux (SELinux) are disabled</u>.  Moreover, Kali\'s Linux processes may run with full root privileges and can therefore access system functionality well beyond the normal Android security model.  Consider therefore that this device, as a hybrid, may not be as secure as either standard Kali Linux OR standard Android, and you are advised not to install or use Nethunter on \"daily driver\" devices or devices which store or access sensitive/private data.</string>
     <string name="nhteam">DEVELOPERS:\ngitlab.com/groups/kalilinux/nethunter/-/group_members</string>
     <string name="unknown">Unknown</string>
     <string name="statusText">Status:</string>
-    <string name="licenseInfo">LICENSE INFO:\nNethunter is licensed under the GPLv2 (gnu.org/licenses/old-licenses/gpl-2.0.en.html) and the source code is available at gitlab.com/kalilinux/nethunter.\n Some icons are licensed from Google, Inc. under CC BY 4.0 (creativecommons.org/licenses/by/4.0). Android-VersionManager and jTar are licensed under Apache 2.0.  </string>
-    <string name="attack_launched">Attack launched!</string>
+    <string name="licenseInfo">LICENSE INFO:\nNethunter is licensed under the GPLv2 (gnu.org/licenses/old-licenses/gpl-2.0.en.html) and the source code is available at gitlab.com/kalilinux/nethunter.\n Some icons are licensed from Google, Inc. under CC BY 4.0 (creativecommons.org/licenses/by/4.0). Android-VersionManager and jTar are licensed under Apache 2.0.  </string><string name="attack_launched">Attack launched!</string>
 
     <!-- sidebar menu item titles -->
     <string name="drawertitlenethunter">Home</string>
@@ -320,7 +394,7 @@
     <!-- SearchSploit -->
     <string name="searchsploit_searchbar">Search Exploits</string>
 
-    <!-- Custom Launhcer -->
+    <!-- Custom Launcher -->
     <string name="add_lauchner_btn_label">Label: </string>
     <string name="add_lauchner_btn_command">Command: </string>
     <string name="toast_input_error_launcher">Invalid arguments given!</string>
@@ -380,6 +454,8 @@
     </string-array>
     <string name="nmap_udpscan">UDP Scan</string>
     <!-- End NMAP -->
+
+
     <!-- Start PineappleFragment -->
     <string name="pineapple_description">The pineapple connector is used in conjunction with the Hak5 Pineapple Nano and a USB OTG cable.   This helper will connect the Pineapple Nano over ethernet and upstream your wifi connection.</string>
     <string name="pineapple_gateway">Pineapple Gateway/Web Interface IP</string>
@@ -420,4 +496,19 @@
     <string name="boot_notification_channel">Boot</string>
     <string name="boot_notification_channel_description">Notification for run at boot services</string>
 
+    <!--Custom Spinner Array-->
+    <string-array name="array_move_position">
+        <item>Before:</item>
+        <item>After:</item>
+    </string-array>
+
+    <string-array name="array_insert_position">
+        <item>Insert to Top</item>
+        <item>Insert to Bottom</item>
+        <item>Insert Before:</item>
+        <item>Insert After:</item>
+    </string-array>
+
+    <!-- dummy_accessibility_service -->
+    <string name="dummy_accessibility_service">dummy_accessibility_service</string>
 </resources>

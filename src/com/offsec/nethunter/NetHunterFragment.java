@@ -1,59 +1,56 @@
 package com.offsec.nethunter;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
-import android.content.pm.PackageManager;
+import android.content.DialogInterface;
 import android.os.Bundle;
-import android.os.Build;
-import android.os.StrictMode;
-import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.Switch;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.offsec.nethunter.RecyclerViewAdapter.NethunterRecyclerViewAdapter;
+import com.offsec.nethunter.RecyclerViewAdapter.NethunterRecyclerViewAdapterDeleteItems;
+import com.offsec.nethunter.RecyclerViewData.NethunterData;
+import com.offsec.nethunter.SQL.NethunterSQL;
+import com.offsec.nethunter.models.NethunterModel;
 import com.offsec.nethunter.utils.NhPaths;
-import com.offsec.nethunter.utils.ShellExecuter;
+import com.offsec.nethunter.viewmodels.NethunterViewModel;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.List;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 
 public class NetHunterFragment extends Fragment {
 
-    /**
-     * The fragment argument representing the section number for this
-     * fragment.
-     */
-
     private static final String ARG_SECTION_NUMBER = "section_number";
-    private static final String IP_REGEX = "\\b(?:\\d{1,3}\\.){3}\\d{1,3}\\b";
-    private static final Pattern IP_REGEX_PATTERN = Pattern.compile(IP_REGEX);
     private Context context;
     private Activity activity;
-    private NhPaths nh;
-
-    /**
-     * Returns a new instance of this fragment for the given section
-     * number.
-     */
-
-
-    public NetHunterFragment() {
-
-    }
+    private NethunterRecyclerViewAdapter nethunterRecyclerViewAdapter;
+    private Button refreshButton;
+    private Button addButton;
+    private Button deleteButton;
+    private Button moveButton;
+    private static int targetPositionId;
 
     public static NetHunterFragment newInstance(int sectionNumber) {
         NetHunterFragment fragment = new NetHunterFragment();
@@ -66,273 +63,374 @@ public class NetHunterFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        context = getContext();
-        activity = getActivity();
-        nh = new NhPaths();
+        setHasOptionsMenu(true);
+        this.context = getContext();
+        this.activity = getActivity();
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.nethunter, container, false);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.nethunter, container, false);
-        TextView ip = rootView.findViewById(R.id.editText2);
-        ip.setFocusable(false);
-        addClickListener(v -> getExternalIp(), rootView);
-        getInterfaces(rootView);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        NethunterViewModel nethunterViewModel = ViewModelProviders.of(this).get(NethunterViewModel.class);
+        nethunterViewModel.init(context);
+        nethunterViewModel.getLiveDataNethunterModelList().observe(this, nethunterModelList -> {
+            nethunterRecyclerViewAdapter.notifyDataSetChanged();
+        });
 
-        return rootView;
+        nethunterRecyclerViewAdapter = new NethunterRecyclerViewAdapter(context, nethunterViewModel.getLiveDataNethunterModelList().getValue());
+        RecyclerView itemRecyclerView = view.findViewById(R.id.f_nethunter_recyclerview);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
+        itemRecyclerView.setLayoutManager(linearLayoutManager);
+        itemRecyclerView.setAdapter(nethunterRecyclerViewAdapter);
+
+        refreshButton = view.findViewById(R.id.f_nethunter_refreshButton);
+        addButton = view.findViewById(R.id.f_nethunter_addItemButton);
+        deleteButton = view.findViewById(R.id.f_nethunter_deleteItemButton);
+        moveButton = view.findViewById(R.id.f_nethunter_moveItemButton);
+
+        onRefreshItemSetup();
+        onAddItemSetup();
+        onDeleteItemSetup();
+        onMoveItemSetup();
     }
 
-    private void addClickListener(View.OnClickListener onClickListener, View rootView) {
-        rootView.findViewById(R.id.button1).setOnClickListener(onClickListener);
-    }
-
-    private void getExternalIp() {
-
-        final TextView ip = activity.findViewById(R.id.editText2);
-        ip.setText("Please wait...");
-
-        new Thread(new Runnable() {
-            final StringBuilder result = new StringBuilder();
-
-            public void run() {
-
-                try {
-                    StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-                    StrictMode.setThreadPolicy(policy);
-                    URLConnection urlcon = new URL("https://api.ipify.org").openConnection();
-                    BufferedReader rd = new BufferedReader(new InputStreamReader(urlcon.getInputStream()));
-                    String line;
-                    while ((line = rd.readLine()) != null) {
-                        result.append(line);
-                    }
-                } catch (Exception e) {
-                    result.append("Check connection!");
-                }
-                final String done;
-                Matcher p = IP_REGEX_PATTERN.matcher(result.toString());
-                if (p.matches() || result.toString().equals("Check connection!")) {
-                    done = result.toString();
-                } else {
-                    done = "Invalid IP!";
-                }
-                activity.runOnUiThread(() -> ip.setText(done));
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.nethunter, menu);
+        final MenuItem searchItem = menu.findItem(R.id.f_nethunter_action_search);
+        final SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setOnSearchClickListener(v -> menu.setGroupVisible(R.id.f_nethunter_menu_group1, false));
+        searchView.setOnCloseListener(() -> {
+            menu.setGroupVisible(R.id.f_nethunter_menu_group1, true);
+            return false;
+        });
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
             }
-        }).start();
-        // CHECK FOR ROOT ACCESS
 
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                nethunterRecyclerViewAdapter.getFilter().filter(newText);
+                return false;
+            }
+        });
     }
 
-    private void getInterfaces(final View rootView) {
-
-        final boolean installed = appInstalledOrNot("com.offsec.nhterm");
-
-
-        // 1 thread, 2 commands
-        final TextView netIfaces = rootView.findViewById(R.id.editTextNET); // NET IFACES
-        final ListView netList = rootView.findViewById(R.id.listViewNet);
-
-        final TextView hidIfaces = rootView.findViewById(R.id.editTextHID); // HID IFACES
-        final ListView hidList = rootView.findViewById(R.id.listViewHid);
-
-        final TextView busyboxIfaces = rootView.findViewById(R.id.editTextBUSYBOX); // BUSYBOX IFACES
-        final ListView busyboxList = rootView.findViewById(R.id.listViewBusybox);
-
-        final TextView kernelverIfaces = rootView.findViewById(R.id.editTextKERNELVER); // BUSYBOX IFACES
-        final ListView kernelverList = rootView.findViewById(R.id.listViewKERNELVER);
-
-        final TextView terminalIfaces = rootView.findViewById(R.id.editTextNHTerminal); // BUSYBOX IFACES
-        final ListView terminalList = rootView.findViewById(R.id.listViewNHTerminal);
-
-        // Dont move this inside the thread. (Will throw a null pointer.)
-        netIfaces.setText("Detecting Network interfaces...");
-        hidIfaces.setText("Detecting HID interfaces...");
-        busyboxIfaces.setText("Detecting Busybox version...");
-        kernelverIfaces.setText("Detecting Kernel version...");
-        terminalIfaces.setText("Detecting Nethunter terminal...");
-
-        new Thread(() -> {
-
-            String busybox_ver = nh.whichBusybox();
-
-            ShellExecuter exe = new ShellExecuter();
-            String commandNET[] = getNetCmd(busybox_ver);
-            String commandHID[] = {"sh", "-c", "ls /dev/hidg*"};
-            String commandBUSYBOX[] = getBusyboxCmd(busybox_ver);
-            String commandKERNELVER[] = {"sh", "-c", "uname -a"};
-
-
-            final String outputNET = exe.Executer(commandNET);
-            final String outputHID = exe.Executer(commandHID);
-            final String outputBUSYBOX = exe.Executer(commandBUSYBOX);
-            final String outputKERNELVER = exe.Executer(commandKERNELVER);
-
-            final String[] netArray = outputNET.split("\n");
-            final String[] hidArray = outputHID.split("\n");
-            final String[] busyboxArray = outputBUSYBOX.split("\n");
-            final String[] kernelverArray = outputKERNELVER.split("\n");
-
-            netIfaces.post(() -> {
-                if (outputNET.equals("")) {
-                    netIfaces.setVisibility(View.VISIBLE);
-                    netList.setVisibility(View.GONE);
-                    netIfaces.setText("No network interfaces detected");
-                    netIfaces.setFocusable(false);
-                } else {
-                    netIfaces.setVisibility(View.GONE);
-                    netList.setVisibility(View.VISIBLE);
-                    ArrayAdapter<String> aaNET = new ArrayAdapter<>(activity, R.layout.nethunter_item, netArray);
-                    netList.setAdapter(aaNET);
-                    fixListHeight(netList, aaNET);
-                    netList.setOnItemLongClickListener((parent, view, position, id) -> {
-                        Log.d("CLICKED", netList.getItemAtPosition(position).toString());
-                        String itemData = netList.getItemAtPosition(position).toString();
-                        String _itemData = itemData.split("\\s+")[2];
-                        doCopy(_itemData);
-                        return false;
-                    });
-                }
-                if (outputHID.equals("")) {
-                    hidIfaces.setVisibility(View.VISIBLE);
-                    hidList.setVisibility(View.GONE);
-                    hidIfaces.setText("No HID interfaces detected");
-                    hidIfaces.setFocusable(false);
-                } else {
-                    hidIfaces.setVisibility(View.GONE);
-                    hidList.setVisibility(View.VISIBLE);
-                    ArrayAdapter<String> aaHID = new ArrayAdapter<>(activity, R.layout.nethunter_item, hidArray);
-                    hidList.setAdapter(aaHID);
-                    fixListHeight(hidList, aaHID);
-                    hidList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-                        @Override
-                        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                            Log.d("CLCIKED", hidList.getItemAtPosition(position).toString());
-                            String itemData = hidList.getItemAtPosition(position).toString();
-                            doCopy(itemData);
-                            return false;
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        final ViewGroup nullParent = null;
+        final LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        final View promptView = inflater.inflate(R.layout.nethunter_custom_dialog_view, nullParent);
+        final TextView titleTextView = promptView.findViewById(R.id.f_nethunter_adb_tv_title1);
+        final EditText storedpathEditText = promptView.findViewById(R.id.f_nethunter_adb_et_storedpath);
+        switch (item.getItemId()) {
+            case R.id.f_nethunter_menu_backupDB:
+                titleTextView.setText("Full path to where you want to save the database:");
+                storedpathEditText.setText(NhPaths.APP_SD_SQLBACKUP_PATH + "/FragmentNethunter");
+                AlertDialog.Builder adbBackup = new AlertDialog.Builder(activity);
+                adbBackup.setView(promptView);
+                adbBackup.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+                adbBackup.setPositiveButton("OK", (dialog, which) -> { });
+                final AlertDialog adBackup = adbBackup.create();
+                adBackup.setOnShowListener(dialog -> {
+                    final Button buttonOK = adBackup.getButton(DialogInterface.BUTTON_POSITIVE);
+                    buttonOK.setOnClickListener(v -> {
+                        String returnedResult = NethunterData.getInstance().backupData(NethunterSQL.getInstance(context), storedpathEditText.getText().toString());
+                        if (returnedResult == null){
+                            NhPaths.showMessage(context, "db is successfully backup to " + storedpathEditText.getText().toString());
+                        } else {
+                            dialog.dismiss();
+                            new AlertDialog.Builder(context).setTitle("Failed to backup the DB.").setMessage(returnedResult).create().show();
                         }
+                        dialog.dismiss();
                     });
-                }
-                if (outputBUSYBOX.equals("")) {
-                    busyboxIfaces.setVisibility(View.VISIBLE);
-                    busyboxList.setVisibility(View.GONE);
-                    busyboxIfaces.setText("Busybox not detected!");
-                    busyboxIfaces.setFocusable(false);
-                } else {
-                    busyboxIfaces.setVisibility(View.GONE);
-                    busyboxList.setVisibility(View.VISIBLE);
-                    ArrayAdapter<String> aaBUSYBOX = new ArrayAdapter<>(activity, R.layout.nethunter_item, busyboxArray);
-                    busyboxList.setAdapter(aaBUSYBOX);
-                    fixListHeight(busyboxList, aaBUSYBOX);
-                    busyboxList.setOnItemLongClickListener((parent, view, position, id) -> {
-                        Log.d("CLICKED", busyboxList.getItemAtPosition(position).toString());
-                        String itemData = busyboxList.getItemAtPosition(position).toString();
-                        doCopy(itemData);
-                        return false;
+                });
+                adBackup.show();
+                break;
+            case R.id.f_nethunter_menu_restoreDB:
+                titleTextView.setText("Full path of the db file from where you want to restore:");
+                storedpathEditText.setText(NhPaths.APP_SD_SQLBACKUP_PATH + "/FragmentNethunter");
+                AlertDialog.Builder adbRestore = new AlertDialog.Builder(activity);
+                adbRestore.setView(promptView);
+                adbRestore.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+                adbRestore.setPositiveButton("OK", (dialog, which) -> { });
+                final AlertDialog adRestore = adbRestore.create();
+                adRestore.setOnShowListener(dialog -> {
+                    final Button buttonOK = adRestore.getButton(DialogInterface.BUTTON_POSITIVE);
+                    buttonOK.setOnClickListener(v -> {
+                        String returnedResult = NethunterData.getInstance().restoreData(NethunterSQL.getInstance(context), storedpathEditText.getText().toString());
+                        if (returnedResult == null) {
+                            NhPaths.showMessage(context, "db is successfully restored to " + storedpathEditText.getText().toString());
+                        } else {
+                            dialog.dismiss();
+                            new AlertDialog.Builder(context).setTitle("Failed to restore the DB.").setMessage(returnedResult).create().show();
+                        }
+                        dialog.dismiss();
                     });
-                }
-                if (!installed) {
-                    // Installed, make note!
-                    terminalIfaces.setVisibility(View.VISIBLE);
-                    terminalList.setVisibility(View.GONE);
-                    terminalIfaces.setText("Nethunter Terminal is NOT installed!");
-                    terminalIfaces.setFocusable(false);
-                } else {
-                    // Not installed, make note!
-                    terminalIfaces.setVisibility(View.VISIBLE);
-                    terminalList.setVisibility(View.GONE);
-                    terminalIfaces.setText("Nethunter Terminal is installed");
-                    terminalIfaces.setFocusable(false);
-                }
+                });
+                adRestore.show();
+                break;
+            case R.id.f_nethunter_menu_ResetToDefault:
+                NethunterData.getInstance().resetData(NethunterSQL.getInstance(context));
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
-                if (outputKERNELVER.equals("")) {
-                    kernelverIfaces.setVisibility(View.VISIBLE);
-                    kernelverList.setVisibility(View.GONE);
-                    kernelverIfaces.setText("Could not find kernel version!");
-                    kernelverIfaces.setFocusable(false);
-                } else {
-                    kernelverIfaces.setVisibility(View.GONE);
-                    kernelverList.setVisibility(View.VISIBLE);
-                    ArrayAdapter<String> aaKERNELVER = new ArrayAdapter<>(activity, R.layout.nethunter_item, kernelverArray);
-                    kernelverList.setAdapter(aaKERNELVER);
-                    kernelverList.setOnItemLongClickListener((parent, view, position, id) -> {
-                        Log.d("CLICKED", kernelverList.getItemAtPosition(position).toString());
-                        String itemData = kernelverList.getItemAtPosition(position).toString();
-                        doCopy(itemData);
-                        return false;
-                    });
+    @Override
+    public void onStart() {
+        super.onStart();
+        NethunterData.getInstance().refreshData();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        refreshButton = null;
+        addButton = null;
+        deleteButton = null;
+        moveButton = null;
+        nethunterRecyclerViewAdapter = null;
+    }
+
+    private void onRefreshItemSetup(){
+        refreshButton.setOnClickListener(v -> NethunterData.getInstance().refreshData());
+    }
+
+    private void onAddItemSetup(){
+        addButton.setOnClickListener(v -> {
+            final ViewGroup nullParent = null;
+            List<NethunterModel> nethunterModelList = NethunterData.getInstance().nethunterModelListFull;
+            if (nethunterModelList == null) return;
+            final LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            final View promptViewAdd = mInflater.inflate(R.layout.nethunter_add_dialog_view, nullParent);
+            final EditText titleEditText = promptViewAdd.findViewById(R.id.f_nethunter_add_adb_et_title);
+            final EditText cmdEditText = promptViewAdd.findViewById(R.id.f_nethunter_add_adb_et_command);
+            final EditText delimiterEditText = promptViewAdd.findViewById(R.id.f_nethunter_add_adb_et_delimiter);
+            final CheckBox runOnCreateCheckbox = promptViewAdd.findViewById(R.id.f_nethunters_add_adb_checkbox_runoncreate);
+            final Spinner insertPositions = promptViewAdd.findViewById(R.id.f_nethunter_add_adb_spr_positions);
+            final Spinner insertTitles = promptViewAdd.findViewById(R.id.f_nethunter_add_adb_spr_titles);
+            ArrayList<String> titleArrayList = new ArrayList<>();
+            for (NethunterModel nethunterModel: nethunterModelList){
+                titleArrayList.add(nethunterModel.getTitle());
+            }
+            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, titleArrayList);
+            arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+            final FloatingActionButton readmeButton1 = promptViewAdd.findViewById(R.id.f_nethunter_add_btn_info_fab1);
+            final FloatingActionButton readmeButton2 = promptViewAdd.findViewById(R.id.f_nethunter_add_btn_info_fab2);
+            final FloatingActionButton readmeButton3 = promptViewAdd.findViewById(R.id.f_nethunter_add_btn_info_fab3);
+
+            readmeButton1.setOnClickListener(view -> {
+                AlertDialog.Builder adb = new AlertDialog.Builder(context);
+                adb.setTitle("HOW TO USE:")
+                        .setMessage(context.getString(R.string.nethunter_howtouse_cmd))
+                        .setNegativeButton("Close", (dialogInterface, i) -> dialogInterface.dismiss());
+                final AlertDialog ad = adb.create();
+                ad.setCancelable(true);
+                ad.show();
+            });
+
+            readmeButton2.setOnClickListener(view -> {
+                AlertDialog.Builder adb = new AlertDialog.Builder(context);
+                adb.setTitle("HOW TO USE:")
+                        .setMessage(context.getString(R.string.nethunter_howtouse_delimiter))
+                        .setNegativeButton("Close", (dialogInterface, i) -> dialogInterface.dismiss());
+                final AlertDialog ad = adb.create();
+                ad.setCancelable(true);
+                ad.show();
+            });
+
+            readmeButton3.setOnClickListener(view -> {
+                AlertDialog.Builder adb = new AlertDialog.Builder(context);
+                adb.setTitle("HOW TO USE:")
+                        .setMessage(context.getString(R.string.nethunter_howtouse_runoncreate))
+                        .setNegativeButton("Close", (dialogInterface, i) -> dialogInterface.dismiss());
+                final AlertDialog ad = adb.create();
+                ad.setCancelable(true);
+                ad.show();
+            });
+
+            delimiterEditText.setText("\\n");
+            runOnCreateCheckbox.setChecked(true);
+
+            insertPositions.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    //if Insert to Top
+                    if (position == 0) {
+                        insertTitles.setVisibility(View.INVISIBLE);
+                        targetPositionId = 1;
+                        //if Insert to Bottom
+                    } else if (position == 1) {
+                        insertTitles.setVisibility(View.INVISIBLE);
+                        targetPositionId = nethunterModelList.size() + 1;
+                        //if Insert Before
+                    } else if (position == 2) {
+                        insertTitles.setVisibility(View.VISIBLE);
+                        insertTitles.setAdapter(arrayAdapter);
+                        insertTitles.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                            @Override
+                            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                                targetPositionId = position + 1;
+                            }
+                            @Override
+                            public void onNothingSelected(AdapterView<?> parent) {
+
+                            }
+                        });
+                        //if Insert After
+                    } else {
+                        insertTitles.setVisibility(View.VISIBLE);
+                        insertTitles.setAdapter(arrayAdapter);
+                        insertTitles.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                            @Override
+                            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                                targetPositionId = position + 2;
+                            }
+                            @Override
+                            public void onNothingSelected(AdapterView<?> parent) {
+
+                            }
+                        });
+                    }
+                }
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
                 }
             });
-        }).start();
+
+            AlertDialog.Builder adb = new AlertDialog.Builder(context);
+            adb.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+            adb.setPositiveButton("OK", (dialog, which) -> { });
+            final AlertDialog ad = adb.create();
+            ad.setView(promptViewAdd);
+            ad.setCancelable(true);
+            ad.setOnShowListener(dialog -> {
+                final Button buttonAdd = ad.getButton(DialogInterface.BUTTON_POSITIVE);
+                buttonAdd.setOnClickListener(v1 -> {
+                    if (titleEditText.getText().toString().isEmpty()){
+                        NhPaths.showMessage(context, "Title cannot be empty");
+                    } else if (cmdEditText.getText().toString().isEmpty()){
+                        NhPaths.showMessage(context, "Command cannot be empty");
+                    } else if (delimiterEditText.getText().toString().isEmpty()){
+                        NhPaths.showMessage(context, "Delimiter cannot be empty");
+                    } else {
+                        ArrayList<String> dataArrayList = new ArrayList<>();
+                        dataArrayList.add(titleEditText.getText().toString());
+                        dataArrayList.add(cmdEditText.getText().toString());
+                        dataArrayList.add(delimiterEditText.getText().toString());
+                        dataArrayList.add(runOnCreateCheckbox.isChecked() ? "1" : "0");
+                        NethunterData.getInstance().addData(targetPositionId, dataArrayList, NethunterSQL.getInstance(context));
+                        ad.dismiss();
+                    }
+                });
+            });
+            ad.show();
+        });
     }
 
-    private String[] getBusyboxCmd(String busybox_ver) {
-        String device = android.os.Build.DEVICE;
-        ShellExecuter exe = new ShellExecuter();
-        if ( device.contains("OnePlus7")) {
-            String commandBUSYBOX[] = {"sh", "-c", busybox_ver + " | head -1 | awk '{print $2}'"};
-            return commandBUSYBOX;
-        }
-        else {
-            String commandBUSYBOX[] = {"sh", "-c", busybox_ver + " | " + busybox_ver + " head -1 | " + busybox_ver + " awk '{print $2}'"};
-            return commandBUSYBOX;
-        }
-    }
-    private String[] getNetCmd(String busybox_ver) {
-        String device = android.os.Build.DEVICE;
-        ShellExecuter exe = new ShellExecuter();
-        if ( device.contains("OnePlus7")) {
-            String commandNET[] = {"sh", "-c", "ip -o addr show | awk '/inet/ {print $2, $3, $4}'"};
-            return commandNET;
-        }
-        else {
-            String commandNET[] = {"sh", "-c", "ip -o addr show | busybox awk '/inet/ {print $2, $3, $4}'"};
-            return commandNET;
-        }
-    }
-    private boolean appInstalledOrNot(String uri) {
-        PackageManager pm = activity.getPackageManager();
-        boolean app_installed;
-        try {
-            pm.getPackageInfo(uri, PackageManager.GET_ACTIVITIES);
-            app_installed = true;
-        } catch (PackageManager.NameNotFoundException e) {
-            app_installed = false;
-        }
-        return app_installed;
+    private void onDeleteItemSetup(){
+        deleteButton.setOnClickListener(v -> {
+            final ViewGroup nullParent = null;
+            List<NethunterModel> nethunterModelList = NethunterData.getInstance().nethunterModelListFull;
+            if (nethunterModelList == null) return;
+            final LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            final View promptViewDelete = inflater.inflate(R.layout.nethunter_delete_dialog_view, nullParent, false);
+            final RecyclerView recyclerViewDeleteItem = promptViewDelete.findViewById(R.id.f_nethunter_delete_recyclerview);
+            NethunterRecyclerViewAdapterDeleteItems nethunterRecyclerViewAdapterDeleteItems = new NethunterRecyclerViewAdapterDeleteItems(context, nethunterModelList);
+            LinearLayoutManager linearLayoutManagerDelete = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
+            recyclerViewDeleteItem.setLayoutManager(linearLayoutManagerDelete);
+            recyclerViewDeleteItem.setAdapter(nethunterRecyclerViewAdapterDeleteItems);
+
+            AlertDialog.Builder adbDelete = new AlertDialog.Builder(activity);
+            adbDelete.setView(promptViewDelete);
+            adbDelete.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+            adbDelete.setPositiveButton("Delete", (dialog, which) -> { });
+            //If you want the dialog to stay open after clicking OK, you need to do it this way...
+            final AlertDialog adDelete = adbDelete.create();
+            adDelete.setMessage("Select the item you want to remove: ");
+            adDelete.setOnShowListener(dialog -> {
+                final Button buttonDelete = adDelete.getButton(DialogInterface.BUTTON_POSITIVE);
+                buttonDelete.setOnClickListener(v1 -> {
+                    RecyclerView.ViewHolder viewHolder;
+                    ArrayList<Integer> selectedPosition = new ArrayList<>();
+                    ArrayList<Integer> selectedTargetIds = new ArrayList<>();
+                    for (int i = 0; i < recyclerViewDeleteItem.getChildCount(); i++) {
+                        viewHolder = recyclerViewDeleteItem.findViewHolderForAdapterPosition(i);
+                        if (viewHolder != null){
+                            CheckBox box = viewHolder.itemView.findViewById(R.id.f_nethunter_recyclerview_dialog_chkbox);
+                            if (box.isChecked()){
+                                selectedPosition.add(i);
+                                selectedTargetIds.add(i+1);
+                            }
+                        }
+                    }
+                    if (selectedPosition.size() != 0) {
+                        NethunterData.getInstance().deleteData(selectedPosition, selectedTargetIds, NethunterSQL.getInstance(context));
+                        NhPaths.showMessage(context, "Successfully deleted " + selectedPosition.size() + " items.");
+                        adDelete.dismiss();
+                    } else NhPaths.showMessage(context, "Nothing to be deleted.");
+                });
+            });
+            adDelete.show();
+        });
     }
 
-    private void fixListHeight(ListView theListView, ArrayAdapter theAdapter) {
-        int totalHeight = 0;
-        for (int i = 0; i < theAdapter.getCount(); i++) {
-            View listItem = theAdapter.getView(i, null, theListView);
-            listItem.measure(0, 0);
-            totalHeight += listItem.getMeasuredHeight();
-        }
-        ViewGroup.LayoutParams params = theListView.getLayoutParams();
-        params.height = totalHeight + (theListView.getDividerHeight() * (theAdapter.getCount() - 1));
-        theListView.setLayoutParams(params);
-        theListView.requestLayout();
-    }
+    private void onMoveItemSetup() {
+        moveButton.setOnClickListener(v -> {
+            final ViewGroup nullParent = null;
+            List<NethunterModel> nethunterModelList = NethunterData.getInstance().nethunterModelListFull;
+            if (nethunterModelList == null) return;
+            final LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            final View promptViewMove = inflater.inflate(R.layout.nethunter_move_dialog_view, nullParent, false);
+            final Spinner titlesBefore = promptViewMove.findViewById(R.id.f_nethunter_move_adb_spr_titlesbefore);
+            final Spinner titlesAfter = promptViewMove.findViewById(R.id.f_nethunter_move_adb_spr_titlesafter);
+            final Spinner actions = promptViewMove.findViewById(R.id.f_nethunter_move_adb_spr_actions);
+            ArrayList<String> titleArrayList = new ArrayList<>();
+            for (NethunterModel nethunterModel: nethunterModelList){
+                titleArrayList.add(nethunterModel.getTitle());
+            }
+            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, titleArrayList);
+            arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            titlesBefore.setAdapter(arrayAdapter);
+            titlesAfter.setAdapter(arrayAdapter);
 
-    // Now we can copy and address from networks!!!!!! Surprise! ;)
-    private void doCopy(String text) {
-        try {
-            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-            android.content.ClipData clip = android.content.ClipData.newPlainText("WordKeeper", text);
-            clipboard.setPrimaryClip(clip);
-            nh.showMessage(context, "Copied: " + text);
-        } catch (Exception e) {
-           nh.showMessage(context, "Error copying: " + text);
-        }
-    }
-    private String getDeviceName() {
-        return Build.DEVICE;
-    }
+            AlertDialog.Builder adbMove = new AlertDialog.Builder(activity);
+            adbMove.setView(promptViewMove);
+            adbMove.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+            adbMove.setPositiveButton("Move", (dialog, which) -> {
 
-    public Boolean isOPO5() {
-        return getDeviceName().equalsIgnoreCase("A5000") ||
-                getDeviceName().equalsIgnoreCase("A5010") ||
-                getDeviceName().equalsIgnoreCase("OnePlus5") ||
-                getDeviceName().equalsIgnoreCase("OnePlus5T");
+            });
+            final AlertDialog adMove = adbMove.create();
+            adMove.setOnShowListener(dialog -> {
+                final Button buttonMove = adMove.getButton(DialogInterface.BUTTON_POSITIVE);
+                buttonMove.setOnClickListener(v1 -> {
+                    int originalPositionIndex = titlesBefore.getSelectedItemPosition();
+                    int targetPositionIndex = titlesAfter.getSelectedItemPosition();
+                    if (originalPositionIndex == targetPositionIndex ||
+                            (actions.getSelectedItemPosition() == 0 && targetPositionIndex == (originalPositionIndex + 1)) ||
+                            (actions.getSelectedItemPosition() == 1 && targetPositionIndex == (originalPositionIndex - 1))) {
+                        NhPaths.showMessage(context, "You are moving the item to the same position, nothing to be moved.");
+                    } else {
+                        if (actions.getSelectedItemPosition() == 1) targetPositionIndex += 1;
+                        NethunterData.getInstance().moveData(originalPositionIndex, targetPositionIndex, NethunterSQL.getInstance(context));
+                        NhPaths.showMessage(context, "Successfully moved item.");
+                        adMove.dismiss();
+                    }
+                });
+            });
+            adMove.show();
+        });
     }
 }

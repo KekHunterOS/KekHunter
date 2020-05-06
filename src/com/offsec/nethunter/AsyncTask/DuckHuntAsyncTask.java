@@ -4,7 +4,7 @@ import android.os.AsyncTask;
 
 import com.offsec.nethunter.utils.ShellExecuter;
 
-public class DuckHuntAsyncTask extends AsyncTask<Object, Void, Object[]> {
+public class DuckHuntAsyncTask extends AsyncTask<Object, Void, Void> {
     public static final int ATTACK = 1;
     public static final int CONVERT = 2;
     public static final int READ_PREVIEW = 3;
@@ -25,7 +25,7 @@ public class DuckHuntAsyncTask extends AsyncTask<Object, Void, Object[]> {
     }
 
     @Override
-    protected Object[] doInBackground(Object... objects) {
+    protected Void doInBackground(Object... objects) {
         switch (ActionCode) {
             case ATTACK:
                 result=true;
@@ -50,12 +50,12 @@ public class DuckHuntAsyncTask extends AsyncTask<Object, Void, Object[]> {
                 result = exe.RunAsRootOutput(objects[0].toString());
                 break;
         }
-        return objects;
+        return null;
     }
 
     @Override
-    protected void onPostExecute(Object[] objects) {
-        super.onPostExecute(objects);
+    protected void onPostExecute(Void voids) {
+        super.onPostExecute(voids);
         if (listener != null) {
             listener.onAsyncTaskFinished(result);
         }

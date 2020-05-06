@@ -1,0 +1,426 @@
+#!/system/bin/sh
+
+## Important note:
+## Some new devices may already use USB HAL to apply vendor's own executable file to implement their USB ConfigFS,
+## which is not done by the init.usb.configfs.rc under root directory, but another executable file under sub directory of /vendor
+## And some devices may have different function instance name when symlinking to /config/usb_gadget/g1/configs/b.1,
+## like "function0" or "f1". That makes us harder to determine what instance name or what functions should be configured for users.
+## That said, this script may not work on other devices even they are already using USB ConfigFs.
+
+SCRIPT_PATH=$(readlink -f $0)
+. ${SCRIPT_PATH%/*}/bootkali_log
+. ${SCRIPT_PATH%/*}/bootkali_env
+
+## First to check if the kernel is supporting usb configfs. ##
+if [ ! -d /config/usb_gadget -o -f /sys/devices/virtual/android_usb/android0/enable ]; then
+    bklog "[-] You device doesn't support usb configfs. Make sure your kernel is using ConfigFS Composite Gadget but not GadgetFS."
+    exit 1
+fi
+
+#################################
+#### Define global variables ####
+#################################
+ORI_DWC=$(getprop sys.usb.controller)
+DIR_CONFIGFS=/config/usb_gadget/g1
+DIR_ALL_FUNCS=$DIR_CONFIGFS/functions
+DIR_CUR_FUNCS=$DIR_CONFIGFS/configs/b.1
+
+## Get what functions the user are using, and list them in ascending order.
+ORI_FUNCS_UNSORT=($($BUSYBOX find $DIR_CUR_FUNCS -type l))
+ORI_FUNCS=($(printf '%s\n' "${ORI_FUNCS_UNSORT[@]}" | $BUSYBOX sort -n))
+
+## Make sure user at least has one usb functions enabled,
+## otherwise it cannot be determined what prefix name and the first instance number should be used.
+if [ -z "$ORI_FUNCS" ]; then
+    bklog "[-] No symlinked function is found in $DIR_CUR_FUNCS, something is wrong, aborting.."
+    exit 1
+fi
+
+## Seperate the prefix name and the instance order.
+FUNCS_NAME_PREFIX=$(echo ${ORI_FUNCS[0]} | $BUSYBOX sed 's/\(^.*\)\(\/\([a-zA-Z]\{1,\}\)[0-9]\{1,\}$\)/\3/g')
+FUNCS_NAME_ORDER=$(echo ${ORI_FUNCS[0]} | $BUSYBOX sed 's/\(^.*\)\(\/[a-zA-Z]\{1,\}\([0-9]\{1,\}\)$\)/\3/g')
+
+## Define the first function name that will be symlinked to $DIR_CUR_FUNCS
+SYMLINK_FUNC_NAME="${FUNCS_NAME_PREFIX}${FUNCS_NAME_ORDER}"
+
+################################
+#### Define shell functions ####
+################################
+
+function print_usage(){
+    bklog "[!] Usage: usbarmory -t <Target OS> -f <USB Functions> -v <idVendor value> -p <idProduct value> [mPs]"
+    bklog "[!] Available target OS: [win|lnx|mac]; win => Windows; lnx => Linux; mac => Mac OS"
+    bklog "[!] Available configfs functions: [reset] or [adb,hid,mass_storage,rndis,acm,ecm]"
+    bklog "[!] reset => enable adb only."
+    bklog "[!] hid => enable HID only."
+    bklog "[!] mass_storage => enable mass storage only."
+    bklog "[!] rndis => enable RNDIS only, usually target on Windows or Linux."
+    bklog "[!] acm,ecm => enable network card simulation on Mac OS when these two are enabled together.\n"
+    bklog "[!] e.g. \"usbarmory -t win -f reset -v '0x18d1' -p '0x4ee7'\""
+    bklog "[!] e.g. \"usbarmory -t win -f adb,hid,mass_storage,rndis -v '0x18d1' -p '0x4a4a'\""
+    bklog "[!] e.g. \"usbarmory -t mac -f adb,hid,mass_storage,acm,ecm -v '0x18d1' -p '0x4b4b'\""
+}
+
+function clear_funcs(){
+    echo "none" > $DIR_CONFIGFS/UDC
+    stop adbd
+    setprop sys.usb.ffs.ready 0
+    rm ${ORI_FUNCS[@]} 2>/dev/null
+}
+
+function fireup_funcs(){
+    echo $ORI_DWC > $DIR_CONFIGFS/UDC
+    sleep 1
+}
+
+function revert_to_ori_state(){
+    clear_funcs
+    start adbd
+    setprop sys.usb.ffs.ready 1
+    if [ ! -e $DIR_CUR_FUNCS/$SYMLINK_FUNC_NAME ]; then
+        ln -s $DIR_ALL_FUNCS/ffs.adb $DIR_CUR_FUNCS/$SYMLINK_FUNC_NAME
+    fi
+    echo "$ID_VENDOR" > $DIR_CONFIGFS/idVendor
+    echo "$ID_PRODUCT" > $DIR_CONFIGFS/idProduct
+    fireup_funcs
+}
+
+function prepare_hid_keyboard(){
+    if [ ! -d $DIR_ALL_FUNCS/hid.0 ]; then
+        if ! mkdir $DIR_ALL_FUNCS/hid.0 > /dev/null 2>&1; then
+            bklog "[-] HID Keyboard is not supported on you device. Make sure your kernel has HID feature patched and enabled."
+            return 1
+        else
+            echo "1" > $DIR_ALL_FUNCS/hid.0/protocol
+            echo "1" > $DIR_ALL_FUNCS/hid.0/subclass
+            echo "8" > $DIR_ALL_FUNCS/hid.0/report_length
+            echo -n -e '\x05\x01\x09\x06\xa1\x01\x05\x07\x19\xe0\x29\xe7\x15\x00\x25\x01\x75\x01\x95\x08\x81\x02\x95\x01\x75\x08\x81\x03\x95\x05\x75\x01\x05\x08\x19\x01\x29\x05\x91\x02\x95\x01\x75\x03\x91\x03\x95\x06\x75\x08\x15\x00\x25\x65\x05\x07\x19\x00\x29\x65\x81\x00\xc0' > $DIR_ALL_FUNCS/hid.0/report_desc
+            return 0
+        fi
+    else
+        return 0
+    fi
+}
+
+function prepare_hid_mouse(){
+    if [ ! -d $DIR_ALL_FUNCS/hid.1 ]; then
+        if ! mkdir $DIR_ALL_FUNCS/hid.1 > /dev/null 2>&1; then
+            bklog "[-] HID Mouse is not supported on you device. Make sure your kernel has HID feature patched and enabled."
+            return 1
+        else
+            echo "1" > $DIR_ALL_FUNCS/hid.1/protocol
+            echo "2" > $DIR_ALL_FUNCS/hid.1/subclass
+            echo "4" > $DIR_ALL_FUNCS/hid.1/report_length
+            echo -n -e '\x05\x01\x09\x02\xa1\x01\x09\x01\xa1\x00\x05\x09\x19\x01\x29\x05\x15\x00\x25\x01\x95\x05\x75\x01\x81\x02\x95\x01\x75\x03\x81\x01\x05\x01\x09\x30\x09\x31\x09\x38\x15\x81\x25\x7f\x75\x08\x95\x03\x81\x06\xc0\xc0' > $DIR_ALL_FUNCS/hid.1/report_desc
+            return 0
+        fi
+    else
+        return 0
+    fi
+}
+
+function prepare_mass_storage(){
+    if [ ! -d $DIR_ALL_FUNCS/mass_storage.0 ]; then
+        if ! mkdir $DIR_ALL_FUNCS/mass_storage.0 > /dev/null 2>&1; then
+            bklog "[-] MASS_STORAGE is not supported on you device. Make sure your kernel has MASS_STORAGE feature patched and enabled."
+            return 1
+        else
+            return 0
+        fi
+    else
+        return 0
+    fi
+}
+
+function prepare_rndis(){
+    if [ ! -d $DIR_ALL_FUNCS/gsi.rndis ]; then
+        if ! mkdir $DIR_ALL_FUNCS/gsi.rndis > /dev/null 2>&1; then
+            if [ ! -d $DIR_ALL_FUNCS/rndis.gs4 ]; then
+                if ! mkdir $DIR_ALL_FUNCS/rndis.gs4 > /dev/null 2>&1; then
+                    bklog "[-] RNDIS is not supported on you device. Make sure your kernel has RNDIS feature patched and enabled."
+                    return 1
+                else
+                    REAL_RNDIS_NAME=rndis.gs4
+                    return 0
+                fi
+            else
+                REAL_RNDIS_NAME=rndis.gs4
+                return 0
+            fi
+        else
+            REAL_RNDIS_NAME=gsi.rndis
+            return 0
+        fi
+    else
+        REAL_RNDIS_NAME=gsi.rndis
+        return 0
+    fi
+}
+
+function prepare_acm(){
+    if [ ! -d $DIR_ALL_FUNCS/acm.usb0 ]; then
+        if ! mkdir $DIR_ALL_FUNCS/acm.usb0 > /dev/null 2>&1; then
+            bklog "[-] ACM is not supported on you device. Make sure your kernel has ACM feature patched and enabled."
+            return 1
+        else
+            return 0
+        fi
+    else
+        return 0
+    fi
+}
+
+function prepare_ecm(){
+    if [ ! -d $DIR_ALL_FUNCS/ecm.usb0 ]; then
+        if ! mkdir $DIR_ALL_FUNCS/ecm.usb0 > /dev/null 2>&1; then
+            bklog "[-] ECM is not supported on you device. Make sure your kernel has ECM feature patched and enabled."
+            return 1
+        else
+            return 0
+        fi
+    else
+        return 0
+    fi
+}
+
+function inc_funcs_order(){
+    FUNCS_NAME_ORDER=$((FUNCS_NAME_ORDER + 1))
+    SYMLINK_FUNC_NAME="$FUNCS_NAME_PREFIX$FUNCS_NAME_ORDER"
+}
+
+function join_by(){
+    local IFS="$1"; shift; echo "$*";
+}
+
+function switch_funcs(){
+    local TARGET_OS=$1
+    local TARGET_FUNCS=$2
+    local ARRAY_TARGET_FUNCS
+    local FUNCS_DESC
+
+    ## All functions are defaulted to not enabled ##
+    local IS_ADB_SELECTED=1
+    local IS_HID_SELECTED=1
+    local IS_MASS_SELECTED=1
+    local IS_RNDIS_SELECTED=1
+    local IS_ACM_SELECTED=1
+    local IS_ECM_SELECTED=1
+
+    local IS_HID_KEYBOARD_READY=1
+    local IS_HID_MOUSE_READY=1
+    local IS_MASS_READY=1
+    local IS_RNDIS_READY=1
+    local IS_ACM_READY=1
+    local IS_ECM_READY=1
+
+    ## If the target function is "reset" then go to reset function directly ##
+    if [ "$TARGET_FUNCS" = "reset" ]; then
+        bklog "[!] Resetting the usb functions."
+        revert_to_ori_state; exit 0
+    fi
+
+    ## Check if functions are already created, if not then it means the function is not supported by user's kernel. ##
+    prepare_hid_keyboard
+    IS_HID_KEYBOARD_READY=$?
+    prepare_hid_mouse
+    IS_HID_MOUSE_READY=$?
+    prepare_mass_storage
+    IS_MASS_READY=$?
+    prepare_rndis
+    IS_RNDIS_READY=$?
+    prepare_acm
+    IS_ACM_READY=$?
+    prepare_ecm
+    IS_ECM_READY=$?
+
+    ## Remove all spaces of user's input, and then put it into array ##
+    TARGET_FUNCS=$(echo ${TARGET_FUNCS//[[:space:]]})
+    IFS=','; ARRAY_TARGET_FUNCS=($TARGET_FUNCS); unset IFS
+
+    ## Validate user's input before going any further ##
+    bklog "[!] Validating user input.."
+    for i in ${ARRAY_TARGET_FUNCS[@]}; do
+        if [ ! "$(echo $i | grep -E '^adb$|^hid$|^mass_storage$|^rndis$|^acm$|^ecm$')" ]; then
+            if [ "$i" = "reset" ]; then
+                bklog "[-] $i cannot be used with other functions"; exit 1
+            else
+                bklog "[-] $i is not a valid function, please check your input again."; exit 1
+            fi
+        elif [ "$(echo ${ARRAY_TARGET_FUNCS[@]} | grep -E 'acm|ecm')" -a ! "$TARGET_OS" = "mac" ]; then
+            bklog "[-] acm and ecm should not be used with Windows."; exit 1
+        elif [ "$(echo ${ARRAY_TARGET_FUNCS[@]} | grep -E 'rndis')" -a "$TARGET_OS" = "mac" ]; then
+            bklog "[-] rndis should not be used with Mac OS."; exit 1
+        else
+            if [ "$i" = "hid" -a $IS_HID_KEYBOARD_READY -eq 1 ]; then
+                bklog "[-] Your kernel doesn't support HID keyboard, aborting.."; exit 1
+            elif [ "$i" = "hid" -a $IS_HID_MOUSE_READY -eq 1 ]; then
+                bklog "[-] Your kernel doesn't support HID mouse, aborting.."; exit 1
+            elif [ "$i" = "mass_storage" -a $IS_MASS_READY -eq 1 ]; then
+                bklog "[-] Your kernel doesn't support MASS_STORAGE, aborting.."; exit 1
+            elif [ "$i" = "rndis" -a $IS_RNDIS_READY -eq 1 ]; then
+                bklog "[-] Your kernel doesn't support RNDIS, aborting.."; exit 1
+            elif [ "$i" = "acm" -a $IS_ACM_READY -eq 1 ]; then
+                bklog "[-] Your kernel doesn't support ACM, aborting.."; exit 1
+            elif [ "$i" = "ecm" -a $IS_ECM_READY -eq 1 ]; then
+                bklog "[-] Your kernel doesn't support ECM, aborting.."; exit 1
+            fi
+        fi
+    done
+
+    ## If user's input is valid, then clear the current usb functions and start to symlink the target functions. ##
+    bklog "[!] Clearing the current functions."
+    clear_funcs
+
+    bklog "[!] Symlinking functions: ${ARRAY_TARGET_FUNCS[@]}"
+    for i in ${ARRAY_TARGET_FUNCS[@]}; do
+        case "$i" in
+            adb)
+                IS_ADB_SELECTED=0
+                ln -s $DIR_ALL_FUNCS/ffs.adb $DIR_CUR_FUNCS/$SYMLINK_FUNC_NAME
+                inc_funcs_order
+                FUNCS_DESC+=('adb')
+                ;;
+            hid)
+                IS_HID_SELECTED=0
+                ln -s $DIR_ALL_FUNCS/hid.0 $DIR_CUR_FUNCS/$SYMLINK_FUNC_NAME
+                inc_funcs_order
+                ln -s $DIR_ALL_FUNCS/hid.1 $DIR_CUR_FUNCS/$SYMLINK_FUNC_NAME
+                inc_funcs_order
+                FUNCS_DESC+=('hid')
+                ;;
+            mass_storage)
+                IS_MASS_SELECTED=0
+                ln -s $DIR_ALL_FUNCS/mass_storage.0 $DIR_CUR_FUNCS/$SYMLINK_FUNC_NAME
+                inc_funcs_order
+                FUNCS_DESC+=('mass_storage')
+                ;;
+            rndis)
+                IS_RNDIS_SELECTED=0
+                ln -s $DIR_ALL_FUNCS/$REAL_RNDIS_NAME $DIR_CUR_FUNCS/$SYMLINK_FUNC_NAME
+                inc_funcs_order
+                FUNCS_DESC+=('rndis')
+                ;;
+            acm)
+                IS_ACM_SELECTED=0
+                ln -s $DIR_ALL_FUNCS/acm.usb0 $DIR_CUR_FUNCS/$SYMLINK_FUNC_NAME
+                inc_funcs_order
+                FUNCS_DESC+=('acm')
+                ;;
+            ecm)
+                IS_ECM_SELECTED=0
+                ln -s $DIR_ALL_FUNCS/ecm.usb0 $DIR_CUR_FUNCS/$SYMLINK_FUNC_NAME
+                inc_funcs_order
+                FUNCS_DESC+=('ecm')
+                ;;
+        esac
+    done
+
+    ## Last work to do ##
+    ## 1. Setup the idProduct, idVendor, manufacturer, product, serialnumber
+    #if [ -z "$ID_VENDOR" -o -z "$ID_PRODUCT" ]; then
+    #    case "$TARGET_OS" in
+    #        win|lnx)
+    #            if [ $(($IS_HID_SELECTED | $IS_MASS_SELECTED | $IS_RNDIS_SELECTED)) -eq 0 ]; then
+    #                ID_VENDOR="0x0525"; ID_PRODUCT="0xa4a8"
+    #            elif [ $(($IS_HID_SELECTED | $IS_MASS_SELECTED)) -eq 0 ]; then
+    #                ID_VENDOR="0x046d"; ID_PRODUCT="0xc318"
+    #            elif [ $(($IS_HID_SELECTED | $IS_RNDIS_SELECTED)) -eq 0 ]; then
+    #                ID_VENDOR="0x0525"; ID_PRODUCT="0xa4a6"
+    #            elif [ $(($IS_MASS_SELECTED | $IS_RNDIS_SELECTED)) -eq 0 ]; then
+    #                ID_VENDOR="0x0525"; ID_PRODUCT="0xa4a4"
+    #            elif [ $IS_HID_SELECTED -eq 0 ]; then
+    #                ID_VENDOR="0x046d"; ID_PRODUCT="0xc316"
+    #            elif [ $IS_MASS_SELECTED -eq 0 ]; then
+    #                ID_VENDOR="0x9051"; ID_PRODUCT="0x168a"
+    #            elif [ $IS_RNDIS_SELECTED -eq 0 ]; then
+    #                ID_VENDOR="0x0525"; ID_PRODUCT="0xa4a2"
+    #            fi
+    #            ;;
+    #        mac)
+    #            if [ $(($IS_HID_SELECTED | $IS_MASS_SELECTED | $IS_ACM_SELECTED | $IS_ECM_SELECTED)) -eq 0 ]; then
+    #                ID_VENDOR="0x05ac"; ID_PRODUCT="0x0201"
+    #            elif [ $(($IS_HID_SELECTED | $IS_MASS_SELECTED)) -eq 0 ]; then
+    #                ID_VENDOR="0x05ac"; ID_PRODUCT="0x0201"
+    #            elif [ $(($IS_HID_SELECTED | $IS_ACM_SELECTED | $IS_ECM_SELECTED)) -eq 0 ]; then
+    #                ID_VENDOR="0x05ac"; ID_PRODUCT="0x0201"
+    #            elif [ $(($IS_MASS_SELECTED | $IS_ACM_SELECTED | $IS_ECM_SELECTED)) -eq 0 ]; then
+    #                ID_VENDOR="0x1d6b"; ID_PRODUCT="0x0105"
+    #            elif [ $IS_HID_SELECTED -eq 0 ]; then
+    #                ID_VENDOR="0x05ac"; ID_PRODUCT="0x0201"
+    #            elif [ $IS_MASS_SELECTED -eq 0 ]; then
+    #                ID_VENDOR="0x0930"; ID_PRODUCT="0x6545"
+    #            elif [ $(($IS_ACM_SELECTED | $IS_ECM_SELECTED)) -eq 0 ]; then
+    #                ID_VENDOR="0x1d6b"; ID_PRODUCT="0x0105"
+    #            fi
+    #            ;;
+    #    esac
+    #fi
+
+    echo "$ID_VENDOR" > $DIR_CONFIGFS/idVendor
+    echo "$ID_PRODUCT" > $DIR_CONFIGFS/idProduct
+
+    ## Changing manufacturer, product, serialnumber may make your PC fail to authen your device again, ##
+    ## so this part is disabled now until further experiment. ##
+    [ ! -z "$MANUFACTURER" ] && [ -f $DIR_CONFIGFS/strings/0x409/manufacturer ] && echo "$MANUFACTURER" > $DIR_CONFIGFS/strings/0x409/manufacturer
+    [ ! -z "$PRODUCT" ]      && [ -f $DIR_CONFIGFS/strings/0x409/product ]      && echo "$PRODUCT" > $DIR_CONFIGFS/strings/0x409/product
+    [ ! -z "$SERIALNUMBER" ] && [ -f $DIR_CONFIGFS/strings/0x409/serialnumber ] && echo "$SERIALNUMBER" > $DIR_CONFIGFS/strings/0x409/serialnumber
+
+    ## 2. Fireup the usb functions ##
+    if [ $IS_ADB_SELECTED -eq 0 ]; then
+        start adbd
+        setprop sys.usb.ffs.ready 1
+    fi
+    fireup_funcs
+
+    ## 3. Set the configuration description. ##
+    FUNCS_DESC=$(join_by _ "${FUNCS_DESC[@]}")
+    echo "$FUNCS_DESC" > $DIR_CUR_FUNCS/strings/0x409/configuration
+
+    ## 4. Check If the hid enabled, but still no /dev/hidg0 and /dev/hidg1 available. ##
+    if [ $IS_HID_SELECTED -eq 0 ]; then
+        if [ ! -c /dev/hidg0 -o ! -c /dev/hidg1 ]; then
+            bklog "[-] No /dev/hidg0 or /dev/hidg1 is up"
+            bklog "[!] Reverting usb state to 'adb'"
+            ## If something goes wrong, revert back to the dedault usb function which should be "adb" ##
+            revert_to_ori_state
+            exit 1
+        else
+            chmod 666 /dev/hidg0 /dev/hidg1
+        fi
+    fi
+
+    bklog "[+] Done."
+}
+
+###################
+#### Main Part ####
+###################
+
+## Parse the args first. ##
+while getopts "t:f:v:p:m:P:s:" OPTS; do
+    case $OPTS in
+        t) TARGET_OS=$OPTARG;;
+        f) TARGET_FUNCS=$OPTARG;;
+        v) ID_VENDOR=$OPTARG;;
+        p) ID_PRODUCT=$OPTARG;;
+        m) MANUFACTURER=$OPTARG;;
+        P) PRODUCT=$OPTARG;;
+        s) SERIALNUMBER=$OPTARG;;
+        *) print_usage; exit 1;;
+    esac
+done
+
+## The number of args should be exactly 4 ##
+if [ -z "$TARGET_OS" -o -z "$TARGET_FUNCS" -o -z "$ID_VENDOR" -o -z "$ID_PRODUCT" ]; then
+    print_usage; exit 1
+fi
+
+## The target OS should only be "win" -> Windows, "lnx" -> Linux, "mac" -> Mac OS ##
+if [ ! "$TARGET_OS" = "win" -a ! "$TARGET_OS" = "lnx" -a ! "$TARGET_OS" = "mac" ]; then
+    print_usage; exit 1
+fi
+
+bklog "[!] You got ${#ORI_FUNCS[@]} function(s) enabled now."
+bklog "[!] They are: ${ORI_FUNCS[@]}"
+
+switch_funcs $TARGET_OS $TARGET_FUNCS

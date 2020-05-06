@@ -1,3 +1,64 @@
 #!/system/bin/sh
 
 # this runs before the Kaliservices
+
+if [ ! $? -eq 0 ]; then
+    exit 1
+fi
+
+## Define the nethunter app package name.
+APP_PGK_NAME=com.offsec.nethunter
+
+USERINIT_SCRIPT_PATH=$(readlink -f $0)
+. /data/data/$APP_PGK_NAME/files/scripts/bootkali_log
+. /data/data/$APP_PGK_NAME/files/scripts/bootkali_env
+
+## Validate busybox path.
+if [ -z "$BUSYBOX" ]; then
+    bklog "[-] No busybox_nh is installed or busybox is not granted execute permission, if you did have it installed, please symlink it to /system/bin and grant it the permission."
+    exit 1
+fi
+
+## Validate kali Chroot path.
+if [ ! -d "$MNT" ]; then
+    bklog "[-] \"$MNT\" directory not exist!"
+    bklog "[!] Click the button [INSTALL KALI CHROOT] down below now!"
+    exit 2
+fi
+if [ -z "$MNT" ]; then
+    bklog "[-] The \$MNT variable is not defined, please run nethunter app first."
+    exit 2
+fi
+
+## Define chroot shell executable path.
+if [ ! -x $MNT$CHROOT_EXEC ]; then
+    bklog "[-] Your chroot has no \"sudo\" installed, please install it manually first."
+    bklog "[-] Also make sure your Kali Chroot is not corrupted."
+    exit 2
+fi
+
+
+if sh /data/data/$APP_PGK_NAME/files/scripts/chrootmgr -p $MNT -c 'status'; then
+    IS_CHROOT_MOUNTED=0
+    bklog "[+] IS_CHROOT_MOUNTED: Yes"
+else
+    IS_CHROOT_MOUNTED=1
+    bklog "[-] IS_CHROOT_MOUNTED: No"
+fi
+
+bklog "[!] Starting user defined custom commands"
+while IFS= read -r line || [ -n "$line" ]; do
+    read -r SENDTO CMD <<< $line
+    if [ "$SENDTO" = "android" ]; then
+        bklog "[!] Executing: sh -c \"$CMD\""
+        sh -c "$CMD"
+    elif [ "$SENDTO" = "kali" ]; then
+        if [ $IS_CHROOT_MOUNTED -eq 0 ]; then
+            bklog "[!] Executing: $BUSYBOX chroot $MNT $CHROOT_EXEC -E PATH=$PATH su -c \"$CMD\""
+            $BUSYBOX chroot $MNT $CHROOT_EXEC -E PATH=$PATH su -c "$CMD"
+        else
+            bklog "[!] Kali Chroot is not mounted, skip executing $BUSYBOX chroot $MNT $CHROOT_EXEC -E PATH=$PATH $CMD"
+        fi
+    fi
+done < /data/data/$APP_PGK_NAME/files/scripts/runonboot_services
+bklog "[+] User defined custom commands has been all executed!"

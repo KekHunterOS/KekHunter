@@ -11,7 +11,7 @@ REM Use shell for loop to loop 2 times..
 for i in 0 1
 do
 REM Sleep for 1 second
-DELAY 1
+DELAY 1000
 STRING 1234567890
 ENTER
 STRING abcdefghijklmnopqrstuvwxyz
@@ -32,7 +32,7 @@ REM This will press ctrl + alt + delete
 CTRL ALT DELETE
 
 REM Just sleep for 2 second
-DELAY 2
+DELAY 2000
 
 REM Press ESC
 ESC
@@ -40,11 +40,11 @@ ESC
 REM Testing the mouse now..
 REM this will press right click
 MOUSE --b2
-DELAY 1
+DELAY 1000
 
 REM this will press left click
 MOUSE --b1
-DELAY 1
+DELAY 1000
 REM THis will hold left mouse button, drag 100 pixels to the right and 50 pixels up, then release
 MOUSE --hold --b1
 MOUSE --hold --b1 100 0
