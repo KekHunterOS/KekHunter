@@ -1,11 +1,10 @@
-#! /usr/bin/env python
+#!/usr/bin/env python3
 
 #Created by @binkybear and @byt3bl33d3r
 
 import sys
 import re
 import os
-from keyseed import *
 import argparse
 from decimal import Decimal #for conversion milliseconds -> seconds
 
@@ -25,11 +24,11 @@ def duckyRules (source):
 
     tmpfile = source
 
-    for (k,v) in WINCMD_rules.items():
+    for (k,v) in list(WINCMD_rules.items()):
         regex = re.compile(k)
         tmpfile = regex.sub(v, tmpfile)
 
-    for (k,v) in rules.items():
+    for (k,v) in list(rules.items()):
         regex = re.compile(k)
         tmpfile = regex.sub(v, tmpfile)
 
@@ -38,7 +37,7 @@ def duckyRules (source):
 if __name__ == "__main__":
 
     rules = {
-        r'ALT' : u'left-alt',
+        r'ALT' : 'left-alt',
         r'GUI' : 'left-meta',
         r'WINDOWS' : 'left-meta',
         r'COMMAND' : 'left-meta',
@@ -118,7 +117,6 @@ if __name__ == "__main__":
         r'WINCMD' : 'GUI d\nDELAY 500\nGUI\nDELAY 1000\nTEXT cmd\nDELAY 1000\nENTER\nDELAY 3000',
         r'WINCMDUAC' : 'GUI d\nDELAY 500\nGUI\nDELAY 1000\nTEXT cmd\nDELAY 1000\nCTRL SHIFT ENTER\nDELAY 2000\nLEFTARROW\nENTER\nDELAY 3000'
     }
-
 
     # For general keyboard commands
     prefix = "echo "
@@ -251,4 +249,4 @@ if __name__ == "__main__":
     src.close()
     dest.close()
     os.remove("tmp.txt")
-    print "File saved to location: " + (args.hunterscript)
+    print(("File saved to location: " + (args.hunterscript)))
