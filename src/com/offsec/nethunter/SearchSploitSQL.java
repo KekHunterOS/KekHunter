@@ -58,7 +58,7 @@ class SearchSploitSQL extends SQLiteOpenHelper {
         String _cmd1 = "su -c 'bootkali custom_cmd /usr/bin/python3 /sdcard/nh_files/modules/csv2sqlite.py /usr/share/exploitdb/files_exploits.csv /root/SearchSploit " + SearchSploit.TABLE + "'";
         exe.RunAsRootOutput(_cmd1);
         // Then move it to app db folder
-        String _cmd2 = "mv /data/local/nhsystem/" + NhPaths.CHROOT_SYMLINK_PATH + "/root/SearchSploit /sdcard/nh_files/";
+        String _cmd2 = "mv " + NhPaths.CHROOT_SYMLINK_PATH + "/root/SearchSploit /sdcard/nh_files/";
         exe.RunAsRootOutput(_cmd2);
         return true;
     }
