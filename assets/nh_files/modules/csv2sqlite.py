@@ -1,12 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # A simple Python script to convert csv files to sqlite (with type guessing)
 #
 # @author: Rufus Pollock
 # Placed in the Public Domain
 # Bug fixes by Simon Heimlicher <sh@nine.ch> marked by `shz:'
-
-from __future__ import print_function
 
 
 import sys
