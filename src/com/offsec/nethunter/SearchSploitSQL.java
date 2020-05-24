@@ -55,7 +55,7 @@ class SearchSploitSQL extends SQLiteOpenHelper {
 
     Boolean doDbFeed() {
         // Generate the csv to kali /root first as temp (so we can read it)
-        String _cmd1 = "su -c 'bootkali custom_cmd /usr/bin/python /sdcard/nh_files/modules/csv2sqlite.py /usr/share/exploitdb/files_exploits.csv /root/SearchSploit " + SearchSploit.TABLE + "'";
+        String _cmd1 = "su -c 'bootkali custom_cmd /usr/bin/python3 /sdcard/nh_files/modules/csv2sqlite.py /usr/share/exploitdb/files_exploits.csv /root/SearchSploit " + SearchSploit.TABLE + "'";
         exe.RunAsRootOutput(_cmd1);
         // Then move it to app db folder
         String _cmd2 = "mv /data/local/nhsystem/kali-armhf/root/SearchSploit /sdcard/nh_files/";
