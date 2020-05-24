@@ -1,12 +1,13 @@
+#!/usr/bin/env python3
+
 import argparse         # Handle arguments
 import os               # To write hid comands to system
-from keyseed import *   # The bytes to translate to keyboard codes
 
 '''
 
 Arguments for filetohid.py
-python filetohid.py -f [inputfile] -l us
-python filetohid.py -s "this is a string" -l us
+python3 filetohid.py -f [inputfile] -l us
+python3 filetohid.py -s "this is a string" -l us
 
 This is a modified version of duckhunter.py.
 Thanks to @byt3bl33d3r and @TheNain38 for help with original code.
@@ -76,7 +77,7 @@ def do_string(string, lang):
             if line is not None:
                 if isinstance(line, str):
                     os.system('%s%s%s\n' % (prefix, line.strip(), suffix))
-                    print('%s%s%s\n' % (prefix, line.rstrip('\n').strip(), suffix))
+                    print(('%s%s%s\n' % (prefix, line.rstrip('\n').strip(), suffix)))
                 else:
                     for elem in line:
                         os.system('%s%s%s\n' % (prefix, elem.rstrip('\n').strip(), suffix))
