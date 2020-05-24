@@ -31,64 +31,136 @@
             <CheckBox
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="kali-linux" />
+                android:text="kali-tools-top10" />
+            <CheckBox
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="kali-linux-default" />
 
             <CheckBox
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="kali-linux-all" />
+                android:text="kali-linux-large" />
 
             <CheckBox
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="kali-linux-forensic" />
+                android:text="kali-linux-everything" />
 
             <CheckBox
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="kali-linux-full" />
+                android:text="kali-tools-802-11" />
 
             <CheckBox
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="kali-linux-gpu" />
+                android:text="kali-tools-bluetooth" />
 
             <CheckBox
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="kali-linux-pwtools" />
+                android:text="kali-tools-crypto-stego" />
 
             <CheckBox
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="kali-linux-rfid" />
+                android:text="kali-tools-database" />
 
             <CheckBox
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="kali-linux-sdr" />
+                android:text="kali-tools-forensics" />
 
             <CheckBox
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="kali-linux-top10" />
+                android:text="kali-tools-fuzzing" />
 
             <CheckBox
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="kali-linux-voip" />
+                android:text="kali-tools-gpu" />
 
             <CheckBox
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="kali-linux-web" />
+                android:text="kali-tools-hardware" />
 
             <CheckBox
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="kali-linux-wireless" />
+                android:text="kali-tools-headless" />
 
+            <CheckBox
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="kali-tools-information-gathering" />
 
+            <CheckBox
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="kali-tools-passwords" />
+
+            <CheckBox
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="kali-tools-post-exploitation" />
+
+            <CheckBox
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="kali-tools-reporting" />
+
+            <CheckBox
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="kali-tools-reverse-engineering" />
+
+            <CheckBox
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="kali-tools-rfid" />
+
+            <CheckBox
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="kali-tools-sdr" />
+
+            <CheckBox
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="kali-tools-sniffing-spoofing" />
+
+            <CheckBox
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="kali-tools-social-engineering" />
+
+            <CheckBox
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="kali-tools-voip" />
+
+            <CheckBox
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="kali-tools-vulnerability" />
+
+            <CheckBox
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="kali-tools-web" />
+
+            <CheckBox
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="kali-tools-windows-resources" />
+
+            <CheckBox
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="kali-tools-wireless" />
         </LinearLayout>
 
         <TextView
