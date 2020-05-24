@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#!/usr/bin/env python3
 
 # Formats payload to HID Keyboard sequences. Real rough poc for testing basic payloads.
 
@@ -2366,113 +2366,113 @@ def findinlist(byte, locale):
     #if dicts[locale][byte] : print "#crap, couldn't find ["+byte +"]. Perhaps try adding it to the list."
     #else :
     if byte == '\n':
-        print '''echo enter | hid-keyboard /dev/hidg0 keyboard'''
+        print('''echo enter | hid-keyboard /dev/hidg0 keyboard''')
     else:
-        print '''echo -ne "''' +dicts[locale][byte]+ '''" > /dev/hidg0'''
-        print '''echo -ne "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0'''
+        print(('''echo -ne "''' +dicts[locale][byte]+ '''" > /dev/hidg0'''))
+        print('''echo -ne "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0''')
 
 def wincmd(locale):
-    print '''sleep 1'''
-    print '''echo -ne "\\x08\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0'''
-    print '''echo -ne "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0'''
-    print '''sleep 1'''
+    print('''sleep 1''')
+    print('''echo -ne "\\x08\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0''')
+    print('''echo -ne "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0''')
+    print('''sleep 1''')
     findinlist(str.encode("\x63"), locale) #c
-    print '''sleep 1'''
+    print('''sleep 1''')
     findinlist(str.encode("\x6d"), locale) #m
-    print '''sleep 1'''
+    print('''sleep 1''')
     findinlist(str.encode("\x64"), locale) #d
-    print '''sleep 1'''
-    print '''echo -ne "\\x10\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0'''
-    print '''echo -ne "\\x20\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0'''
-    print '''sleep 1'''
-    print '''echo -ne "\\x00\\x00\\x00\\x28\\x00\\x00\\x00\\x00" > /dev/hidg0'''
-    print '''echo -ne "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0'''
-    print '''sleep 3'''
+    print('''sleep 1''')
+    print('''echo -ne "\\x10\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0''')
+    print('''echo -ne "\\x20\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0''')
+    print('''sleep 1''')
+    print('''echo -ne "\\x00\\x00\\x00\\x28\\x00\\x00\\x00\\x00" > /dev/hidg0''')
+    print('''echo -ne "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0''')
+    print('''sleep 3''')
 
 def win7cmd_elevated(locale):
-    print '''sleep 1'''
-    print '''echo -ne "\\x08\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0''' #windows key
-    print '''echo -ne "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0'''
-    print '''sleep 1'''
+    print('''sleep 1''')
+    print('''echo -ne "\\x08\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0''') #windows key
+    print('''echo -ne "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0''')
+    print('''sleep 1''')
     findinlist("\x63", locale) #c
-    print '''sleep 0.5'''
+    print('''sleep 0.5''')
     findinlist("\x6d", locale) #m
-    print '''sleep 0.5'''
+    print('''sleep 0.5''')
     findinlist("\x64", locale) #d
-    print '''sleep 3'''
-    print '''echo left-ctrl left-shift return | hid-keyboard /dev/hidg0 keyboard'''
-    print '''sleep 2'''
-    print '''echo left | hid-keyboard /dev/hidg0 keyboard'''
-    print '''sleep 0.5'''
-    print '''echo enter | hid-keyboard /dev/hidg0 keyboard'''
-    print '''sleep 3'''
+    print('''sleep 3''')
+    print('''echo left-ctrl left-shift return | hid-keyboard /dev/hidg0 keyboard''')
+    print('''sleep 2''')
+    print('''echo left | hid-keyboard /dev/hidg0 keyboard''')
+    print('''sleep 0.5''')
+    print('''echo enter | hid-keyboard /dev/hidg0 keyboard''')
+    print('''sleep 3''')
 
 def win8cmd_elevated(locale):
-    print '''sleep 1'''
-    print '''echo -ne "\\x08\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0'''
-    print '''echo -ne "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0'''
-    print '''sleep 1'''
+    print('''sleep 1''')
+    print('''echo -ne "\\x08\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0''')
+    print('''echo -ne "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0''')
+    print('''sleep 1''')
     findinlist("\x63", locale) #c
-    print '''sleep 0.5'''
+    print('''sleep 0.5''')
     findinlist("\x6d", locale) #m
-    print '''sleep 0.5'''
+    print('''sleep 0.5''')
     findinlist("\x64", locale) #d
-    print '''sleep 3'''
-    print '''echo -ne "\\x10\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0'''
-    print '''echo -ne "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0'''
-    print '''sleep 1'''
-    print '''echo -ne "\\x02\\x00\\x00\\x43\\x00\\x00\\x00\\x00" > /dev/hidg0'''
-    print '''echo -ne "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0'''
-    print '''sleep 1'''
-    print '''echo -ne "\\x01\\x00\\x00\\x51\\x00\\x00\\x00\\x00" > /dev/hidg0'''
-    print '''echo -ne "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0'''
-    print '''sleep 1'''
-    print '''echo -ne "\\x01\\x00\\x00\\x51\\x00\\x00\\x00\\x00" > /dev/hidg0'''
-    print '''echo -ne "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0'''
-    print '''sleep 1'''
-    print '''echo -ne "\\x01\\x00\\x00\\x51\\x00\\x00\\x00\\x00" > /dev/hidg0'''
-    print '''echo -ne "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0'''
-    print '''sleep 1'''
-    print '''echo -ne "\\x01\\x00\\x00\\x51\\x00\\x00\\x00\\x00" > /dev/hidg0'''
-    print '''echo -ne "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0'''
-    print '''sleep 2'''
-    print '''echo -ne "\\x00\\x00\\x00\\x28\\x00\\x00\\x00\\x00" > /dev/hidg0'''
-    print '''echo -ne "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0'''
-    print '''sleep 2'''
-    print '''echo left | hid-keyboard /dev/hidg0 keyboard'''
-    print '''sleep 0.5'''
-    print '''echo enter | hid-keyboard /dev/hidg0 keyboard'''
-    print '''sleep 3'''
+    print('''sleep 3''')
+    print('''echo -ne "\\x10\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0''')
+    print('''echo -ne "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0''')
+    print('''sleep 1''')
+    print('''echo -ne "\\x02\\x00\\x00\\x43\\x00\\x00\\x00\\x00" > /dev/hidg0''')
+    print('''echo -ne "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0''')
+    print('''sleep 1''')
+    print('''echo -ne "\\x01\\x00\\x00\\x51\\x00\\x00\\x00\\x00" > /dev/hidg0''')
+    print('''echo -ne "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0''')
+    print('''sleep 1''')
+    print('''echo -ne "\\x01\\x00\\x00\\x51\\x00\\x00\\x00\\x00" > /dev/hidg0''')
+    print('''echo -ne "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0''')
+    print('''sleep 1''')
+    print('''echo -ne "\\x01\\x00\\x00\\x51\\x00\\x00\\x00\\x00" > /dev/hidg0''')
+    print('''echo -ne "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0''')
+    print('''sleep 1''')
+    print('''echo -ne "\\x01\\x00\\x00\\x51\\x00\\x00\\x00\\x00" > /dev/hidg0''')
+    print('''echo -ne "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0''')
+    print('''sleep 2''')
+    print('''echo -ne "\\x00\\x00\\x00\\x28\\x00\\x00\\x00\\x00" > /dev/hidg0''')
+    print('''echo -ne "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0''')
+    print('''sleep 2''')
+    print('''echo left | hid-keyboard /dev/hidg0 keyboard''')
+    print('''sleep 0.5''')
+    print('''echo enter | hid-keyboard /dev/hidg0 keyboard''')
+    print('''sleep 3''')
 
 def win10cmd_elevated(locale):
-    print '''sleep 1'''
-    print '''echo -ne "\\x08\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0''' # Wincmd Key
-    print '''echo -ne "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0'''
-    print '''sleep 1'''
+    print('''sleep 1''')
+    print('''echo -ne "\\x08\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0''') # Wincmd Key
+    print('''echo -ne "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0''')
+    print('''sleep 1''')
     findinlist("\x63", locale) #c
-    print '''sleep 0.5'''
+    print('''sleep 0.5''')
     findinlist("\x6d", locale) #m
-    print '''sleep 0.5'''
+    print('''sleep 0.5''')
     findinlist("\x64", locale) #d
-    print '''sleep 3'''
-    print '''echo -ne "\\x02\\x00\\x00\\x43\\x00\\x00\\x00\\x00" > /dev/hidg0''' # Menu key
-    print '''echo -ne "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0'''
-    print '''sleep 1'''
-    print '''echo down | hid-keyboard /dev/hidg0 keyboard'''
-    print '''sleep 1'''
-    print '''echo enter | hid-keyboard /dev/hidg0 keyboard'''
-    print '''sleep 2'''
-    print '''echo left | hid-keyboard /dev/hidg0 keyboard'''
-    print '''sleep 0.5'''
-    print '''echo enter | hid-keyboard /dev/hidg0 keyboard'''
-    print '''sleep 3'''
+    print('''sleep 3''')
+    print('''echo -ne "\\x02\\x00\\x00\\x43\\x00\\x00\\x00\\x00" > /dev/hidg0''') # Menu key
+    print('''echo -ne "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0''')
+    print('''sleep 1''')
+    print('''echo down | hid-keyboard /dev/hidg0 keyboard''')
+    print('''sleep 1''')
+    print('''echo enter | hid-keyboard /dev/hidg0 keyboard''')
+    print('''sleep 2''')
+    print('''echo left | hid-keyboard /dev/hidg0 keyboard''')
+    print('''sleep 0.5''')
+    print('''echo enter | hid-keyboard /dev/hidg0 keyboard''')
+    print('''sleep 3''')
 
 
 def enterb():
-    print '''sleep 2'''
-    print '''echo -ne "\\x00\\x00\\x00\\x28\\x00\\x00\\x00\\x00" > /dev/hidg0'''
-    print '''echo -ne "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0'''
-    print '''sleep 2'''
+    print('''sleep 2''')
+    print('''echo -ne "\\x00\\x00\\x00\\x28\\x00\\x00\\x00\\x00" > /dev/hidg0''')
+    print('''echo -ne "\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00" > /dev/hidg0''')
+    print('''sleep 2''')
 
 #Unit tests
 #def main():
