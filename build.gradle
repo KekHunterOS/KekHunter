@@ -5,7 +5,7 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.6.1'
+        classpath 'com.android.tools.build:gradle:4.0.0'
     }
 }
 
@@ -51,7 +51,8 @@ android {
     defaultConfig {
         minSdkVersion 17
         targetSdkVersion 29
-        versionCode 2020022200
+        //noinspection HighAppVersionCode
+        versionCode 2020022600
         versionName "2020.2"
         multiDexEnabled true
     }
