@@ -52,6 +52,10 @@
              android:id="@+id/mana_item"
              android:icon="@drawable/ic_action_network_wifi"
              android:title="@string/drawertitlemana" />
+        <item
+            android:id="@+id/bt_item"
+            android:icon="@drawable/ic_action_bluetooth"
+            android:title="@string/drawertitlebt" />
          <item
              android:id="@+id/mitmf_item"
              android:icon="@drawable/ic_share_black_24dp"

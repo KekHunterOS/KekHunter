@@ -215,6 +215,13 @@
 
     <!-- KeX -->
     <string name="kex_description">Welcome to the Kali NetHunter Desktop Experience.\nYou can start multiple sessions as different users, add, save, and restore your own custom resolutions, start KeX at boot, and even output KeX to HDMI.</string>
+
+    <!-- BT Attacks -->
+    <string name="bt_description">Experimental version of Bluetooth Arsenal by yesimxev. Recon, spoof, listen to, or inject audio to various devices. Note that RFcomm needs to be enabled in your kernel for some of the attacks. Also, some devices might not support BT service.</string>
+    <string name="bt_carwhisperer">Carwhisperer script from the wayback. Listen to, or inject audio to various devices like speakers, headsets, watches or even cars. Note that target needs to be disconnected from original source. Live stream will have some delay. The sampling has to be 8kHz as we\'re injecting into SCO protocol.</string>
+    <string name="bt_spoof">Spoof your BT adapters.\nWill play essential role in upcoming attacks.</string>
+    <string name="bt_tools">Brute force BT device addresses, ping, and discover their services.</string>
+
     <!-- MITMf -->
     <string name="mitmf_description">Written by @byt3bl33d3r, MITMf aims to provide a one-stop-shop for Man-In-The-Middle and network attacks while updating and improving existing attacks and techniques.</string>
     <string-array name="mitmf_interface_array">
@@ -328,6 +335,7 @@
     <string name="drawertitleduckhunter">DuckHunter HID</string>
     <string name="drawertitlebadusb">Bad USB MITM Attack</string>
     <string name="drawertitlemana">Mana Wireless Toolkit</string>
+    <string name="drawertitlebt">Bluetooth Arsenal</string>
     <string name="drawertitlemitmf">MITM Framework</string>
     <string name="drawertitlenmap">Nmap Scan</string>
     <string name="drawertitlempc">Metasploit Payload Generator</string>
