@@ -131,7 +131,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Sound file to inject (only .wav)"
+            android:text="Sound file to inject"
             android:padding="4dp" />
 
         <LinearLayout

