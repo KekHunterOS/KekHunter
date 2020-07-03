@@ -56,7 +56,7 @@ public class BTFragment extends Fragment {
     private Context context;
     private Activity activity;
     private static final String ARG_SECTION_NUMBER = "section_number";
-    
+
     public static BTFragment newInstance(int sectionNumber) {
         BTFragment fragment = new BTFragment();
         Bundle args = new Bundle();
@@ -130,8 +130,8 @@ public class BTFragment extends Fragment {
     public void RunSetup() {
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
                 intentClickListener_NH("echo -ne \"\\033]0;BT Arsenal Setup\\007\" && clear;if [[ -f /usr/bin/hciconfig && -f /usr/bin/l2ping && " +
-                        "-f /usr/bin/fang && -f /usr/bin/blueranger &&-f /usr/bin/bluelog && -f /usr/bin/sdptool && -f /usr/bin/sox ]];then echo \"All packages are installed!\"; else " +
-                        "apt-get update && apt-get install bluetooth bluez bluez-tools bluez-obexd libbluetooth3 sox " +
+                        "-f /usr/bin/fang && -f /usr/bin/blueranger &&-f /usr/bin/bluelog && -f /usr/bin/sdptool && -f /usr/bin/spooftooph && -f /usr/bin/sox ]];then echo \"All packages are installed!\"; else " +
+                        "apt-get update && apt-get install bluetooth bluez bluez-tools bluez-obexd libbluetooth3 sox spooftooph " +
                         "libbluetooth-dev redfang bluelog blueranger -y;fi; if [[ -f /usr/bin/carwhisperer && -f /usr/bin/rfcomm_scan ]];then echo \"All scripts are installed!\"; else " +
                         "git clone https://github.com/yesimxev/carwhisperer-0.2 /root/carwhisperer;" +
                         "cd /root/carwhisperer;make && make install;git clone https://github.com/yesimxev/bt_audit /root/bt_audit;cd /root/bt_audit/src;make;" +
@@ -141,7 +141,7 @@ public class BTFragment extends Fragment {
 
     public void RunUpdate() {
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-        intentClickListener_NH("echo -ne \"\\033]0;BT Arsenal Update\\007\" && clear;apt-get update && apt-get install bluetooth bluez bluez-tools bluez-obexd libbluetooth3 sox " +
+        intentClickListener_NH("echo -ne \"\\033]0;BT Arsenal Update\\007\" && clear;apt-get update && apt-get install bluetooth bluez bluez-tools bluez-obexd libbluetooth3 sox spooftooph " +
                 "libbluetooth-dev redfang bluelog blueranger -y;if [[ -f /usr/bin/carwhisperer && -f /usr/bin/rfcomm_scan ]];then cd /root/carwhisperer/;git pull && make && make install;cd /root/bt_audit; git pull; cd src && make;" +
                 "cp rfcomm_scan /usr/bin/;fi; echo \"Done! Closing in 3secs..\"; sleep 3 && exit ");
         sharedpreferences.edit().putBoolean("setup_done", true).apply();
@@ -646,9 +646,9 @@ public class BTFragment extends Fragment {
                 } else {
                     final String target_classname = target_class + target_name;
                     if (!target_address.equals(" -a ")) {
-                        intentClickListener_NH("echo -ne \"\\033]0;Spoofing Bluetooth\\007\" && clear;echo \"Spooftooph started..\";spooftooph " + target_interface + target_address + "; sleep 2 && hciconfig " + target_interface + " up && spooftooph " + target_interface + target_classname + " && echo \"\nBringing interface up with hciconfig..\n\nClass/Name changed, closing in 3 secs..\";sleep 3 && exit");
+                        intentClickListener_NH("echo -ne \"\\033]0;Spoofing Bluetooth\\007\" && clear;echo \"Spooftooph started..\";spooftooph -i " + target_interface + target_address + "; sleep 2 && hciconfig " + target_interface + " up && spooftooph -i " + target_interface + target_classname + " && echo \"\nBringing interface up with hciconfig..\n\nClass/Name changed, closing in 3 secs..\";sleep 3 && exit");
                     } else {
-                        intentClickListener_NH("echo -ne \"\\033]0;Spoofing Bluetooth\\007\" && clear;echo \"Spooftooph started..\";spooftooph " + target_interface + target_classname + " && echo \"\nClass/Name changed, closing in 3 secs..\";sleep 3 && exit");
+                        intentClickListener_NH("echo -ne \"\\033]0;Spoofing Bluetooth\\007\" && clear;echo \"Spooftooph started..\";spooftooph -i " + target_interface + target_classname + " && echo \"\nClass/Name changed, closing in 3 secs..\";sleep 3 && exit");
                     }
                 }
             });
