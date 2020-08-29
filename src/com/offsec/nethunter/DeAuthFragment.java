@@ -14,21 +14,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.offsec.nethunter.utils.BootKali;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.ShellExecuter;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-/**
- * Created by nik on 20/02/17.
- */
-
-
-
 
     public class DeAuthFragment  extends Fragment {
     private final ShellExecuter exe = new ShellExecuter();
@@ -64,34 +57,32 @@ import androidx.fragment.app.FragmentActivity;
         final CheckBox whitelist = rootView.findViewById(R.id.deauth_whitelist);
         final CheckBox white_me = rootView.findViewById(R.id.deauth_me);
         whitelist.setChecked(false);
-        start.setOnClickListener(new View.OnClickListener(){
-            public void onClick(View v) {
-                String whitelist_command;
-                new BootKali("ifconfig " + wlan.getText() + " up");
-                try {
-                    Thread.sleep(1000);
-                    new BootKali("airmon-ng start  " + wlan.getText()).run_bg();
-                    Thread.sleep(2000);
-                    if (whitelist.isChecked()){
-                        whitelist_command = "-w /sdcard/nh_files/deauth/whitelist.txt ";
-                    }
-                    else{
-                        whitelist_command = "";
-                    }
-                    intentClickListener_NH("echo Press Crtl+C to stop! && mdk3 " + wlan.getText() + "mon d " + whitelist_command + "-c " + channel.getText());
+        start.setOnClickListener(v -> {
+            String whitelist_command;
+            new BootKali("ip link set " + wlan.getText() + " up");
+            try {
+                Thread.sleep(1000);
+                new BootKali("airmon-ng start  " + wlan.getText()).run_bg();
+                Thread.sleep(2000);
+                if (whitelist.isChecked()){
+                    whitelist_command = "-w /sdcard/nh_files/deauth/whitelist.txt ";
                 }
-                catch (InterruptedException e) {
-                    e.printStackTrace();
+                else{
+                    whitelist_command = "";
                 }
+                intentClickListener_NH("echo Press Crtl+C to stop! && mdk3 " + wlan.getText() + "mon d " + whitelist_command + "-c " + channel.getText());
             }
-            });
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
         scan.setOnClickListener(v -> {
 
-            /**TODO: create .sh that executes the commands and puts its output in a file and then read the file in the textview 20/02/17*/
+            /*TODO: create .sh that executes the commands and puts its output in a file and then read the file in the textview 20/02/17*/
             new BootKali("cp /sdcard/nh_files/deauth/scan.sh /root/scan.sh && chmod +x /root/scan.sh").run_bg();
             String cmd = "./root/scan.sh " + wlan.getText() + " | tr -s [:space:] > /sdcard/nh_files/deauth/output.txt";
             try {
-                new BootKali("ifconfig " + wlan.getText() + " up").run_bg();
+                new BootKali("ip link set " + wlan.getText() + " up").run_bg();
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -106,18 +97,12 @@ import androidx.fragment.app.FragmentActivity;
                 term.setText(e.toString());
             }
 
-
         });
         whitelist.setOnClickListener(v -> {
             if (whitelist.isChecked()){
                 white_me.setClickable(true);
                 String check_me = exe.RunAsRootOutput("grep -q " + getmac(wlan.getText().toString()) + " \"" + NhPaths.APP_SD_FILES_PATH + "/deauth/whitelist.txt\" && echo $?");
-                if (check_me.contains("0")){
-                    white_me.setChecked(true);
-                }
-                else{
-                    white_me.setChecked(false);
-                }
+                white_me.setChecked(check_me.contains("0"));
             }
             else{
                 white_me.setChecked(false);
@@ -127,20 +112,15 @@ import androidx.fragment.app.FragmentActivity;
         white_me.setOnClickListener(v -> {
             if (whitelist.isChecked()) {
                 if (white_me.isChecked()) {
-                    if (wlan.getText().toString() == "wlan0") {
-                        exe.RunAsRootOutput("echo '" + getmac(wlan.getText().toString()) + "' >> " + NhPaths.APP_SD_FILES_PATH + "/deauth/whitelist.txt");
-
-                    } else {
+                    if (!wlan.getText().toString().equals("wlan0")) {
                         exe.RunAsRootOutput("echo '" + getmac("wlan0") + "' >> " + NhPaths.APP_SD_FILES_PATH + "/deauth/whitelist.txt");
-                        exe.RunAsRootOutput("echo '" + getmac(wlan.getText().toString()) + "' >> " + NhPaths.APP_SD_FILES_PATH + "/deauth/whitelist.txt");
                     }
+                    exe.RunAsRootOutput("echo '" + getmac(wlan.getText().toString()) + "' >> " + NhPaths.APP_SD_FILES_PATH + "/deauth/whitelist.txt");
                 } else {
-                    if (wlan.getText().toString() == "wlan0") {
-                        exe.RunAsRootOutput("sed -i '/" + getmac(wlan.getText().toString()) + "/d' " + NhPaths.APP_SD_FILES_PATH + "/deauth/whitelist.txt");
-                    } else {
+                    if (!wlan.getText().toString().equals("wlan0")) {
                         exe.RunAsRootOutput("sed -i '/wlan0/d' /sdcard/nh_files/deauth/whitelist.txt");
-                        exe.RunAsRootOutput("sed -i '/" + getmac(wlan.getText().toString()) + "/d' " + NhPaths.APP_SD_FILES_PATH + "/deauth/whitelist.txt");
                     }
+                    exe.RunAsRootOutput("sed -i '/" + getmac(wlan.getText().toString()) + "/d' " + NhPaths.APP_SD_FILES_PATH + "/deauth/whitelist.txt");
                 }
             }
             else{
@@ -150,21 +130,18 @@ import androidx.fragment.app.FragmentActivity;
         return rootView;
     }
 
-
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.deauth, menu);
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.deauth_modify:
-                Intent i = new Intent(activity, DeAuthWhitelistActivity.class);
-                startActivity(i);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == R.id.deauth_modify) {
+            Intent i = new Intent(activity, DeAuthWhitelistActivity.class);
+            startActivity(i);
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     private void intentClickListener_NH(final String command) {
