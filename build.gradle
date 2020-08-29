@@ -39,8 +39,10 @@ android {
     compileSdkVersion 29
     buildToolsVersion '29.0.3'
 
-    dataBinding {
-        enabled = true
+    buildFeatures {
+        dataBinding true
+        // for view binding:
+        // viewBinding true
     }
 
     compileOptions {
@@ -75,8 +77,8 @@ android {
             storeFile file("${System.properties['user.home']}" + "/.android/debug.keystore")
         }
 
-        /* note:  To build a signed version of nethunter:
-        1. Put your keystore in ~/.android/release-keystore and set up a key "nethunter"
+        /* note:  To build a signed version of NetHunter:
+        1. Put your keystore in ~/.android/release-keystore and set up a key "NetHunter"
         2. set KEYSTORE_PASSWORD and KEY_PASSWORD environment variables before running gradle.  this
            can be done easily by adding them to .bashrc
         (or change the below values, hard-coding or whatever...)
@@ -85,7 +87,7 @@ android {
         release {
             storePassword System.getenv("KEYSTORE_PASSWORD")
             storeFile file("${System.properties['user.home']}" +  "/.android/release.keystore")
-            keyAlias "nethunter"
+            keyAlias "NetHunter"
             keyPassword System.getenv("KEY_PASSWORD")
 
         }
