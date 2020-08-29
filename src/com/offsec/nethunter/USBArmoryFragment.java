@@ -1,5 +1,6 @@
 package com.offsec.nethunter;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -50,8 +51,8 @@ public class USBArmoryFragment extends Fragment {
     private static final String TAG = "USBArmoryFragment";
     private Context context;
     private Activity activity;
-    private USBArmoryHandlerThread usbArmoryHandlerThread = new USBArmoryHandlerThread();
-    private Handler uiHandler = new Handler(Looper.getMainLooper());
+    private final USBArmoryHandlerThread usbArmoryHandlerThread = new USBArmoryHandlerThread();
+    private final Handler uiHandler = new Handler(Looper.getMainLooper());
     private static boolean is_init_exists = true;
     //private Message msg = new Message();
     private TextView usbStatusTextView;
@@ -98,6 +99,7 @@ public class USBArmoryFragment extends Fragment {
         return inflater.inflate(R.layout.usbarmory, container, false);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -132,7 +134,6 @@ public class USBArmoryFragment extends Fragment {
         usbNetworkInfoEditTextGroup[2] = view.findViewById(R.id.f_usbarmory_et_usbnetwork_targetip);
         usbNetworkInfoEditTextGroup[3] = view.findViewById(R.id.f_usbarmory_et_usbnetwork_gatewayip);
         usbNetworkInfoEditTextGroup[4] = view.findViewById(R.id.f_usbarmory_et_usbnetwork_ipsubnetmask);
-
 
         { Message msg = new Message();
             msg.what = USBArmoryHandlerThread.IS_INIT_EXIST;
@@ -264,10 +265,18 @@ public class USBArmoryFragment extends Fragment {
                 unmountImgButton.setEnabled(false);
                 Message msg = new Message();
                 msg.what = USBArmoryHandlerThread.MOUNT_IMAGE;
-                msg.obj = (readOnlyCheckBox.isChecked()?"echo '1' > /config/usb_gadget/g1/functions/mass_storage.0/lun.0/ro":"echo '0' > /config/usb_gadget/g1/functions/mass_storage.0/lun.0/ro") +
-                        (imgFileSpinner.getSelectedItem().toString().contains(".iso")?" && echo '1' > /config/usb_gadget/g1/functions/mass_storage.0/lun.0/cdrom":" && echo '0' > /config/usb_gadget/g1/functions/mass_storage.0/lun.0/cdrom") +
-                        " && echo '" + NhPaths.APP_SD_FILES_IMG_PATH + "/" +
-                        imgFileSpinner.getSelectedItem().toString() + "' > /config/usb_gadget/g1/functions/mass_storage.0/lun.0/file";
+                if (readOnlyCheckBox.isChecked())
+                    msg.obj = String.format("%s%s && echo '%s/%s' > /config/usb_gadget/g1/functions/mass_storage.0/lun.0/file",
+                            "echo '1' > /config/usb_gadget/g1/functions/mass_storage.0/lun.0/ro",
+                            imgFileSpinner.getSelectedItem().toString().contains(".iso") ? " && echo '1' > /config/usb_gadget/g1/functions/mass_storage.0/lun.0/cdrom" : " && echo '0' > /config/usb_gadget/g1/functions/mass_storage.0/lun.0/cdrom",
+                            NhPaths.APP_SD_FILES_IMG_PATH,
+                            imgFileSpinner.getSelectedItem().toString());
+                else
+                    msg.obj = String.format("%s%s && echo '%s/%s' > /config/usb_gadget/g1/functions/mass_storage.0/lun.0/file",
+                            "echo '0' > /config/usb_gadget/g1/functions/mass_storage.0/lun.0/ro",
+                            imgFileSpinner.getSelectedItem().toString().contains(".iso") ? " && echo '1' > /config/usb_gadget/g1/functions/mass_storage.0/lun.0/cdrom" : " && echo '0' > /config/usb_gadget/g1/functions/mass_storage.0/lun.0/cdrom",
+                            NhPaths.APP_SD_FILES_IMG_PATH,
+                            imgFileSpinner.getSelectedItem().toString());
                 usbArmoryHandlerThread.getHandler().sendMessage(msg);
             }
         });
@@ -478,12 +487,12 @@ public class USBArmoryFragment extends Fragment {
         super.onCreateOptionsMenu(menu, inflater);
     }
 
+    @SuppressLint({"NonConstantResourceId", "SetTextI18n"})
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        final ViewGroup nullParent = null;
         final LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         assert inflater != null;
-        final View promptView = inflater.inflate(R.layout.kaliservices_custom_dialog_view, nullParent);
+        final View promptView = inflater.inflate(R.layout.kaliservices_custom_dialog_view, null);
         final TextView titleTextView = promptView.findViewById(R.id.f_kaliservices_adb_tv_title1);
         final EditText storedpathEditText = promptView.findViewById(R.id.f_kaliservices_adb_et_storedpath);
 

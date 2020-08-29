@@ -79,7 +79,7 @@ public class RunAtBootService extends JobIntentService {
         HashMap<String, String> hashMap = new HashMap<>();
         hashMap.put("ROOT", "No root access is granted.");
         hashMap.put("BUSYBOX", "No busybox is found.");
-        hashMap.put("KALICHROOT", "kali Chroot is not yet installed.");
+        hashMap.put("CHROOT", "Chroot is not yet installed.");
 
         if (CheckForRoot.isRoot()) {
             hashMap.put("ROOT", isOK);
@@ -94,10 +94,10 @@ public class RunAtBootService extends JobIntentService {
         if (exe.RunAsRootReturnValue(NhPaths.APP_SCRIPTS_PATH + "/chrootmgr -c \"status\"") == 0){
             // remove possible vnc locks (if the phone is rebooted with the vnc server running)
             exe.RunAsRootOutput("rm -rf " + NhPaths.CHROOT_PATH() + "/tmp/.X1*");
-            hashMap.put("KALICHROOT", isOK);
+            hashMap.put("CHROOT", isOK);
         }
 
-        String resultMsg = "Boot completed.\nEveryting is fine and Kali Chroot has been started!";
+        String resultMsg = "Boot completed.\nEveryting is fine and Chroot has been started!";
         for(Map.Entry<String, String> entry: hashMap.entrySet()){
             if (!entry.getValue().equals(isOK)){
                 resultMsg = "Make sure the above requirements are met.";
@@ -108,7 +108,7 @@ public class RunAtBootService extends JobIntentService {
         doNotification(
                 "Root: " + hashMap.get("ROOT") + "\n" +
                 "Busybox: " + hashMap.get("BUSYBOX") + "\n" +
-                "Kali Chroot: " + hashMap.get("KALICHROOT") + "\n" +
+                "Chroot: " + hashMap.get("CHROOT") + "\n" +
                 resultMsg);
     }
 

@@ -1,5 +1,6 @@
 package com.offsec.nethunter;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -38,6 +39,8 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import static com.offsec.nethunter.R.id.f_nethunter_action_search;
 
 
 public class NetHunterFragment extends Fragment {
@@ -79,7 +82,8 @@ public class NetHunterFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         NethunterViewModel nethunterViewModel = ViewModelProviders.of(this).get(NethunterViewModel.class);
         nethunterViewModel.init(context);
-        nethunterViewModel.getLiveDataNethunterModelList().observe(this, nethunterModelList -> {
+
+        nethunterViewModel.getLiveDataNethunterModelList().observe(getViewLifecycleOwner(), nethunterModelList -> {
             nethunterRecyclerViewAdapter.notifyDataSetChanged();
         });
 
@@ -101,10 +105,10 @@ public class NetHunterFragment extends Fragment {
     }
 
     @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.nethunter, menu);
-        final MenuItem searchItem = menu.findItem(R.id.f_nethunter_action_search);
+        final MenuItem searchItem = menu.findItem(f_nethunter_action_search);
         final SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setOnSearchClickListener(v -> menu.setGroupVisible(R.id.f_nethunter_menu_group1, false));
         searchView.setOnCloseListener(() -> {
@@ -125,11 +129,11 @@ public class NetHunterFragment extends Fragment {
         });
     }
 
+    @SuppressLint({"NonConstantResourceId", "SetTextI18n"})
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        final ViewGroup nullParent = null;
         final LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        final View promptView = inflater.inflate(R.layout.nethunter_custom_dialog_view, nullParent);
+        final View promptView = inflater.inflate(R.layout.nethunter_custom_dialog_view, null);
         final TextView titleTextView = promptView.findViewById(R.id.f_nethunter_adb_tv_title1);
         final EditText storedpathEditText = promptView.findViewById(R.id.f_nethunter_adb_et_storedpath);
         switch (item.getItemId()) {
@@ -208,11 +212,10 @@ public class NetHunterFragment extends Fragment {
 
     private void onAddItemSetup(){
         addButton.setOnClickListener(v -> {
-            final ViewGroup nullParent = null;
             List<NethunterModel> nethunterModelList = NethunterData.getInstance().nethunterModelListFull;
             if (nethunterModelList == null) return;
             final LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            final View promptViewAdd = mInflater.inflate(R.layout.nethunter_add_dialog_view, nullParent);
+            final View promptViewAdd = mInflater.inflate(R.layout.nethunter_add_dialog_view, null);
             final EditText titleEditText = promptViewAdd.findViewById(R.id.f_nethunter_add_adb_et_title);
             final EditText cmdEditText = promptViewAdd.findViewById(R.id.f_nethunter_add_adb_et_command);
             final EditText delimiterEditText = promptViewAdd.findViewById(R.id.f_nethunter_add_adb_et_delimiter);
@@ -342,11 +345,10 @@ public class NetHunterFragment extends Fragment {
 
     private void onDeleteItemSetup(){
         deleteButton.setOnClickListener(v -> {
-            final ViewGroup nullParent = null;
             List<NethunterModel> nethunterModelList = NethunterData.getInstance().nethunterModelListFull;
             if (nethunterModelList == null) return;
             final LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            final View promptViewDelete = inflater.inflate(R.layout.nethunter_delete_dialog_view, nullParent, false);
+            final View promptViewDelete = inflater.inflate(R.layout.nethunter_delete_dialog_view, null, false);
             final RecyclerView recyclerViewDeleteItem = promptViewDelete.findViewById(R.id.f_nethunter_delete_recyclerview);
             NethunterRecyclerViewAdapterDeleteItems nethunterRecyclerViewAdapterDeleteItems = new NethunterRecyclerViewAdapterDeleteItems(context, nethunterModelList);
             LinearLayoutManager linearLayoutManagerDelete = new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false);
@@ -389,11 +391,10 @@ public class NetHunterFragment extends Fragment {
 
     private void onMoveItemSetup() {
         moveButton.setOnClickListener(v -> {
-            final ViewGroup nullParent = null;
             List<NethunterModel> nethunterModelList = NethunterData.getInstance().nethunterModelListFull;
             if (nethunterModelList == null) return;
             final LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            final View promptViewMove = inflater.inflate(R.layout.nethunter_move_dialog_view, nullParent, false);
+            final View promptViewMove = inflater.inflate(R.layout.nethunter_move_dialog_view, null, false);
             final Spinner titlesBefore = promptViewMove.findViewById(R.id.f_nethunter_move_adb_spr_titlesbefore);
             final Spinner titlesAfter = promptViewMove.findViewById(R.id.f_nethunter_move_adb_spr_titlesafter);
             final Spinner actions = promptViewMove.findViewById(R.id.f_nethunter_move_adb_spr_actions);
