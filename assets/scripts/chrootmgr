@@ -156,7 +156,7 @@ if [ ! $# -eq 0 ]; then
                         exit 2
                     fi
 
-                    bklog "[!] verifying chroot environmnet..."
+                    bklog "[!] verifying chroot environment..."
                     if [ "$($BUSYBOX chroot $MNT /bin/uname -n)" ]; then
                         bklog "[+] seems you have kali chroot installed already!"
                         ## Define chroot shell executable path.
@@ -183,6 +183,16 @@ if [ ! $# -eq 0 ]; then
                                 ISALLREADY=1
                             fi
                         done
+
+                      KERNEL="$(uname -r)"
+                      DIR="/lib/modules/$KERNEL"
+                      if [ -d "$DIR" ]; then
+                          bklog "[+] kernel modules exists and linked."
+                          else
+                          bklog "[-] $i ${DIR} doesn't exist or isn't mounted. ."
+                          exit 1
+                        fi
+
                         if [ $ISALLREADY -eq 0 ]; then
                             bklog "[+] Chroot environment has been set and started."
                             bklog "[!] You may click \"STOP KALI CHROOT\" to shutdown the chroot environment."
@@ -222,7 +232,7 @@ if [ ! $# -eq 0 ]; then
                         bklog "[!] Chroot is already unmounted."
                     fi
                     bklog "[!] Creating chroot backup from \"$TARGET_DIR\" to \"$2\", please be patient until it is finished.."
-                    cd $1/../
+                    cd $1/../ || exit
                     if echo $2 | $BUSYBOX grep -q ".tar.gz$"; then
                         $BUSYBOX tar czf $2 $TARGET_DIR
                         $BUSYBOX sync

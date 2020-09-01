@@ -10,10 +10,10 @@ import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.offsec.nethunter.BuildConfig;
+import androidx.multidex.BuildConfig;
+
 import com.offsec.nethunter.models.CustomCommandsModel;
 import com.offsec.nethunter.utils.NhPaths;
-import com.offsec.nethunter.utils.ShellExecuter;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,28 +21,29 @@ import java.io.FileOutputStream;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 
-import static android.content.Context.MODE_PRIVATE;
-
 public class CustomCommandsSQL extends SQLiteOpenHelper {
     private static CustomCommandsSQL instance;
     private static final String DATABASE_NAME = "CustomCommandsFragment";
     private static final String TAG = "CustomCommandsSQL";
     private static final String TABLE_NAME = DATABASE_NAME;
-    private static ArrayList<String> COLUMNS = new ArrayList<>();
+    private static final ArrayList<String> COLUMNS = new ArrayList<>();
     private static final String[][] customcommandsData = {
-            {"1", "Update Kali Metapackages",
+            {"1", "Enable HID + MTP + ADB for Windows",
+                    "su -c setprop sys.usb.config win,mtp,hid,adb;exit",
+                    "android", "interactive", "0"},
+            {"2", "Update Kali Metapackages",
                     "apt update && apt-get -y upgrade",
                     "kali", "interactive", "0"},
-            {"2", "Launch Wifite",
+            {"3", "Launch Wifite",
                     "wifite",
                     "kali", "interactive", "0"},
-            {"3", "Start wlan0 in monitor mode",
+            {"4", "Start wlan0 in monitor mode",
                     "su -c \"ip link set wlan0 down; echo 4 > /sys/module/wlan/parameters/con_mode;ip link set wlan0 up\";exit",
                     "android", "interactive", "0"},
-            {"4", "Stop wlan0 monitor mode",
+            {"5", "Stop wlan0 monitor mode",
                     "su -c \"ip link set wlan0 down; echo 0 > /sys/module/wlan/parameters/con_mode;ip link set wlan0 up; svc wifi enable\";exit",
                     "android", "interactive", "0"},
-            {"5", "Start wlan1 in monitor mode",
+            {"6", "Start wlan1 in monitor mode",
                     "ip link set wlan1 down && iw wlan1 set monitor control && ip link set wlan1 up;exit",
                     "kali", "interactive", "0"}
     };
@@ -149,12 +150,11 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
         if (originalPosition < targetPosition){
             db.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(0) + " = " + COLUMNS.get(0) + " - 1 WHERE " + COLUMNS.get(0) + " > " +
                     (originalPosition + 1)  + " AND " + COLUMNS.get(0) + " < " + (targetPosition + 2) + ";");
-            db.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(0) + " = " + (targetPosition + 1) + " WHERE " + COLUMNS.get(0) + " = -1;");
         } else {
             db.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(0) + " = " + COLUMNS.get(0) + " + 1 WHERE " + COLUMNS.get(0) + " > " +
                     targetPosition  + " AND " + COLUMNS.get(0) + " < " + (originalPosition + 1) + ";");
-            db.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(0) + " = " + (targetPosition + 1) + " WHERE " + COLUMNS.get(0) + " = -1;");
         }
+        db.execSQL("UPDATE " + TABLE_NAME + " SET " + COLUMNS.get(0) + " = " + (targetPosition + 1) + " WHERE " + COLUMNS.get(0) + " = -1;");
         db.close();
     }
 

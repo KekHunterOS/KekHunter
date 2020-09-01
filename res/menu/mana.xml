@@ -15,4 +15,9 @@
         android:id="@+id/stop_service"
         android:title="@string/stop_mana"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/first_run"
+        android:title="First setup"
+        app:showAsAction="never" />
 </menu>

@@ -1,18 +1,16 @@
 package com.offsec.nethunter;
 
-import android.app.Activity;
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
@@ -21,8 +19,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -40,11 +36,11 @@ import com.offsec.nethunter.utils.CheckForRoot;
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.PermissionCheck;
 import com.offsec.nethunter.utils.SharePrefTag;
-import com.winsontan520.wversionmanager.library.WVersionManager;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Stack;
 
 import androidx.annotation.NonNull;
@@ -63,7 +59,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
 
     public final static String TAG = "AppNavHomeActivity";
     public static final String CHROOT_INSTALLED_TAG = "CHROOT_INSTALLED_TAG";
-    private static final String GPS_BACKGROUND_FRAGMENT_TAG = "BG_FRAGMENT_TAG";
+    public static final String GPS_BACKGROUND_FRAGMENT_TAG = "BG_FRAGMENT_TAG";
     public static final String BOOT_CHANNEL_ID = "BOOT_CHANNEL";
     /**
      * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
@@ -72,7 +68,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     private ActionBarDrawerToggle mDrawerToggle;
     private NavigationView navigationView;
     private CharSequence mTitle = "NetHunter";
-    private Stack<String> titles = new Stack<>();
+    private final Stack<String> titles = new Stack<>();
     private SharedPreferences prefs;
     public static MenuItem lastSelectedMenuItem;
     private boolean locationUpdatesRequested = false;
@@ -85,7 +81,6 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
 
         // Initiate the NhPaths singleton class, and it will then keep living until the app dies.
@@ -94,7 +89,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
 
         // Initiate the PermissionCheck class.
         permissionCheck = new PermissionCheck(this, getApplicationContext());
-        // Register the nethunter receiver with intent actions.
+        // Register the NetHunter receiver with intent actions.
         nethunterReceiver = new NethunterReceiver();
         IntentFilter AppNavHomeIntentFilter = new IntentFilter();
         AppNavHomeIntentFilter.addAction(NethunterReceiver.CHECKCOMPAT);
@@ -120,8 +115,8 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                 // Fetch the busybox path again after the busybox_nh is copied.
                 NhPaths.BUSYBOX = NhPaths.getBusyboxPath();
 
-                // Now Initate all SQL singleton in MainActivity so that it can be less lagged when switching fragments,
-                // because it takes time to retrive data from database.
+                // Now Initiate all SQL singleton in MainActivity so that it can be less lagged when switching fragments,
+                // because it takes time to retrieve data from database.
                 NethunterSQL.getInstance(getApplicationContext());
                 KaliServicesSQL.getInstance(getApplicationContext());
                 CustomCommandsSQL.getInstance(getApplicationContext());
@@ -133,17 +128,17 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                 // After finishing copying app files, we do a compatibility check before allowing user to use it.
                 // First, check if the app has gained the root already.
                 if (!CheckForRoot.isRoot()){
-                    showWarningDialog("Nethunter app cannot be run properly", "Root permission is required!!", true);
+                    showWarningDialog("NetHunter app cannot be run properly", "Root permission is required!!", true);
                 }
 
                 // Secondly, check if busybox is present.
                 if (!CheckForRoot.isBusyboxInstalled()){
-                    showWarningDialog("Nethunter app cannot be run properly", "No busybox is detected, please make sure you have busybox installed!!", true);
+                    showWarningDialog("NetHunter app cannot be run properly", "No busybox is detected, please make sure you have busybox installed!!", true);
                 }
 
-                // Thirdly, check if nethunter terminal app has been installed.
+                // Thirdly, check if NetHunter terminal app has been installed.
                 if (getApplicationContext().getPackageManager().getLaunchIntentForPackage("com.offsec.nhterm") == null) {
-                    showWarningDialog("Nethunter app cannot be run properly", "Nethunter terminal is not installed yet.", true);
+                    showWarningDialog("NetHunter app cannot be run properly", "NetHunter terminal is not installed yet.", true);
                 }
 
                 // Lastly, check if all required permissions are granted, if yes, show the view to user.
@@ -161,14 +156,13 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
-                    mDrawerLayout.closeDrawers();
-                } else {
-                    mDrawerLayout.openDrawer(GravityCompat.START);
-                }
-                return true;
+        if (item.getItemId() == android.R.id.home) {
+            if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+                mDrawerLayout.closeDrawers();
+            } else {
+                mDrawerLayout.openDrawer(GravityCompat.START);
+            }
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -181,10 +175,10 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
             for (int grantResult:grantResults){
                 if (grantResult != 0){
                     if (getApplicationContext().getPackageManager().getLaunchIntentForPackage("com.offsec.nhterm") == null) {
-                        showWarningDialog("Nethunter app cannot be run properly", "Nethunter Terminal is not installed yet, please install from the store!", true);
+                        showWarningDialog("NetHunter app cannot be run properly", "NetHunter Terminal is not installed yet, please install from the store!", true);
                         return;
                     }
-                    showWarningDialog("Nethunter app cannot be run properly", "Please grant all the permission requests from outside the app or restart the app to grant the rest of permissions again.", true);
+                    showWarningDialog("NetHunter app cannot be run properly", "Please grant all the permission requests from outside the app or restart the app to grant the rest of permissions again.", true);
                     return;
                 }
             }
@@ -204,7 +198,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
 
     private LocationUpdateService locationService;
     private boolean updateServiceBound = false;
-    private ServiceConnection locationServiceConnection = new ServiceConnection() {
+    private final ServiceConnection locationServiceConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName className,
@@ -219,7 +213,6 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
 
         }
 
-        @Override
         public void onServiceDisconnected(ComponentName arg0) {
             updateServiceBound = false;
         }
@@ -243,7 +236,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                     if (lastSelectedMenuItem != _current) {
                         //remove last
                         lastSelectedMenuItem.setChecked(false);
-                        // udpate for the next
+                        // update for the next
                         lastSelectedMenuItem = _current;
                     }
                     //set checked
@@ -281,6 +274,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void setRootView(){
 
         setContentView(R.layout.base_layout);
@@ -295,9 +289,8 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         mDrawerLayout = findViewById(R.id.drawer_layout);
 
         navigationView = findViewById(R.id.navigation_view);
-        final ViewGroup nullParent = null;
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        LinearLayout navigationHeadView = (LinearLayout) inflater.inflate(R.layout.sidenav_header, nullParent);
+        @SuppressLint("InflateParams") LinearLayout navigationHeadView = (LinearLayout) inflater.inflate(R.layout.sidenav_header, null);
         navigationView.addHeaderView(navigationHeadView);
 
         FloatingActionButton readmeButton = navigationHeadView.findViewById(R.id.info_fab);
@@ -353,15 +346,6 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         startService(new Intent(getApplicationContext(), CompatCheckService.class));
     }
 
-    private void checkUpdate() {
-        WVersionManager versionManager = new WVersionManager(this);
-        versionManager.setVersionContentUrl("https://images.offensive-security.com/version.txt");
-        versionManager.setUpdateUrl("https://images.offensive-security.com/latest.apk");
-        versionManager.checkVersion();
-        versionManager.setUpdateNowLabel("Update");
-        versionManager.setIgnoreThisVersionLabel("Ignore");
-    }
-
     private void showLicense() {
         // @binkybear here goes the changelog etc... \n\n%s
         String readmeData = String.format("%s\n\n%s\n\n%s",
@@ -382,10 +366,11 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
             ad.getWindow().getAttributes().windowAnimations = R.style.DialogStyle;
         }
         ad.show();
-        ((TextView)ad.findViewById(android.R.id.message)).setMovementMethod(LinkMovementMethod.getInstance());
+        ((TextView) Objects.requireNonNull(ad.findViewById(android.R.id.message))).setMovementMethod(LinkMovementMethod.getInstance());
 
     }
 
+    @SuppressLint("NonConstantResourceId")
     private void setupDrawerContent(NavigationView navigationView) {
         navigationView.setNavigationItemSelectedListener(
                 menuItem -> {
@@ -462,7 +447,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                             break;
                         case R.id.vnc_item:
                             if (getApplicationContext().getPackageManager().getLaunchIntentForPackage("com.offsec.nethunter.kex") == null) {
-                                showWarningDialog("", "Nethunter KeX is not installed yet, please install from the store!", false);
+                                showWarningDialog("", "NetHunter KeX is not installed yet, please install from the store!", false);
                             } else {
                                     changeFragment(fragmentManager, VNCFragment.newInstance(itemId));
                             }
@@ -563,7 +548,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
             if (intent.getAction() != null) {
                 switch (intent.getAction()) {
                     case CHECKCOMPAT:
-                        showWarningDialog("Nethunter app cannot be run properly",
+                        showWarningDialog("NetHunter app cannot be run properly",
                             intent.getStringExtra("message"),
                             true);
                         break;

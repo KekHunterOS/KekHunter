@@ -1,17 +1,15 @@
 package com.offsec.nethunter;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.AttributeSet;
 import android.view.View;
 import android.widget.EditText;
 
 import com.offsec.nethunter.utils.NhPaths;
 import com.offsec.nethunter.utils.ShellExecuter;
 
-import java.util.ConcurrentModificationException;
 import java.util.Locale;
 
 import androidx.appcompat.app.ActionBar;
@@ -22,6 +20,7 @@ public class DeAuthWhitelistActivity extends AppCompatActivity {
     private Activity activity;
     private final ShellExecuter exe = new ShellExecuter();
 
+    @SuppressLint("SdCardPath")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,7 +45,7 @@ public class DeAuthWhitelistActivity extends AppCompatActivity {
     public void updatewhitelist(View view) {
         EditText source = findViewById(R.id.deauth_modify);
         String newSource = source.getText().toString();
-        Boolean isSaved = exe.SaveFileContents(newSource, "/sdcard/nh_files/deauth/whitelist.txt");
+        @SuppressLint("SdCardPath") boolean isSaved = exe.SaveFileContents(newSource, "/sdcard/nh_files/deauth/whitelist.txt");
         if (isSaved) {
             NhPaths.showMessage(activity,"Source updated");
         } else {
