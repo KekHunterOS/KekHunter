@@ -1,4 +1,6 @@
 GUI r
 DELAY 500
-STRING iexplore -k http://fakeupdate.net/win10u/index.html
+STRING iexplore -k https://fakeupdate.net/win10ue/
+REM you can do it with edge but you will get a notification to press F11 to exit the full screen
+REM msegde --start-fullscreen https://fakeupdate.net/win10ue/
 ENTER
