@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -52,6 +53,10 @@ public class KaliGpsServiceFragment extends Fragment implements KaliGPSUpdates.R
                 gpsProvider.onLocationUpdatesRequested(KaliGpsServiceFragment.this);
                 gpsTextView.append("Starting gps updates \n");
             }
+        }, rootView);
+
+        addClickListener(R.id.start_kismet_no_gpsd, v -> {
+            startKismet();
         }, rootView);
 
         addClickListener(R.id.gps_stop, v -> {
