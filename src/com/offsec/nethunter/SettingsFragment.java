@@ -263,7 +263,7 @@ public class SettingsFragment extends Fragment {
                         Toast.makeText(getActivity().getApplicationContext(), "Bootanimation zip is not created!!", Toast.LENGTH_SHORT).show();
                     else {
                         intentClickListener_NHSU("echo -ne \"\\033]0;Installing animation\\007\" && clear;if [ \"$(getprop ro.build.system_root_image)\" == \"true\" ]; then export SYSTEM=/; else export SYSTEM=/system; " +
-                                "fi && mount -o rw,remount $SYSTEM && cp " + nh.SD_PATH + "/bootanimation.zip " + bootanimation_path +
+                                "fi && mount -o rw,remount $SYSTEM && cp " + nh.SD_PATH + "/bootanimation.zip " + BootanimationPath.getText().toString() + " " +
                                 "&& echo \"Done. Please reboot to check the result! Exiting in 3secs..\" && sleep 3 && exit");
                     }
         });
