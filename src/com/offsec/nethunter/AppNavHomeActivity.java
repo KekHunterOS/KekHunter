@@ -279,7 +279,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
 
         setContentView(R.layout.base_layout);
 
-        //set kali wallpaper as background
+        //set boot_kali wallpaper as background
         ActionBar ab = getSupportActionBar();
         if (ab != null) {
             ab.setHomeButtonEnabled(true);
@@ -463,6 +463,9 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                             break;
                         case R.id.gps_item:
                             changeFragment(fragmentManager, KaliGpsServiceFragment.newInstance(itemId));
+                            break;
+                        case R.id.settings_item:
+                            changeFragment(fragmentManager, SettingsFragment.newInstance(itemId));
                             break;
                     }
                     restoreActionBar();
