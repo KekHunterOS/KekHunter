@@ -80,5 +80,9 @@
             android:id="@+id/deauth_item"
             android:icon="@drawable/ic_action_network_wifi"
             android:title="@string/drawertitledeauth" />
+        <item
+            android:id="@+id/settings_item"
+            android:icon="@drawable/ic_action_settings_applications"
+            android:title="@string/drawertitlesettings" />
      </group>
 </menu>
