@@ -155,7 +155,7 @@ public class SettingsFragment extends Fragment {
                 } else if (selected_animation.equals("ctOS")){
                     String path = ("android.resource://" + context.getPackageName() + "/" + R.raw.boot_ctos);
                     videoview.setVideoURI(Uri.parse(path));
-                    animation_dir[0] = "src_kali";
+                    animation_dir[0] = "src_ctos";
                     bootanimation_start();
                 }
             }
