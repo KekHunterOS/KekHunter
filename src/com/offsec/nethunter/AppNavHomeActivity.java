@@ -307,8 +307,8 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         final String buildTime = sdf.format(BuildConfig.BUILD_TIME);
         TextView buildInfo1 = navigationHeadView.findViewById(R.id.buildinfo1);
         TextView buildInfo2 = navigationHeadView.findViewById(R.id.buildinfo2);
-        buildInfo1.setText(String.format("Version: %s (%s)", BuildConfig.VERSION_NAME, Build.TAGS));
-        buildInfo2.setText(String.format("Built by %s at %s", BuildConfig.BUILD_NAME, buildTime));
+        buildInfo1.setText(String.format("Version: %s", BuildConfig.VERSION_NAME, Build.TAGS));
+        buildInfo2.setText(String.format("Made for kekhunter", BuildConfig.BUILD_NAME, buildTime));
 
         if (navigationView != null) {
             setupDrawerContent(navigationView);
