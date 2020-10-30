@@ -187,10 +187,9 @@ if [ ! $# -eq 0 ]; then
                       KERNEL="$(uname -r)"
                       DIR="/lib/modules/$KERNEL"
                       if [ -d "$DIR" ]; then
-                          bklog "[+] kernel modules exists and linked."
+                          DIR="/system/lib/modules"
                           else
-                          bklog "[-] $i ${DIR} doesn't exist or isn't mounted. ."
-                          exit 1
+                          DIR="/vendor/lib/modules"
                         fi
 
                         if [ $ISALLREADY -eq 0 ]; then
