@@ -96,7 +96,7 @@
         android:layout_marginStart="4dp"
         android:layout_marginTop="4dp"
         android:layout_marginEnd="4dp"
-        android:alpha="100"
+        android:alpha="0.60"
         android:background="@android:color/black"
         android:gravity="bottom"
         android:scrollbars="vertical"
