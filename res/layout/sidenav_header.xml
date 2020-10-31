@@ -2,7 +2,7 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="170dp"
+    android:layout_height="150dp"
     android:background="@color/primary_dark_material_dark"
     android:orientation="vertical"
     android:weightSum="1">
@@ -38,7 +38,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="56dp"
+        android:layout_height="38dp"
         android:clickable="false"
         android:focusableInTouchMode="false"
         android:orientation="vertical">
@@ -48,9 +48,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal|center"
-            android:gravity="center"
+            android:gravity="left"
             android:paddingTop="4dp"
-            android:textColor="@android:color/white"
             android:textSize="12sp" />
 
         <TextView
@@ -58,9 +57,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal|center"
-            android:gravity="center"
+            android:gravity="left"
             android:paddingBottom="4dp"
-            android:textColor="@android:color/white"
             android:textSize="12sp" />
 
     </LinearLayout>

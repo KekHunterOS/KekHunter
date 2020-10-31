@@ -222,7 +222,10 @@ else
 	# Usage:	bootkali start_gpsd <listen port>
 
 	if [ "$1" == "start_gpsd" ]; then
-		$BUSYBOX chroot $MNT sudo /usr/sbin/gpsd -n tcp://127.0.0.1:$2
+		# clear out any that are already running
+		killall gpsd;
+		sleep 1;
+		$BUSYBOX chroot $MNT sudo /usr/sbin/gpsd -n udp://127.0.0.1:$2
 	fi
 
 

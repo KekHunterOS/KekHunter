@@ -32,7 +32,7 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
                     "su -c setprop sys.usb.config win,mtp,hid,adb;exit",
                     "android", "interactive", "0"},
             {"2", "Update Kali Metapackages",
-                    "apt update && apt-get -y upgrade",
+                    "apt update && apt-get -y full-upgrade",
                     "kali", "interactive", "0"},
             {"3", "Launch Wifite",
                     "wifite",
@@ -41,10 +41,13 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
                     "su -c \"ip link set wlan0 down; echo 4 > /sys/module/wlan/parameters/con_mode;ip link set wlan0 up\";exit",
                     "android", "interactive", "0"},
             {"5", "Stop wlan0 monitor mode",
-                    "su -c \"ip link set wlan0 down; echo 0 > /sys/module/wlan/parameters/con_mode;ip link set wlan0 up; svc wifi enable\";exit",
+                    "su -c \"ifconfig wlan0 down; echo 0 > /sys/module/wlan/parameters/con_mode; ip link set wlan0 up; svc wifi enable\"; exit",
                     "android", "interactive", "0"},
             {"6", "Start wlan1 in monitor mode",
                     "ip link set wlan1 down && iw wlan1 set monitor control && ip link set wlan1 up;exit",
+                    "kali", "interactive", "0"},
+            {"7", "Start wlan2 in monitor mode",
+                    "ip link set wlan2 down && iw wlan2 set monitor control && ip link set wlan2 up;exit",
                     "kali", "interactive", "0"}
     };
 

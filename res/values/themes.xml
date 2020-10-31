@@ -7,6 +7,10 @@
         <item name="colorPrimaryDark">@color/material_blue_grey_950</item>
         <item name="colorAccent">@color/colorPrimary</item>
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
+        <item name="colorButtonNormal">#1C1C1C</item>
+        <item name="android:textColorLink">#92AAE8</item>
+        <item name="android:textColor">#E5E8ED</item>
+        <item name="colorBackgroundFloating">#1C1C1C</item>
 
         <item name="android:windowShowWallpaper">true</item>
         <item name="android:windowBackground">@color/colorBackground</item>

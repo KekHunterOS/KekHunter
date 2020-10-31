@@ -77,10 +77,12 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     private PermissionCheck permissionCheck;
     private BroadcastReceiver nethunterReceiver;
     public static Boolean isBackPressEnabled = true;
+    private int desiredFragment = -1;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
 
         // Initiate the NhPaths singleton class, and it will then keep living until the app dies.
@@ -148,6 +150,13 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
             }
         });
         copyBootFilesAsyncTask.execute();
+
+        int menuFragment = getIntent().getIntExtra("menuFragment", -1);
+        if(menuFragment != -1) {
+            Log.d(TAG, "menuFragment = " + menuFragment);
+            desiredFragment = menuFragment;
+        }
+
     }
 
 
@@ -189,11 +198,30 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     }
 
     @Override
+    public boolean onReceiverReattach(KaliGPSUpdates.Receiver receiver) {
+        Log.d(TAG, "onReceiverReattach");
+        if(LocationUpdateService.isInstanceCreated()) {
+            // there is already a service running, we should re-attach to it
+            this.locationUpdateReceiver = receiver;
+            Log.d(TAG, "locationService: " + !(locationService == null));
+            if (locationService != null) {
+                locationService.requestUpdates(locationUpdateReceiver);
+                return true; // reattached
+            } else { // the app was probably re-launched.  the service is running but we've not bound it
+                onLocationUpdatesRequested(receiver);
+                return true;
+            }
+        }
+            return false; // nothing to reattach to
+    }
+
+    @Override
     public void onLocationUpdatesRequested(KaliGPSUpdates.Receiver receiver) {
         locationUpdatesRequested = true;
         this.locationUpdateReceiver = receiver;
         Intent intent = new Intent(getApplicationContext(), LocationUpdateService.class);
         bindService(intent, locationServiceConnection, Context.BIND_AUTO_CREATE);
+
     }
 
     private LocationUpdateService locationService;
@@ -235,7 +263,8 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                     MenuItem _current = menuNav.getItem(i);
                     if (lastSelectedMenuItem != _current) {
                         //remove last
-                        lastSelectedMenuItem.setChecked(false);
+                        if(lastSelectedMenuItem != null)
+                            lastSelectedMenuItem.setChecked(false);
                         // update for the next
                         lastSelectedMenuItem = _current;
                     }
@@ -251,8 +280,15 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
 
     @Override
     public void onStopRequested() {
+        locationUpdatesRequested = false;
         if (locationService != null) {
             locationService.stopUpdates();
+            locationService = null;
+        }
+        if(updateServiceBound) {
+            updateServiceBound = false;
+            unbindService(locationServiceConnection);
+
         }
     }
 
@@ -308,7 +344,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         TextView buildInfo1 = navigationHeadView.findViewById(R.id.buildinfo1);
         TextView buildInfo2 = navigationHeadView.findViewById(R.id.buildinfo2);
         buildInfo1.setText(String.format("Version: %s", BuildConfig.VERSION_NAME, Build.TAGS));
-        buildInfo2.setText(String.format("Made for kekhunter", BuildConfig.BUILD_NAME, buildTime));
+        buildInfo2.setText(String.format("Developer preview only!!", BuildConfig.BUILD_NAME, buildTime));
 
         if (navigationView != null) {
             setupDrawerContent(navigationView);
@@ -344,6 +380,11 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
         startService(new Intent(getApplicationContext(), CompatCheckService.class));
+
+        if(desiredFragment != -1) {
+            changeDrawer(desiredFragment);
+            desiredFragment = -1;
+        }
     }
 
     private void showLicense() {
@@ -377,7 +418,8 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                     // only change it if is not the same as the last one
                     if (lastSelectedMenuItem != menuItem) {
                         //remove last
-                        lastSelectedMenuItem.setChecked(false);
+                        if(lastSelectedMenuItem != null)
+                            lastSelectedMenuItem.setChecked(false);
                         // update for the next
                         lastSelectedMenuItem = menuItem;
                     }
@@ -387,12 +429,21 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                     mTitle = menuItem.getTitle();
                     titles.push(mTitle.toString());
 
-                    FragmentManager fragmentManager = getSupportFragmentManager();
                     int itemId = menuItem.getItemId();
-                    switch (itemId) {
-                        case R.id.nethunter_item:
-                            changeFragment(fragmentManager, NetHunterFragment.newInstance(itemId));
-                            break;
+
+                    changeDrawer(itemId);
+                    restoreActionBar();
+                    return true;
+                });
+    }
+
+    private void changeDrawer(int itemId) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        switch (itemId) {
+            case R.id.nethunter_item:
+                changeFragment(fragmentManager, NetHunterFragment.newInstance(itemId));
+                break;
+
                         /*
                         case R.id.kalilauncher_item:
                             fragmentManager
@@ -402,75 +453,70 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                                     .commit();
                             break;
                         */
-                        case R.id.deauth_item:
-                            changeFragment(fragmentManager, DeAuthFragment.newInstance(itemId));
-                            break;
-                        case R.id.kaliservices_item:
-                            changeFragment(fragmentManager, KaliServicesFragment.newInstance(itemId));
-                            break;
-                        case R.id.custom_commands_item:
-                            changeFragment(fragmentManager, CustomCommandsFragment.newInstance(itemId));
-                            break;
-                        case R.id.hid_item:
-                            changeFragment(fragmentManager, HidFragment.newInstance(itemId));
-                            break;
-                        case R.id.duckhunter_item:
-                            changeFragment(fragmentManager, DuckHunterFragment.newInstance(itemId));
-                            break;
-                        case R.id.usbarmory_item:
-                            if (new File("/config/usb_gadget/g1").exists()) {
-                                changeFragment(fragmentManager, USBArmoryFragment.newInstance(itemId));
-                            } else {
-                                showWarningDialog("", "Your kernel does not support USB ConfigFS!", false);
-                            }
-                            break;
-                        case R.id.badusb_item:
-                            changeFragment(fragmentManager, BadusbFragment.newInstance(itemId));
-                            break;
-                        case R.id.mana_item:
-                            changeFragment(fragmentManager, ManaFragment.newInstance(itemId));
-                            break;
-                        case R.id.bt_item:
-                            changeFragment(fragmentManager, BTFragment.newInstance(itemId));
-                            break;
-                        case R.id.macchanger_item:
-                            changeFragment(fragmentManager, MacchangerFragment.newInstance(itemId));
-                            break;
-                        case R.id.createchroot_item:
-                            changeFragment(fragmentManager, ChrootManagerFragment.newInstance(itemId));
-                            break;
-                        case R.id.mpc_item:
-                            changeFragment(fragmentManager, MPCFragment.newInstance(itemId));
-                            break;
-                        case R.id.mitmf_item:
-                            changeFragment(fragmentManager, MITMfFragment.newInstance(itemId));
-                            break;
-                        case R.id.vnc_item:
-                            if (getApplicationContext().getPackageManager().getLaunchIntentForPackage("com.offsec.nethunter.kex") == null) {
-                                showWarningDialog("", "NetHunter KeX is not installed yet, please install from the store!", false);
-                            } else {
-                                    changeFragment(fragmentManager, VNCFragment.newInstance(itemId));
-                            }
-                            break;
-                        case R.id.searchsploit_item:
-                            changeFragment(fragmentManager, SearchSploitFragment.newInstance(itemId));
-                            break;
-                        case R.id.nmap_item:
-                            changeFragment(fragmentManager, NmapFragment.newInstance(itemId));
-                            break;
-                        case R.id.pineapple_item:
-                            changeFragment(fragmentManager, PineappleFragment.newInstance(itemId));
-                            break;
-                        case R.id.gps_item:
-                            changeFragment(fragmentManager, KaliGpsServiceFragment.newInstance(itemId));
-                            break;
-                        case R.id.settings_item:
-                            changeFragment(fragmentManager, SettingsFragment.newInstance(itemId));
-                            break;
-                    }
-                    restoreActionBar();
-                    return true;
-                });
+            case R.id.deauth_item:
+                changeFragment(fragmentManager, DeAuthFragment.newInstance(itemId));
+                break;
+            case R.id.kaliservices_item:
+                changeFragment(fragmentManager, KaliServicesFragment.newInstance(itemId));
+                break;
+            case R.id.custom_commands_item:
+                changeFragment(fragmentManager, CustomCommandsFragment.newInstance(itemId));
+                break;
+            case R.id.hid_item:
+                changeFragment(fragmentManager, HidFragment.newInstance(itemId));
+                break;
+            case R.id.duckhunter_item:
+                changeFragment(fragmentManager, DuckHunterFragment.newInstance(itemId));
+                break;
+            case R.id.usbarmory_item:
+                if (new File("/config/usb_gadget/g1").exists()) {
+                    changeFragment(fragmentManager, USBArmoryFragment.newInstance(itemId));
+                } else {
+                    showWarningDialog("", "Your kernel does not support USB ConfigFS!", false);
+                }
+                break;
+            case R.id.badusb_item:
+                changeFragment(fragmentManager, BadusbFragment.newInstance(itemId));
+                break;
+            case R.id.mana_item:
+                changeFragment(fragmentManager, ManaFragment.newInstance(itemId));
+                break;
+            case R.id.bt_item:
+                changeFragment(fragmentManager, BTFragment.newInstance(itemId));
+                break;
+            case R.id.macchanger_item:
+                changeFragment(fragmentManager, MacchangerFragment.newInstance(itemId));
+                break;
+            case R.id.createchroot_item:
+                changeFragment(fragmentManager, ChrootManagerFragment.newInstance(itemId));
+                break;
+            case R.id.mpc_item:
+                changeFragment(fragmentManager, MPCFragment.newInstance(itemId));
+                break;
+            case R.id.mitmf_item:
+                changeFragment(fragmentManager, MITMfFragment.newInstance(itemId));
+                break;
+            case R.id.vnc_item:
+                if (getApplicationContext().getPackageManager().getLaunchIntentForPackage("com.offsec.nethunter.kex") == null) {
+                    showWarningDialog("", "Nethunter KeX is not installed yet, please install from the store!", false);
+                } else {
+                    changeFragment(fragmentManager, VNCFragment.newInstance(itemId));
+                }
+                break;
+            case R.id.searchsploit_item:
+                changeFragment(fragmentManager, SearchSploitFragment.newInstance(itemId));
+                break;
+            case R.id.nmap_item:
+                changeFragment(fragmentManager, NmapFragment.newInstance(itemId));
+                break;
+            case R.id.pineapple_item:
+                changeFragment(fragmentManager, PineappleFragment.newInstance(itemId));
+                break;
+            case R.id.gps_item:
+                changeFragment(fragmentManager, KaliGpsServiceFragment.newInstance(itemId));
+                break;
+        }
+
     }
 
     public void restoreActionBar() {
