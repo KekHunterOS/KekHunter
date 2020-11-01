@@ -5,7 +5,7 @@
         <!-- customize the color palette -->
         <item name="colorPrimary">#AE1E1E1E</item>
         <item name="colorPrimaryDark">@color/material_blue_grey_950</item>
-        <item name="colorAccent">@color/colorPrimary</item>
+        <item name="colorAccent">#B5B5B5</item>
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
         <item name="colorButtonNormal">#1C1C1C</item>
         <item name="android:textColorLink">#92AAE8</item>

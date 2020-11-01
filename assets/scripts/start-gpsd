@@ -1,3 +1,4 @@
-#!/system/bin/sh
-
-chroot /data/local/nhsystem/kali-armhf /bin/bash -c "gpsd -n udp://127.0.0.1:10110"
+unset LD_PRELOAD
+chroot /data/local/nhsystem/kali-armhf /bin/bash -c "chmod 777 /dev/null"
+chroot /data/local/nhsystem/kali-armhf /bin/bash -c "/etc/init.d/dbus start"
+sleep 5

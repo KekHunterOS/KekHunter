@@ -13,7 +13,7 @@
         <item name="android:textAppearance">@style/TextAppearance.AppCompat.Body1</item>
         <item name="android:textColor">@color/clearTitle</item>
 
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorAccent">@color/colorPrimary</item>
         <item name="android:windowShowWallpaper">true</item>
         <item name="android:windowBackground">@color/colorBackground</item>
     </style>

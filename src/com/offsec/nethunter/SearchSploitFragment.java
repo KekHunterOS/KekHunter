@@ -392,7 +392,7 @@ class ExploitLoader extends BaseAdapter {
         vH.viewSource.setOnClickListener(v -> {
             Intent i = new Intent(_mContext, EditSourceActivity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            i.putExtra("path", "/data/local/nhsystem/kali-armhf/usr/share/exploitdb/" + _file);
+            i.putExtra("path", "/data/local/nhsystem/kalifs/usr/share/exploitdb/" + _file);
             _mContext.startActivity(i);
 
         });

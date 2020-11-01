@@ -82,14 +82,6 @@
             <CheckBox
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/mitmf_filepwn"
-                android:id="@+id/mitmf_filepwn"
-                android:paddingTop="5dp"
-                android:paddingBottom="5dp" />
-
-            <CheckBox
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:text="@string/mitmf_smbauth"
                 android:id="@+id/mitmf_smb"
                 android:paddingTop="5dp"

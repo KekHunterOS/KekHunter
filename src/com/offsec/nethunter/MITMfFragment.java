@@ -266,7 +266,6 @@ public class MITMfFragment extends Fragment {
                     .append(generalBinding.mitmfJskey.isChecked() ? " --jskeylogger" : "")
                     .append(generalBinding.mitmfFerretng.isChecked() ? " --ferretng" : "")
                     .append(generalBinding.mitmfBrowserprofile.isChecked() ? " --browserprofiler" : "")
-                    .append(generalBinding.mitmfFilepwn.isChecked() ? " --filepwn" : "")
                     .append(generalBinding.mitmfSmb.isChecked() ? " --smbauth" : "")
                     .append(generalBinding.mitmfSmbTrap.isChecked() ? " --smbtrap" : "")
                     .append(generalBinding.mitmfSslstrip.isChecked() ? " --hsts" : "")

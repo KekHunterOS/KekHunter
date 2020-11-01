@@ -47,7 +47,7 @@ public class ChrootManagerFragment extends Fragment {
 
     public static final String TAG = "ChrootManager";
     private static final String ARG_SECTION_NUMBER = "section_number";
-    private static final String IMAGE_SERVER = "images.kali.org";
+    private static final String IMAGE_SERVER = "https://github.com/Team-420/Chroot/releases/download/0.1";
     private static String ARCH = "";
     private static String MINORFULL = "";
     private TextView mountStatsTextView;
@@ -295,7 +295,7 @@ public class ChrootManagerFragment extends Fragment {
                         sharedPreferences.edit().putString(SharePrefTag.CHROOT_DEFAULT_STORE_DOWNLOAD_SHAREPREF_TAG, downloadDir.getAbsolutePath()).apply();
                         if (archSpinner.getSelectedItemPosition() == 0) {
                             ARCH = "arm64";
-                        } else ARCH = "armhf";
+                        }
                         if (minorfullSpinner.getSelectedItemPosition() == 0){
                             MINORFULL = "full";
                         } else MINORFULL = "minimal";
