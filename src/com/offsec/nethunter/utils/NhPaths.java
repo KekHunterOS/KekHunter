@@ -36,6 +36,7 @@ public class NhPaths implements SharedPreferences.OnSharedPreferenceChangeListen
     public static String APP_SD_FILES_IMG_PATH;
     public static String BUSYBOX;
     public static String MAGISK_DB_PATH;
+    public static int GPS_PORT;
 
     private NhPaths(Context context) {
         sharedPreferences = context.getApplicationContext().getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
@@ -59,6 +60,9 @@ public class NhPaths implements SharedPreferences.OnSharedPreferenceChangeListen
         CHROOT_SYMLINK_PATH             = NH_SYSTEM_PATH + "/kalifs";
         BUSYBOX                         = getBusyboxPath();
         MAGISK_DB_PATH                  = "/data/adb/magisk.db";
+
+        // This isn't really a path, but this is a convenient place to stick a config variable...
+        GPS_PORT                       = 10110;
     }
 
     public synchronized static NhPaths getInstance(Context context) {

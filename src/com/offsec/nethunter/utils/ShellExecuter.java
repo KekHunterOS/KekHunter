@@ -25,7 +25,7 @@ import java.util.Locale;
 public class ShellExecuter {
 
     private SimpleDateFormat timeStamp = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
-    private final static String TAG = "ShellExecutor";
+    private final static String TAG = "ShellExecuter";
 
     public ShellExecuter() {
 

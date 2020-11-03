@@ -11,6 +11,8 @@ public interface KaliGPSUpdates {
     interface Provider {
         void onLocationUpdatesRequested(Receiver receiver);
 
+        boolean onReceiverReattach(Receiver receiver);
+
         void onStopRequested();
     }
 

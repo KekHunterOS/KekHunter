@@ -77,10 +77,11 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     private PermissionCheck permissionCheck;
     private BroadcastReceiver nethunterReceiver;
     public static Boolean isBackPressEnabled = true;
-
+    private int desiredFragment = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+	Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
 
         // Initiate the NhPaths singleton class, and it will then keep living until the app dies.
@@ -148,6 +149,12 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
             }
         });
         copyBootFilesAsyncTask.execute();
+
+        int menuFragment = getIntent().getIntExtra("menuFragment", -1);
+        if(menuFragment != -1) {
+            Log.d(TAG, "menuFragment = " + menuFragment);
+            desiredFragment = menuFragment;
+        }
     }
 
 
@@ -186,6 +193,25 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                 setRootView();
             }
         }
+    }
+
+    @Override
+    public boolean onReceiverReattach(KaliGPSUpdates.Receiver receiver) {
+        Log.d(TAG, "onReceiverReattach");
+        if(LocationUpdateService.isInstanceCreated()) {
+            // there is already a service running, we should re-attach to it
+            this.locationUpdateReceiver = receiver;
+            Log.d(TAG, "locationService: " + !(locationService==null));
+            if(locationService != null) {
+                locationService.requestUpdates(locationUpdateReceiver);
+                return true; // reattached
+            }
+            else { // the app was probably re-launched.  the service is running but we've not bound it
+                onLocationUpdatesRequested(receiver);
+                return true;
+            }
+        }
+        return false; // nothing to reattach to
     }
 
     @Override
@@ -251,8 +277,14 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
 
     @Override
     public void onStopRequested() {
+        locationUpdatesRequested = false;
         if (locationService != null) {
             locationService.stopUpdates();
+            locationService = null;
+        }
+        if(updateServiceBound) {
+            updateServiceBound = false;
+            unbindService(locationServiceConnection);
         }
     }
 
@@ -276,7 +308,6 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
 
     @SuppressLint("ClickableViewAccessibility")
     private void setRootView(){
-
         setContentView(R.layout.base_layout);
 
         //set boot_kali wallpaper as background
@@ -344,6 +375,11 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         mDrawerLayout.setDrawerListener(mDrawerToggle);
         mDrawerToggle.syncState();
         startService(new Intent(getApplicationContext(), CompatCheckService.class));
+
+        if(desiredFragment != -1) {
+            changeDrawer(desiredFragment);
+            desiredFragment = -1;
+        }
     }
 
     private void showLicense() {
@@ -377,7 +413,8 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                     // only change it if is not the same as the last one
                     if (lastSelectedMenuItem != menuItem) {
                         //remove last
-                        lastSelectedMenuItem.setChecked(false);
+                        if(lastSelectedMenuItem != null)
+                            lastSelectedMenuItem.setChecked(false);
                         // update for the next
                         lastSelectedMenuItem = menuItem;
                     }
@@ -387,12 +424,19 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                     mTitle = menuItem.getTitle();
                     titles.push(mTitle.toString());
 
-                    FragmentManager fragmentManager = getSupportFragmentManager();
                     int itemId = menuItem.getItemId();
-                    switch (itemId) {
-                        case R.id.nethunter_item:
-                            changeFragment(fragmentManager, NetHunterFragment.newInstance(itemId));
-                            break;
+                    changeDrawer(itemId);
+                    restoreActionBar();
+                    return true;
+                });
+    }
+
+    private void changeDrawer(int itemId) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        switch (itemId) {
+            case R.id.nethunter_item:
+                changeFragment(fragmentManager, NetHunterFragment.newInstance(itemId));
+                break;
                         /*
                         case R.id.kalilauncher_item:
                             fragmentManager
@@ -468,9 +512,6 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                             changeFragment(fragmentManager, SettingsFragment.newInstance(itemId));
                             break;
                     }
-                    restoreActionBar();
-                    return true;
-                });
     }
 
     public void restoreActionBar() {
