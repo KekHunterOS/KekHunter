@@ -78,6 +78,7 @@ public class DuckHunterFragment extends Fragment {
         map.put("Danish", "dk");
         map.put("German", "de");
         map.put("Candian", "ca");
+        map.put("Canadian Multilingual Standard", "cm");
         map.put("Brazil", "br");
         map.put("Belgian", "be");
         map.put("Hungarian", "hu");
