@@ -10,16 +10,16 @@
             android:id="@+id/createchroot_item"
             android:icon="@drawable/ic_action_android"
             android:title="@string/drawertitlecreatechroot" />
-        <item
-            android:id="@+id/usbarmory_item"
-            android:icon="@drawable/ic_action_keyboard"
-            android:title="@string/drawertitleusbarmory" />
+    </group>
+    <group android:id="@+id/chrootDependentGroup">
         <item
             android:id="@+id/settings_item"
             android:icon="@drawable/ic_action_settings_applications"
             android:title="@string/drawertitlesettings" />
-    </group>
-    <group android:id="@+id/chrootDependentGroup">
+        <item
+            android:id="@+id/usbarmory_item"
+            android:icon="@drawable/ic_action_keyboard"
+            android:title="@string/drawertitleusbarmory" />
          <item
              android:id="@+id/kaliservices_item"
              android:icon="@drawable/ic_action_settings_applications"

@@ -5,7 +5,7 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.2'
+        classpath 'com.android.tools.build:gradle:4.1.0'
     }
 }
 
@@ -23,10 +23,10 @@ dependencies {
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
-    implementation 'com.google.android.material:material:1.3.0-alpha02'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'com.google.android.material:material:1.3.0-alpha03'
     implementation 'org.thoughtcrime.ssl.pinning:AndroidPinning:1.0.0'
-    implementation 'com.google.android.gms:play-services-location:17.0.0'
+    implementation 'com.google.android.gms:play-services-location:17.1.0'
     implementation 'joda-time:joda-time:2.10.6'
     implementation 'com.google.guava:guava:29.0-jre'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
@@ -53,7 +53,7 @@ android {
         targetSdkVersion 29
         //noinspection HighAppVersionCode
         versionCode 1
-        versionName "DEV-PRE"
+        versionName "0.0.1"
         multiDexEnabled true
     }
 
@@ -75,21 +75,6 @@ android {
             storeFile file("${System.properties['user.home']}" + "/.android/debug.keystore")
         }
 
-        /* note:  To build a signed version of NetHunter:
-        1. Put your keystore in ~/.android/release-keystore and set up a key "NetHunter"
-        2. set KEYSTORE_PASSWORD and KEY_PASSWORD environment variables before running gradle.  this
-           can be done easily by adding them to .bashrc
-        (or change the below values, hard-coding or whatever...)
-        3. Don't forget to create a proguard.cfg file.  You can find a sample one in the sdk or
-           point to it directly.
-        release {
-            storePassword System.getenv("KEYSTORE_PASSWORD")
-            storeFile file("${System.properties['user.home']}" +  "/.android/release.keystore")
-            keyAlias "NetHunter"
-            keyPassword System.getenv("KEY_PASSWORD")
-
-        }
-       */ 
     }
 
     buildTypes {

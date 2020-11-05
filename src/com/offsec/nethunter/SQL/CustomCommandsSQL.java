@@ -28,27 +28,41 @@ public class CustomCommandsSQL extends SQLiteOpenHelper {
     private static final String TABLE_NAME = DATABASE_NAME;
     private static final ArrayList<String> COLUMNS = new ArrayList<>();
     private static final String[][] customcommandsData = {
-            {"1", "Enable HID + MTP + ADB for Windows",
-                    "su -c setprop sys.usb.config win,mtp,hid,adb;exit",
-                    "android", "interactive", "0"},
-            {"2", "Update Kali Metapackages",
+            {"1", "Update Kali Metapackages",
                     "apt update && apt-get -y full-upgrade",
                     "kali", "interactive", "0"},
-            {"3", "Launch Wifite",
+            {"2", "Launch Wifite",
                     "wifite",
                     "kali", "interactive", "0"},
-            {"4", "Start wlan0 in monitor mode",
+            {"3", "Start wlan0 in monitor mode",
                     "su -c \"ip link set wlan0 down; echo 4 > /sys/module/wlan/parameters/con_mode;ip link set wlan0 up\";exit",
                     "android", "interactive", "0"},
-            {"5", "Stop wlan0 monitor mode",
+            {"4", "Stop wlan0 monitor mode",
                     "su -c \"ifconfig wlan0 down; echo 0 > /sys/module/wlan/parameters/con_mode; ip link set wlan0 up; svc wifi enable\"; exit",
                     "android", "interactive", "0"},
-            {"6", "Start wlan1 in monitor mode",
+            {"5", "Start wlan1 in monitor mode",
                     "ip link set wlan1 down && iw wlan1 set monitor control && ip link set wlan1 up;exit",
                     "kali", "interactive", "0"},
-            {"7", "Start wlan2 in monitor mode",
+            {"6", "Start wlan2 in monitor mode",
                     "ip link set wlan2 down && iw wlan2 set monitor control && ip link set wlan2 up;exit",
-                    "kali", "interactive", "0"}
+                    "kali", "interactive", "0"},
+            {"7", "Start beef",
+                    "cd /usr/share/beef-xss; && ./beef; exit",
+                    "kali", "interactive", "0"},
+            {"8", "Y-cable start",
+                    "su -c \"bootkali ycable start;exit\"",
+                    "android", "interactive", "0"},
+            {"9", "Y-cable stop",
+                    "su -c \"bootkali ycable start;exit\"",
+                    "android", "interactive", "0"},
+
+// New way of making wlan0 mon mode (WIP)
+//            {"4", "Start wlan0 in monitor mode",
+//                    "su -c \"svc wifi disable; sleep 1; echo 4 > /sys/module/wlan/parameters/con_mode; sleep 2; iwpriv wlan0 MonitorModeConf 11 40 1 111 0; iwpriv wlan0 monitor 1; killall -q -SIGSTOP lowi-server || true; ip link set wlan0 up;\";",
+//                    "android", "interactive", "0"},
+//            {"5", "Stop wlan0 monitor mode",
+//                    "su -c \"iwpriv wlan0 monitor 0; ip link set wlan0 down; sleep 1; echo 0 > /sys/module/wlan/parameters/con_mode; sleep 2; killall -q -SIGCONT lowi-server || true\";",
+//                    "android", "interactive", "0"},
     };
 
     public synchronized static CustomCommandsSQL getInstance(Context context){

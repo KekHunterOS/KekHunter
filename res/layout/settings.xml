@@ -290,25 +290,25 @@
                 android:text="Install bootanimation"
                 android:textColor="#ffffffff" />
 
-          <View
-              android:id="@+id/divider5"
-              android:layout_width="match_parent"
-              android:layout_height="1dp"
-              android:background="?android:attr/listDivider" />
+            <View
+                android:id="@+id/divider5"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider" />
 
-          <TextView
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:text="BACKUP OR RESTORE NETHUNTER FILES"
-              android:paddingTop="10dp"
-              android:padding="4dp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="BACKUP OR RESTORE NETHUNTER FILES"
+                android:paddingTop="10dp"
+                android:padding="4dp" />
 
             <Button
-              android:id="@+id/backup"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:text="Backup"
-              android:textColor="#ffffffff" />
+                android:id="@+id/backup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Backup"
+                android:textColor="#ffffffff" />
 
             <View
                 android:id="@+id/divider6"
@@ -317,35 +317,35 @@
                 android:background="?android:attr/listDivider" />
 
             <LinearLayout
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:layout_gravity="center_horizontal"
-              android:orientation="horizontal">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:orientation="horizontal">
 
-              <EditText
-                  android:id="@+id/restorefilename"
-                  android:layout_width="fill_parent"
-                  android:layout_height="wrap_content"
-                  android:layout_weight="1"
-                  android:hint="/sdcard/nh_files_20201010.tar"
-                  android:inputType="text" />
+                <EditText
+                    android:id="@+id/restorefilename"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="/sdcard/nh_files_20201010.tar"
+                    android:inputType="text" />
 
-              <Button
-                  android:id="@+id/restorefilebrowse"
-                  android:layout_width="fill_parent"
-                  android:layout_height="wrap_content"
-                  android:layout_weight="5"
-                  android:text="..."
-                  android:textColor="#ffffffff" />
+                <Button
+                    android:id="@+id/restorefilebrowse"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="5"
+                    android:text="..."
+                    android:textColor="#ffffffff" />
 
-          </LinearLayout>
+            </LinearLayout>
 
             <Button
-              android:id="@+id/restore"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:text="Restore"
-              android:textColor="#ffffffff" />
+                android:id="@+id/restore"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Restore"
+                android:textColor="#ffffffff" />
 
             <View
                 android:id="@+id/divider7"
@@ -369,8 +369,8 @@
                 android:text="Uninstall NetHunter App"
                 android:textColor="#ffffffff" />
 
-      </LinearLayout>
+        </LinearLayout>
 
-  </ScrollView>
+    </ScrollView>
 
 </LinearLayout>

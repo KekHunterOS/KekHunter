@@ -344,7 +344,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         TextView buildInfo1 = navigationHeadView.findViewById(R.id.buildinfo1);
         TextView buildInfo2 = navigationHeadView.findViewById(R.id.buildinfo2);
         buildInfo1.setText(String.format("Version: %s", BuildConfig.VERSION_NAME, Build.TAGS));
-        buildInfo2.setText(String.format("Developer preview only!!", BuildConfig.BUILD_NAME, buildTime));
+        buildInfo2.setText(String.format("Developer preview", BuildConfig.BUILD_NAME, buildTime));
 
         if (navigationView != null) {
             setupDrawerContent(navigationView);
@@ -514,6 +514,9 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                 break;
             case R.id.gps_item:
                 changeFragment(fragmentManager, KaliGpsServiceFragment.newInstance(itemId));
+                break;
+            case R.id.settings_item:
+                changeFragment(fragmentManager, SettingsFragment.newInstance(itemId));
                 break;
         }
 

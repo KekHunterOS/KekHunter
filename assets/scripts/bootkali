@@ -240,15 +240,23 @@ else
 	if [ "$1" == "ycable" ] && [ "$2" == "start" ]; then
 		if [ -f "/sys/module/msm_otg/parameters/usbhost_charge_mode" ]; then
 			echo "1" > /sys/module/msm_otg/parameters/usbhost_charge_mode
+			echo "Choosed msm_otg way"
+			sleep 5
 		fi
 		if [ -f "/sys/module/tegra_otg/parameters/tegra_otg_on_charging" ]; then
 			echo "Y" > /sys/module/tegra_otg/parameters/tegra_otg_on_charging
+			echo "Choosed tegra_otg way"
+			sleep 5
 		fi
 		if [ -f "/sys/module/dwc3/parameters/aca_enable" ]; then
 			echo "Y" > /sys/module/dwc3/parameters/aca_enable
+			echo "Choosed dwc3 (aca) way"
+			sleep 5
 		fi
 		if [ -f "/sys/module/dwc3/parameters/otg_charging" ]; then
 			echo "Y" > /sys/module/dwc3/parameters/otg_charging
+			echo "Choosed dwc3 (otg_charging) way"
+			sleep 5
 		fi
 	fi
 
