@@ -1,0 +1,5 @@
+GUI r
+STRING cmd.exe
+ENTER
+DELAY 200
+STRING %SystemRoot%/system32/rundll32 user32, SwapMouseButton >nul

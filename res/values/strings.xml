@@ -287,7 +287,6 @@
     <!-- chroot stuff -->
     <array name="f_chrootmanager_build_chroot_arm_opts">
         <item>arm64</item>
-        <item>armhf</item>
     </array>
     <array name="f_chrootmanager_build_chroot_full_or_min">
         <item>full</item>

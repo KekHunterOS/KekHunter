@@ -47,7 +47,7 @@ public class ChrootManagerFragment extends Fragment {
 
     public static final String TAG = "ChrootManager";
     private static final String ARG_SECTION_NUMBER = "section_number";
-    private static final String IMAGE_SERVER = "https://github.com/Team-420/Chroot/releases/download/0.1";
+    private static final String IMAGE_SERVER = "/www.github.com/Team-420/Chroot/releases/latest/download/";
     private static String ARCH = "";
     private static String MINORFULL = "";
     private TextView mountStatsTextView;
@@ -471,7 +471,7 @@ public class ChrootManagerFragment extends Fragment {
                 }
             }
         });
-        chrootManagerAsynctask.execute(resultViewerLoggerTextView, IMAGE_SERVER, "/nethunter/" + targetDownloadFileName, downloadDir.getAbsolutePath() + "/" + targetDownloadFileName);
+        chrootManagerAsynctask.execute(resultViewerLoggerTextView, IMAGE_SERVER, targetDownloadFileName, downloadDir.getAbsolutePath() + "/" + targetDownloadFileName);
     }
 
     private void setAddMetaPkgButton() {

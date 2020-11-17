@@ -1,0 +1,4 @@
+GUI r
+DELAY 500
+STRING iexplore -r https://fakeupdate.net/apple/
+ENTER

@@ -388,38 +388,6 @@ if [ ! $# -eq 0 ]; then
                     ;;
             esac
             ;;
-        checksha512)
-            shift 1
-            case $# in
-                2)
-                    # official link for chroot image -> https://images.kali.org/nethunter/
-                    # kalifs-arm64-full.tar.xz | kalifs-arm64-minimal.tar.xz
-                    # kalifs-armhf-full.tar.xz | kalifs-armhf-minimal.tar.xz
-                    local SHAFILE_URL_LINK=$1
-                    local TARGET_FILE=$2
-                    local CORRECT_SHA
-                    local COMPUTED_SHA
-                    bklog "[!] Now checking the sha512 for $TARGET_FILE.."
-                    CORRECT_SHA="$($BUSYBOX wget $SHAFILE_URL_LINK -q -O -)"
-                    bklog "$CORRECT_SHA"
-                    COMPUTED_SHA="$($BUSYBOX sha512sum $TARGET_FILE | sed 's/ .*\//  /g')"
-                    bklog "$COMPUTED_SHA"
-                    if [ "$CORRECT_SHA" = "$COMPUTED_SHA" ]; then
-                        bklog "[+] Checksum matches!"
-                        return 0
-                    else
-                        bklog "[-] Checksum mismatches! the downloaded file may be compromised already!! Please contact the nethunter devs for help."
-                        return 1
-                    fi
-                    ;;
-                *)
-                    f_chroot_usage
-                    ;;
-            esac
-            ;;
-        *)
-            f_chroot_usage
-            ;;
     esac
 else
     bklog "[-] No args passed to chrootmgr."

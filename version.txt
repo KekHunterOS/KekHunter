@@ -1,0 +1,4 @@
+{
+	"version_code": 003,
+	"content": "Version 0.0.3 <p> First time KekHunter InApp updater!!! </P><p>Fixes/Addons</P><li>Upstreamed and fixed inapp updater</li><li>Some under the hood fixes/modifications</li>"
+}

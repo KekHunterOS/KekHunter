@@ -1,0 +1,16 @@
+<resources>
+
+    <string name="app_name">WVersionManager</string>
+    <string name="wvm_toast_download_started">Download started …</string>
+    <string name="wvm_toast_download_complete">Download completed, installing …</string>
+    <string name="wvm_dialog_title_update">New Update Available!</string>
+    <string name="wvm_dialog_title_rate_us">Rate this app</string>
+    <string name="wvm_dialog_message_update">What\'s new in this version:</string>
+    <string name="wvm_dialog_message_rate_us">Please rate us!</string>
+    <string name="wvm_button_ignore">Ignore</string>
+    <string name="wvm_button_remind_later">Later</string>
+    <string name="wvm_button_update">Update</string>
+    <string name="wvm_button_ok">OK</string>
+    <string name="wvm_button_not_now">Not now</string>
+
+</resources>

@@ -22,6 +22,9 @@ import android.view.MenuItem;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+// Updater stuff
+import com.winsontan520.wversionmanager.library.WVersionManager;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.offsec.nethunter.AsyncTask.CopyBootFilesAsyncTask;
@@ -331,7 +334,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
 
         FloatingActionButton readmeButton = navigationHeadView.findViewById(R.id.info_fab);
         readmeButton.setOnTouchListener((v, event) -> {
-            //checkUpdate();
+            checkUpdate();
             showLicense();
             return false;
         });
@@ -386,6 +389,14 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
             desiredFragment = -1;
         }
     }
+
+    private void checkUpdate() {
+        WVersionManager versionManager = new WVersionManager(this);
+        versionManager.setVersionContentUrl("https://images.offensive-security.com/version.txt");
+        versionManager.setUpdateUrl("https://images.offensive-security.com/latest.apk");
+        versionManager.checkVersion();
+    }
+
 
     private void showLicense() {
         // @binkybear here goes the changelog etc... \n\n%s

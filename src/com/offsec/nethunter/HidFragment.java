@@ -72,7 +72,7 @@ public class HidFragment extends Fragment {
         mViewPager = rootView.findViewById(R.id.pagerHid);
         mViewPager.setAdapter(tabsPagerAdapter);
 
-        configFilePath = NhPaths.CHROOT_PATH() + "/var/www/html/powersploit-payload";
+        configFilePath = NhPaths.APP_SCRIPTS_PATH + "/configs/powersploit-payload";
 
         mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
@@ -325,8 +325,8 @@ public class HidFragment extends Fragment {
         public void onCreate(@Nullable Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             context = getContext();
-            configFilePath = NhPaths.CHROOT_PATH() + "/var/www/html/powersploit-payload";
-            configFileUrlPath = NhPaths.CHROOT_PATH() + "/var/www/html/powersploit-url";
+            configFilePath = NhPaths.APP_SCRIPTS_PATH + "/configs/powersploit-payload";
+            configFileUrlPath = NhPaths.APP_SCRIPTS_PATH + "/configs/powersploit-url";
         }
 
         @Override
