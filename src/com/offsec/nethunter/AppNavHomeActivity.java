@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -46,6 +47,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Stack;
 
+import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -332,12 +334,8 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         @SuppressLint("InflateParams") LinearLayout navigationHeadView = (LinearLayout) inflater.inflate(R.layout.sidenav_header, null);
         navigationView.addHeaderView(navigationHeadView);
 
-        FloatingActionButton readmeButton = navigationHeadView.findViewById(R.id.info_fab);
-        readmeButton.setOnTouchListener((v, event) -> {
-            checkUpdate();
-            showLicense();
-            return false;
-        });
+        FloatingActionButton readmeButton = navigationHeadView.findViewById(R.id.info_tab);
+        readmeButton.setOnClickListener( view -> showLicense());
 
         /// moved build info to the menu
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd KK:mm:ss a zzz",
@@ -392,31 +390,31 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
 
     private void checkUpdate() {
         WVersionManager versionManager = new WVersionManager(this);
-        versionManager.setVersionContentUrl("https://images.offensive-security.com/version.txt");
-        versionManager.setUpdateUrl("https://images.offensive-security.com/latest.apk");
+        versionManager.setVersionContentUrl("https://raw.githubusercontent.com/KekHunterOS/Nethunter_app/kek-2020.4/demo.txt");
+        versionManager.setUpdateUrl("https://github.com/KekHunterOS/Nethunter_app/releases/latest/download/Nethunter_app-debug.apk");
         versionManager.checkVersion();
     }
 
 
     private void showLicense() {
         // @binkybear here goes the changelog etc... \n\n%s
-        String readmeData = String.format("%s\n\n%s\n\n%s",
+        String readmeData = String.format("%s\n\n%s\n\n%s\n\n%s\n\n",
                 getResources().getString(R.string.licenseInfo),
                 getResources().getString(R.string.nhwarning),
-                getResources().getString(R.string.nhteam));
+                getResources().getString(R.string.nhteam),
+                getResources().getString(R.string.kekteam),
+                getResources().getString(R.string.telegramgroup));
         final SpannableString readmeText = new SpannableString(readmeData);
         Linkify.addLinks(readmeText, Linkify.WEB_URLS);
 
 
-        AlertDialog.Builder adb = new AlertDialog.Builder(this);
+        AlertDialog.Builder adb = new AlertDialog.Builder(this,R.style.DialogStyle);
         adb.setTitle("README INFO")
                 .setMessage(readmeText)
-                .setNegativeButton("Close", (dialog, which) -> dialog.cancel()); //nhwarning
+                .setNegativeButton("CLOSE", (dialog, which) -> dialog.cancel()); //nhwarning
         AlertDialog ad = adb.create();
         ad.setCancelable(false);
-        if (ad.getWindow() != null) {
-            ad.getWindow().getAttributes().windowAnimations = R.style.DialogStyle;
-        }
+        ad.getWindow().getAttributes().windowAnimations = R.style.DialogStyle;
         ad.show();
         ((TextView) Objects.requireNonNull(ad.findViewById(android.R.id.message))).setMovementMethod(LinkMovementMethod.getInstance());
 
@@ -466,6 +464,9 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                         */
             case R.id.deauth_item:
                 changeFragment(fragmentManager, DeAuthFragment.newInstance(itemId));
+                break;
+            case R.id.update_btn:
+                checkUpdate();
                 break;
             case R.id.kaliservices_item:
                 changeFragment(fragmentManager, KaliServicesFragment.newInstance(itemId));

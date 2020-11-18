@@ -322,6 +322,8 @@
     <string name="extractinganddeploying">Extracting and Deploying</string>
     <string name="nhwarning">WARNING:\nNethunter installs and uses a standard Kali Linux distribution \"under the hood\".  To support this functionality, some <u>standard Android security features such as Security Enhanced Linux (SELinux) are disabled</u>.  Moreover, Kali\'s Linux processes may run with full root privileges and can therefore access system functionality well beyond the normal Android security model.  Consider therefore that this device, as a hybrid, may not be as secure as either standard Kali Linux OR standard Android, and you are advised not to install or use Nethunter on \"daily driver\" devices or devices which store or access sensitive/private data.</string>
     <string name="nhteam">DEVELOPERS:\ngitlab.com/groups/kalilinux/nethunter/-/group_members</string>
+    <string name="kekteam">KEKHUNTER:\n * t.me/@hilledkinged\n * t.me/@S133PY \n * t.me/@JochenSplifficus</string>
+    <string name="telegramgroup">OUR GROUP IN TG:\n * t.me/kekhunter \n * t.me/team420nethunter</string>
     <string name="unknown">Unknown</string>
     <string name="statusText">Status:</string>
     <string name="licenseInfo">LICENSE INFO:\nNethunter is licensed under the GPLv2 (gnu.org/licenses/old-licenses/gpl-2.0.en.html) and the source code is available at gitlab.com/kalilinux/nethunter.\n Some icons are licensed from Google, Inc. under CC BY 4.0 (creativecommons.org/licenses/by/4.0). Android-VersionManager and jTar are licensed under Apache 2.0.  </string><string name="attack_launched">Attack launched!</string>

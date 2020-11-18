@@ -1,42 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.Nethunter" parent="Theme.AppCompat">
-        <!-- customize the color palette -->
-        <item name="colorPrimary">#AE1E1E1E</item>
-        <item name="colorPrimaryDark">@color/material_blue_grey_950</item>
-        <item name="colorAccent">#B5B5B5</item>
-        <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
-        <item name="colorButtonNormal">#1C1C1C</item>
-        <item name="android:textColorLink">#92AAE8</item>
-        <item name="android:textColor">#E5E8ED</item>
-        <item name="colorBackgroundFloating">#1C1C1C</item>
-
-        <item name="android:windowShowWallpaper">true</item>
-        <item name="android:windowBackground">@color/colorBackground</item>
-
-    </style>
-
-    <style name="DrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
-        <item name="spinBars">true</item>
-        <item name="color">@android:color/white</item>
-    </style>
-
-    <style name="DesignTextInput" parent="Theme.Nethunter">
-        <item name="height">72dp</item>
-        <item name="android:inputType">textNoSuggestions</item>
-
-    </style>
-
-
-    <style name="DialogStyle" parent="Base.Theme.AppCompat.Dialog.Alert">
-        <item name="android:windowEnterAnimation">@android:anim/fade_in</item>
-        <item name="android:windowExitAnimation">@android:anim/fade_out</item>
-
-        <item name="android:windowNoTitle">true</item>
-        <item name="windowActionBar">false</item>
-        <item name="android:windowContentOverlay">@null</item>
-    </style>
+<!-- See styles.xml for theming!!! -->
 
 </resources>
-

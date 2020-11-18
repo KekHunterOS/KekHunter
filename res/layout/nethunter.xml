@@ -61,31 +61,28 @@
             android:orientation="horizontal">
 
             <Button
+                android:alpha="1"
                 android:id="@+id/f_nethunter_refreshButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@android:style/Holo.Light.ButtonBar"
                 android:text="Refresh" />
 
             <Button
                 android:id="@+id/f_nethunter_addItemButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@android:style/Holo.Light.ButtonBar"
                 android:text="Add" />
 
             <Button
                 android:id="@+id/f_nethunter_deleteItemButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@android:style/Holo.Light.ButtonBar"
                 android:text="Delete" />
 
             <Button
                 android:id="@+id/f_nethunter_moveItemButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@android:style/Holo.Light.ButtonBar"
                 android:text="Move" />
 
         </LinearLayout>

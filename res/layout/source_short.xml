@@ -22,7 +22,7 @@
             android:id="@+id/source"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:lines="18"
+            android:lines="29"
             android:includeFontPadding="false"
             android:paddingTop="0px"
             android:gravity="top"

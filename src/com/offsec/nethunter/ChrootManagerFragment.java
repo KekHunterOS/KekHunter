@@ -47,7 +47,7 @@ public class ChrootManagerFragment extends Fragment {
 
     public static final String TAG = "ChrootManager";
     private static final String ARG_SECTION_NUMBER = "section_number";
-    private static final String IMAGE_SERVER = "/www.github.com/Team-420/Chroot/releases/latest/download/";
+    private static final String IMAGE_SERVER = "www.github.com/Team-420/Chroot/releases/latest/download/";
     private static String ARCH = "";
     private static String MINORFULL = "";
     private TextView mountStatsTextView;

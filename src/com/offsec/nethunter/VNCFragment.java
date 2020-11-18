@@ -83,7 +83,6 @@ public class VNCFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.vnc_setup, container, false);
-        View AdvancedView = rootView.findViewById(R.id.AdvancedView);
         Button Advanced = rootView.findViewById(R.id.AdvancedButton);
         CheckBox localhostCheckBox = rootView.findViewById(R.id.vnc_checkBox);
         SharedPreferences sharedpreferences = context.getSharedPreferences(BuildConfig.APPLICATION_ID, Context.MODE_PRIVATE);
@@ -99,10 +98,6 @@ public class VNCFragment extends Fragment {
             localhostCheckBox.setChecked(false);
         } else {
             localhostCheckBox.setChecked(true);
-        }
-        AdvancedView.setVisibility(showingAdvanced ? View.VISIBLE : View.INVISIBLE);
-        if (showingAdvanced) {
-            Advanced.setText("HIDE ADVANCED SETTINGS");
         }
         // Get screen size to pass to VNC
         DisplayMetrics displaymetrics = new DisplayMetrics();
@@ -366,17 +361,6 @@ public class VNCFragment extends Fragment {
             intentClickListener_VNC(); // since is a kali command we can send it as is
         });
         addClickListener(Advanced, v -> {
-            if (!showingAdvanced) {
-                AdvancedView.setVisibility(View.VISIBLE);
-                Advanced.setText("HIDE ADVANCED SETTINGS");
-                showingAdvanced = true;
-                sharedpreferences.edit().putBoolean("advanced_visible", true).apply();
-            } else {
-                AdvancedView.setVisibility(View.GONE);
-                Advanced.setText("SHOW ADVANCED SETTINGS");
-                showingAdvanced = false;
-                sharedpreferences.edit().putBoolean("advanced_visible", false).apply();
-            }
         });
         addClickListener(AddUserButton, v -> {
             intentClickListener_NH("echo -ne \"\\033]0;New User\\007\" && clear;read -p \"Please enter your new username\"$'\n' USER && adduser --firstuid " + MIN_UID + " --lastuid " + MAX_UID + " $USER; groupmod -g $(id -u $USER) $USER; usermod -aG sudo $USER; usermod -aG inet $USER; usermod -aG sockets $USER; echo \"Please refresh your KeX manager, closing in 2 secs\" && sleep 2 && exit");
