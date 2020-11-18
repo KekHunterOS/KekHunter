@@ -190,17 +190,16 @@ if [ ! $# -eq 0 ]; then
                           bklog "[+] kernel modules exists and linked."
                           else
                           bklog "[-] $i ${DIR} doesn't exist or isn't mounted. ."
-                          exit 1
-                        fi
+                      fi
 
-                        if [ $ISALLREADY -eq 0 ]; then
+                      if [ $ISALLREADY -eq 0 ]; then
                             bklog "[+] Chroot environment has been set and started."
                             bklog "[!] You may click \"STOP KALI CHROOT\" to shutdown the chroot environment."
                             return 0
-                        else
+                      else
                             bklog "[!] You may click \"START KALI CHROOT\" to start the chroot environment."
                             return 1
-                        fi
+                      fi
                     else
                         bklog "[-] seems there is no kali chroot installed yet, please click the button \"EDIT\" to configure the proper Kali Chroot Path or install the chroot."
                         return 2
