@@ -310,7 +310,7 @@ public class WVersionManager implements IWVersionManager {
      */
     @Override
     public int getReminderTimer() {
-        return mReminderTimer > 0 ? mReminderTimer : 60; // default value: 60 minutes
+        return mReminderTimer > 0 ? mReminderTimer : 1; // default value: 60 minutes
     }
 
     /*
@@ -429,10 +429,8 @@ public class WVersionManager implements IWVersionManager {
         switch (mMode) {
             case MODE_CHECK_VERSION:
                 builder.setPositiveButton(R.string.wvm_button_update, mDialogListener);
-                if (!mIsBlocking) {
-                    builder.setNeutralButton(R.string.wvm_button_remind_later, mDialogListener);
-                    builder.setNegativeButton(R.string.wvm_button_ignore, mDialogListener);
-                }
+                builder.setNeutralButton(R.string.wvm_button_remind_later, mDialogListener);
+                //builder.setNegativeButton(R.string.wvm_button_close, mDialogListener);
                 break;
             case MODE_ASK_FOR_RATE:
                 builder.setPositiveButton(R.string.wvm_button_ok, mDialogListener);
@@ -578,7 +576,6 @@ public class WVersionManager implements IWVersionManager {
                     remindMeLater(getReminderTimer());
                     break;
                 case AlertDialog.BUTTON_NEGATIVE:
-                    ignoreThisVersion();
                     break;
             }
         }

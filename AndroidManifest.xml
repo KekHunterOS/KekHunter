@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="com.offsec.nhterm.permission.RUN_SCRIPT" />
     <uses-permission android:name="com.offsec.nhterm.permission.RUN_SCRIPT_SU" />
     <uses-permission android:name="com.offsec.nhterm.permission.RUN_SCRIPT_NH" />

@@ -72,35 +72,19 @@
             android:id="@+id/mitmf_spoof_arpmodespin"
             android:enabled="@{viewModel.spoofEnabled}" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp">
-
-                <com.google.android.material.textfield.TextInputEditText
+                <EditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:enabled="@{viewModel.spoofEnabled}"
                     android:hint="@string/mitmf_spoof_gateway"
                     android:id="@+id/mitmf_spoof_gateway_text" />
 
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp">
-
-                <com.google.android.material.textfield.TextInputEditText
+                <EditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:enabled="@{viewModel.spoofEnabled}"
                     android:hint="@string/mitmf_spoof_targets"
                     android:id="@+id/mitmf_spoof_targets_text" />
-
-            </com.google.android.material.textfield.TextInputLayout>
 
             <CheckBox
             android:layout_width="wrap_content"
@@ -109,20 +93,12 @@
                 android:id="@+id/mitmf_spoof_shellshock"
                 android:enabled="@{viewModel.spoofEnabled}" />
 
-            <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp">
-
-                <com.google.android.material.textfield.TextInputEditText
+                <EditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:enabled="@{viewModel.shellShockEnabled}"
                     android:hint="@string/shellshock_command"
                     android:id="@+id/mitmf_spoof_shellshock_text" />
-
-            </com.google.android.material.textfield.TextInputLayout>
 
 
         </LinearLayout>

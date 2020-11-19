@@ -61,7 +61,8 @@
             android:orientation="horizontal">
 
             <Button
-                android:alpha="1"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
                 android:id="@+id/f_nethunter_refreshButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -69,18 +70,24 @@
 
             <Button
                 android:id="@+id/f_nethunter_addItemButton"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Add" />
 
             <Button
                 android:id="@+id/f_nethunter_deleteItemButton"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Delete" />
 
             <Button
                 android:id="@+id/f_nethunter_moveItemButton"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Move" />

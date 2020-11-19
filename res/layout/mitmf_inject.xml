@@ -62,52 +62,30 @@
                 android:text="@string/objects_to_inject"
                 android:textAppearance="@android:style/TextAppearance.DeviceDefault.Widget.ActionBar.Subtitle" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp">
-
-                <com.google.android.material.textfield.TextInputEditText
+                <EditText
                     android:id="@+id/mitmf_injectjs_url"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:enabled="@{viewModel.injectJSEnabled}"
                     android:hint="@string/mitmf_inject_JS"
+                    android:enabled="@{viewModel.injectJSEnabled}"
                     app:addTextChangedListener="@{viewModel.injectJSWatcher}" />
-            </com.google.android.material.textfield.TextInputLayout>
 
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp">
-
-                <com.google.android.material.textfield.TextInputEditText
+                <EditText
                     android:id="@+id/mitmf_injecthtml_url"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:enabled="@{viewModel.injectHtmlUrlEnabled}"
                     android:hint="@string/mitmf_inject_HTML"
                     app:addTextChangedListener="@{viewModel.injectHtmlUrlWatcher}" />
-            </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp">
-
-                <com.google.android.material.textfield.TextInputEditText
+                <EditText
                     android:id="@+id/mitmf_injecthtmlpay_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:enabled="@{viewModel.injectHtmlEnabled}"
                     android:hint="@string/mitmf_inject_HTMLPAY"
                     app:addTextChangedListener="@{viewModel.injectHtmlWatcher}" />
-
-            </com.google.android.material.textfield.TextInputLayout>
 
 
             <TextView
@@ -118,13 +96,7 @@
                 android:text="@string/inject_characteristics"
                 android:textAppearance="@android:style/TextAppearance.DeviceDefault.Widget.ActionBar.Subtitle" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp">
-
-                <com.google.android.material.textfield.TextInputEditText
+                <EditText
                     android:id="@+id/mitmf_inject_rateseconds"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -132,15 +104,7 @@
                     android:inputType="number"
                     android:enabled="@{viewModel.injectionEnabled}" />
 
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp">
-
-                <com.google.android.material.textfield.TextInputEditText
+                <EditText
                     android:id="@+id/mitmf_inject_times_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -148,38 +112,19 @@
                     android:inputType="number"
                     android:enabled="@{viewModel.injectionEnabled}" />
 
-            </com.google.android.material.textfield.TextInputLayout>
-
-
-            <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp">
-
-                <com.google.android.material.textfield.TextInputEditText
+                <EditText
                     android:id="@+id/mitmf_inject_ip_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/mitmf_inject_INJECTIP"
                     android:enabled="@{viewModel.injectionEnabled}" />
 
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp">
-
-                <com.google.android.material.textfield.TextInputEditText
+                <EditText
                     android:id="@+id/mitmf_inject_noip_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/mitmf_inject_NOINJECTIP"
                     android:enabled="@{viewModel.injectionEnabled}" />
-
-            </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
     </ScrollView>
 </layout>

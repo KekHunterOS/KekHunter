@@ -1,5 +1,6 @@
 package com.offsec.nethunter;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -9,6 +10,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -53,6 +55,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -134,12 +137,12 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
 
                 // After finishing copying app files, we do a compatibility check before allowing user to use it.
                 // First, check if the app has gained the root already.
-                if (!CheckForRoot.isRoot()){
+                if (!CheckForRoot.isRoot()) {
                     showWarningDialog("NetHunter app cannot be run properly", "Root permission is required!!", true);
                 }
 
                 // Secondly, check if busybox is present.
-                if (!CheckForRoot.isBusyboxInstalled()){
+                if (!CheckForRoot.isBusyboxInstalled()) {
                     showWarningDialog("NetHunter app cannot be run properly", "No busybox is detected, please make sure you have busybox installed!!", true);
                 }
 
@@ -149,7 +152,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                 }
 
                 // Lastly, check if all required permissions are granted, if yes, show the view to user.
-                if (isAllRequiredPermissionsGranted()){
+                if (isAllRequiredPermissionsGranted()) {
                     setRootView();
                 }
             }
@@ -157,7 +160,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         copyBootFilesAsyncTask.execute();
 
         int menuFragment = getIntent().getIntExtra("menuFragment", -1);
-        if(menuFragment != -1) {
+        if (menuFragment != -1) {
             Log.d(TAG, "menuFragment = " + menuFragment);
             desiredFragment = menuFragment;
         }
@@ -185,9 +188,9 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if (requestCode == PermissionCheck.DEFAULT_PERMISSION_RQCODE || requestCode == PermissionCheck.NH_TERM_PERMISSIONS_RQCODE){
-            for (int grantResult:grantResults){
-                if (grantResult != 0){
+        if (requestCode == PermissionCheck.DEFAULT_PERMISSION_RQCODE || requestCode == PermissionCheck.NH_TERM_PERMISSIONS_RQCODE) {
+            for (int grantResult : grantResults) {
+                if (grantResult != 0) {
                     if (getApplicationContext().getPackageManager().getLaunchIntentForPackage("com.offsec.nhterm") == null) {
                         showWarningDialog("NetHunter app cannot be run properly", "NetHunter Terminal is not installed yet, please install from the store!", true);
                         return;
@@ -205,7 +208,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     @Override
     public boolean onReceiverReattach(KaliGPSUpdates.Receiver receiver) {
         Log.d(TAG, "onReceiverReattach");
-        if(LocationUpdateService.isInstanceCreated()) {
+        if (LocationUpdateService.isInstanceCreated()) {
             // there is already a service running, we should re-attach to it
             this.locationUpdateReceiver = receiver;
             Log.d(TAG, "locationService: " + !(locationService == null));
@@ -217,7 +220,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                 return true;
             }
         }
-            return false; // nothing to reattach to
+        return false; // nothing to reattach to
     }
 
     @Override
@@ -268,7 +271,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
                     MenuItem _current = menuNav.getItem(i);
                     if (lastSelectedMenuItem != _current) {
                         //remove last
-                        if(lastSelectedMenuItem != null)
+                        if (lastSelectedMenuItem != null)
                             lastSelectedMenuItem.setChecked(false);
                         // update for the next
                         lastSelectedMenuItem = _current;
@@ -290,7 +293,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
             locationService.stopUpdates();
             locationService = null;
         }
-        if(updateServiceBound) {
+        if (updateServiceBound) {
             updateServiceBound = false;
             unbindService(locationServiceConnection);
 
@@ -300,7 +303,8 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     @Override
     protected void onStart() {
         super.onStart();
-        if (navigationView != null) startService(new Intent(getApplicationContext(), CompatCheckService.class));
+        if (navigationView != null)
+            startService(new Intent(getApplicationContext(), CompatCheckService.class));
     }
 
     @Override
@@ -310,13 +314,13 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         if (nethunterReceiver != null) {
             unregisterReceiver(nethunterReceiver);
         }
-        if (nhPaths != null){
+        if (nhPaths != null) {
             nhPaths.onDestroy();
         }
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private void setRootView(){
+    private void setRootView() {
 
         setContentView(R.layout.base_layout);
 
@@ -335,7 +339,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         navigationView.addHeaderView(navigationHeadView);
 
         FloatingActionButton readmeButton = navigationHeadView.findViewById(R.id.info_tab);
-        readmeButton.setOnClickListener( view -> showLicense());
+        readmeButton.setOnClickListener(view -> showLicense());
 
         /// moved build info to the menu
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd KK:mm:ss a zzz",
@@ -382,17 +386,35 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         mDrawerToggle.syncState();
         startService(new Intent(getApplicationContext(), CompatCheckService.class));
 
-        if(desiredFragment != -1) {
+        if (desiredFragment != -1) {
             changeDrawer(desiredFragment);
             desiredFragment = -1;
         }
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    // VERSION FILE LINKS FOR RELEASE AND DEMO/TEST                                                  //
+    // RELEASE: https://raw.githubusercontent.com/KekHunterOS/Nethunter_app/kek-2020.4/version.txt   //
+    // DEMO/TESTING: https://raw.githubusercontent.com/KekHunterOS/Nethunter_app/kek-2020.4/demo.txt //
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+
     private void checkUpdate() {
         WVersionManager versionManager = new WVersionManager(this);
-        versionManager.setVersionContentUrl("https://raw.githubusercontent.com/KekHunterOS/Nethunter_app/kek-2020.4/demo.txt");
+        versionManager.setVersionContentUrl("https://raw.githubusercontent.com/KekHunterOS/Nethunter_app/kek-2020.4/verison.txt");
         versionManager.setUpdateUrl("https://github.com/KekHunterOS/Nethunter_app/releases/latest/download/Nethunter_app-debug.apk");
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
         versionManager.checkVersion();
+        versionManager.useDownloadManager(true);
+        versionManager.installAfterDownload(true);
     }
 
 

@@ -1,4 +1,4 @@
 {
 	"version_code": 99,
-	"content": "Version 9.9.9 <p> First time KekHunter InApp updater, yass. </P><p>Fixes/Addons</P><li>This is the demo version of the updater</li><li>Some under the hood fixes/modifications :)</li>"
+	"content": "Version 9.9.9 <p> DEMO </P><p>Fixes/Addons</P><li>This is the demo version of the updater</li><li>Some under the hood fixes/modifications :)</li>"
 }

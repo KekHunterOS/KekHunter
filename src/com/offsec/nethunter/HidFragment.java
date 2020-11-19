@@ -316,7 +316,7 @@ public class HidFragment extends Fragment {
         }
     }
 
-    public static class PowerSploitFragment extends HidFragment implements OnClickListener {
+    public static class PowerSploitFragment extends Fragment implements OnClickListener {
         private Context context;
         private String configFilePath;
         private String configFileUrlPath;
@@ -373,31 +373,28 @@ public class HidFragment extends Fragment {
             final Spinner payload = rootView.findViewById(R.id.payload);
             final ShellExecuter exe = new ShellExecuter();
 
+// Fixed by ShellExecuter
             new Thread(() -> {
                 final String textUrl = exe.ReadFile_SYNC(configFileUrlPath);
-                final String text = exe.ReadFile_SYNC(configFilePath);
+
                 String regExPatPayloadUrl = "DownloadString\\(\"(.*)\"\\)";
                 Pattern patternPayloadUrl = Pattern.compile(regExPatPayloadUrl, Pattern.MULTILINE);
                 final Matcher matcherPayloadUrl = patternPayloadUrl.matcher(textUrl);
 
-                String[] lines = text.split("\n");
-                final String line = lines[lines.length - 1];
-
                 String regExPatIp = "-Lhost\\ (.*)\\ -Lport";
                 Pattern patternIp = Pattern.compile(regExPatIp, Pattern.MULTILINE);
-                final Matcher matcherIp = patternIp.matcher(line);
+                final Matcher matcherIp = patternIp.matcher(exe.ReadFile_SYNC(configFileUrlPath));
 
                 String regExPatPort = "-Lport\\ (.*)\\ -Force";
                 Pattern patternPort = Pattern.compile(regExPatPort, Pattern.MULTILINE);
-                final Matcher matcherPort = patternPort.matcher(line);
+                final Matcher matcherPort = patternPort.matcher(exe.ReadFile_SYNC(configFileUrlPath));
 
                 String regExPatPayload = "-Payload\\ (.*)\\ -Lhost";
                 Pattern patternPayload = Pattern.compile(regExPatPayload, Pattern.MULTILINE);
-                final Matcher matcherPayload = patternPayload.matcher(line);
+                final Matcher matcherPayload = patternPayload.matcher(exe.ReadFile_SYNC(configFileUrlPath));
 
                 payloadUrl.post(() -> {
-
-                    if (matcherPayloadUrl.find()) {
+                if (matcherPayloadUrl.find()) {
                         String payloadUrlValue = matcherPayloadUrl.group(1);
                         payloadUrl.setText(payloadUrlValue);
                     }

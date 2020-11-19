@@ -68,5 +68,3 @@ nethunter-app
         modules     <-- Mainly used by duckhunter.  Contains keyseed.py which does all the HID work.
       scripts <-- This is what launches chroot (bootkali) and checks services
 ```
-# 3party sources i used here (Including upstreamed sources!)
-* WVersionManager: https://github.com/revanmj/Android-WVersionManager
