@@ -59,12 +59,10 @@
 
         <Button
             android:id="@+id/f_nethunter_item_run_btn"
-            style="@style/Widget.AppCompat.Button"
             android:layout_width="77dp"
             android:fontFamily="sans-serif-condensed"
             android:layout_height="wrap_content"
             android:text="RUN"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textColor="#FFFFFF"
             android:textSize="14sp" />
 

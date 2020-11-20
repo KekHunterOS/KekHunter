@@ -112,17 +112,14 @@
 
         <Button
             android:id="@+id/f_customcommands_recyclerview_btn_run"
-            style="@style/Widget.AppCompat.Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:layout_weight="0.8"
-            android:alpha="0.50"
             android:bufferType="normal"
             android:capitalize="characters"
             android:fontFamily="sans-serif-condensed"
             android:text="RUN"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textColor="#FFFFFF"
             android:textDirection="firstStrong"
             android:textSize="14sp" />

@@ -6,20 +6,34 @@
         <item name="colorPrimary">#AE1E1E1E</item>
         <item name="colorPrimaryDark">@color/material_blue_grey_950</item>
         <item name="colorAccent">#B5B5B5</item>
+
+        <!-- other styles/themes -->
+        <item name="dialogTheme">@style/DialogStyle2</item>
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
+
+        <!-- button styles -->
         <item name="materialButtonStyle">@style/kekbutton</item>
+        <item name="buttonStyle">@style/kekbutton</item>
+
+        <!-- text colors/colours -->
         <item name="android:textColorLink">#476CCD</item>
         <item name="android:textColor">#E5E8ED</item>
+
+        <!-- text size -->
         <item name="android:textSize">14dp</item>
+
+        <!-- Button background colors/colours -->
         <item name="colorBackgroundFloating">#1C1C1C</item>
+
+        <!-- Button text colors/colours -->
         <item name="android:negativeButtonText">#FFFFFF</item>
 
+        <!-- Button styles-->
         <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
         <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
         <item name="buttonBarNeutralButtonStyle">@style/NeutralButtonStyle</item>
 
-        <item name="dialogTheme">@style/DialogStyle2</item>
-
+        <!-- Main styles-->
         <item name="android:windowShowWallpaper">true</item>
         <item name="android:windowBackground">@color/colorBackground</item>
 

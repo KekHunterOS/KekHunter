@@ -57,8 +57,8 @@
         android:layout_alignParentStart="true" />
 
     <Button
+        android:textSize="10dp"
         android:id="@+id/viewSource"
-        style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/searchsploit_sendhid_button"
@@ -118,8 +118,8 @@
         android:layout_alignStart="@+id/author" />
 
     <Button
+        android:textSize="10dp"
         android:id="@+id/openWeb"
-        style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/viewSource"
@@ -129,8 +129,8 @@
         android:textColor="@android:color/holo_blue_dark" />
 
     <Button
+        android:textSize="10dp"
         android:id="@+id/searchsploit_sendhid_button"
-        style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignStart="@+id/viewSource"

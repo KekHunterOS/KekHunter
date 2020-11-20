@@ -231,7 +231,9 @@
         <item>wlan0</item>
         <item>wlan1</item>
         <item>wlan2</item>
+        <item>wlan3</item>
         <item>eth0</item>
+        <item>eth1</item>
         <item>rndis0</item>
         <item>usb0</item>
     </string-array>
