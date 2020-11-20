@@ -10,6 +10,7 @@
         <item name="materialButtonStyle">@style/kekbutton</item>
         <item name="android:textColorLink">#476CCD</item>
         <item name="android:textColor">#E5E8ED</item>
+        <item name="android:textSize">14dp</item>
         <item name="colorBackgroundFloating">#1C1C1C</item>
         <item name="android:negativeButtonText">#FFFFFF</item>
 
@@ -39,9 +40,13 @@
     <!-- Button styles go here-->
 
     <!-- Overall buttons styles-->
-    <style name="kekbutton" parent="@style/Widget.MaterialComponents.Button.TextButton">
-        <item name="backgroundTint">#1C1C1C</item>
+    <style name="kekbutton" parent="@style/Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="backgroundTint">#2C2C30</item>
         <item name="android:textColor">#FFFFFF</item>
+
+        <item name="android:maxHeight">5dp</item>
+        <item name="android:paddingLeft">5dp</item>
+        <item name="android:paddingRight">5dp</item>
     </style>
 
     <!-- Alert dialog button styles go here-->

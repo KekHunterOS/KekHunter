@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <item name="blue" type="color">#A7FFEB</item>
+    <item name="blue" type="color">#65B7F6</item>
     <item name="darkorange" type="color">#FFFF8800</item>
 
     <item name="clearTitle" type="color">#fcfcfc</item>

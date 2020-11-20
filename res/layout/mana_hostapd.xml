@@ -20,74 +20,81 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/iface"
+            android:text="interface"
             android:padding="4dp" />
 
         <EditText
             android:id="@+id/ifc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"/>
+            android:ems="10" >
+        </EditText>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/bssid"
+            android:text="bssid"
             android:padding="4dp" />
 
         <EditText
             android:id="@+id/bssid"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"/>
+            android:ems="10" >
+        </EditText>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/ssid"
+            android:text="ssid"
             android:padding="4dp" />
 
         <EditText
             android:id="@+id/ssid"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"/>
+            android:ems="10" >
+        </EditText>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/chanel"
+            android:text="channel"
             android:padding="4dp" />
 
         <EditText
             android:id="@+id/channel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"/>
+            android:ems="10" >
+        </EditText>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/enable_karma"
+            android:text="enable_karma"
             android:padding="4dp" />
 
         <EditText
             android:id="@+id/enable_karma"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"/>
+            android:ems="10" >
+        </EditText>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/karma_loud"
+            android:text="karma_loud"
             android:padding="4dp" />
 
         <EditText
             android:id="@+id/karma_loud"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"/>
+            android:ems="10" >
+        </EditText>
+
 
 
         <Button

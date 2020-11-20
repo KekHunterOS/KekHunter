@@ -349,7 +349,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
         TextView buildInfo1 = navigationHeadView.findViewById(R.id.buildinfo1);
         TextView buildInfo2 = navigationHeadView.findViewById(R.id.buildinfo2);
         buildInfo1.setText(String.format("Version: %s", BuildConfig.VERSION_NAME, Build.TAGS));
-        buildInfo2.setText(String.format("Developer preview", BuildConfig.BUILD_NAME, buildTime));
+        buildInfo2.setText(String.format("KekHunter-420", BuildConfig.BUILD_NAME, buildTime));
 
         if (navigationView != null) {
             setupDrawerContent(navigationView);
@@ -400,7 +400,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
 
     private void checkUpdate() {
         WVersionManager versionManager = new WVersionManager(this);
-        versionManager.setVersionContentUrl("https://raw.githubusercontent.com/KekHunterOS/Nethunter_app/kek-2020.4/verison.txt");
+        versionManager.setVersionContentUrl("https://raw.githubusercontent.com/KekHunterOS/Nethunter_app/kek-2020.4/version.txt");
         versionManager.setUpdateUrl("https://github.com/KekHunterOS/Nethunter_app/releases/latest/download/Nethunter_app-debug.apk");
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             // TODO: Consider calling
