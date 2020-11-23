@@ -125,7 +125,7 @@ public class SettingsFragment extends Fragment {
             SetupDialog();
 
         //Bootanimation spinner
-        String[] animations = new String[]{"Classic", "Burning", "New Kali", "ctOS"};
+        String[] animations = new String[]{"Classic", "Burning", "New Kali", "ctOS", "Glitch", "Kek"};
         Spinner animation_spinner = rootView.findViewById(R.id.animation_spinner);
         animation_spinner.setAdapter(new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_list_item_1, animations));
@@ -155,7 +155,17 @@ public class SettingsFragment extends Fragment {
                 } else if (selected_animation.equals("ctOS")){
                     String path = ("android.resource://" + context.getPackageName() + "/" + R.raw.boot_ctos);
                     videoview.setVideoURI(Uri.parse(path));
-                    animation_dir[0] = "src_kali";
+                    animation_dir[0] = "src_ctos";
+                    bootanimation_start();
+                } else if (selected_animation.equals("Glitch")){
+                    String path = ("android.resource://" + context.getPackageName() + "/" + R.raw.boot_glitch);
+                    videoview.setVideoURI(Uri.parse(path));
+                    animation_dir[0] = "src_glitch";
+                    bootanimation_start();
+                } else if (selected_animation.equals("Kek")){
+                    String path = ("android.resource://" + context.getPackageName() + "/" + R.raw.boot_kek);
+                    videoview.setVideoURI(Uri.parse(path));
+                    animation_dir[0] = "src_kek";
                     bootanimation_start();
                 }
             }
@@ -198,14 +208,14 @@ public class SettingsFragment extends Fragment {
         View PreView = rootView.findViewById(R.id.pre_view);
         CheckBox PreviewCheckbox = rootView.findViewById(R.id.preview_checkbox);
         PreviewCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    PreView.setVisibility(View.VISIBLE);
-                } else {
-                    PreView.setVisibility(View.GONE);
-                }
-            }
-        });
+                                               public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                                   if (isChecked) {
+                                                       PreView.setVisibility(View.VISIBLE);
+                                                   } else {
+                                                       PreView.setVisibility(View.GONE);
+                                                   }
+                                               }
+                                           });
 
         // Screen size
         DisplayMetrics displaymetrics = new DisplayMetrics();
@@ -259,13 +269,13 @@ public class SettingsFragment extends Fragment {
         Button InstallBootAnimationButton = rootView.findViewById(R.id.set_bootanimation);
         addClickListener(InstallBootAnimationButton, v -> {
             File AnimationZip = new File(nh.SD_PATH + "/bootanimation.zip");
-            if (AnimationZip.length() == 0)
-                Toast.makeText(getActivity().getApplicationContext(), "Bootanimation zip is not created!!", Toast.LENGTH_SHORT).show();
-            else {
-                intentClickListener_NHSU("echo -ne \"\\033]0;Installing animation\\007\" && clear;if [ \"$(getprop ro.build.system_root_image)\" == \"true\" ]; then export SYSTEM=/; else export SYSTEM=/system; " +
-                        "fi && mount -o rw,remount $SYSTEM && cp " + nh.SD_PATH + "/bootanimation.zip " + bootanimation_path +
-                        "&& echo \"Done. Please reboot to check the result! Exiting in 3secs..\" && sleep 3 && exit");
-            }
+                    if (AnimationZip.length() == 0)
+                        Toast.makeText(getActivity().getApplicationContext(), "Bootanimation zip is not created!!", Toast.LENGTH_SHORT).show();
+                    else {
+                        intentClickListener_NHSU("echo -ne \"\\033]0;Installing animation\\007\" && clear;if [ \"$(getprop ro.build.system_root_image)\" == \"true\" ]; then export SYSTEM=/; else export SYSTEM=/system; " +
+                                "fi && mount -o rw,remount $SYSTEM && cp " + nh.SD_PATH + "/bootanimation.zip " + BootanimationPath.getText().toString() + " " +
+                                "&& echo \"Done. Please reboot to check the result! Exiting in 3secs..\" && sleep 3 && exit");
+                    }
         });
 
         //Backup
@@ -303,12 +313,12 @@ public class SettingsFragment extends Fragment {
         //Uninstall
         final Button UninstallButton = rootView.findViewById(R.id.uninstall_nh);
         File NhSystemApp = new File("/system/app/NetHunter/NetHunter.apk");addClickListener(UninstallButton, v -> {
-            if (NhSystemApp.length() == 0) {
-                Toast.makeText(getActivity().getApplicationContext(), "NetHunter was not flashed as system app! Please remove it from Android settings.", Toast.LENGTH_LONG).show();
-            } else {
-                intentClickListener_NHSU("echo -ne \"\\033]0;Uninstalling NetHunter\\007\" && clear;if [ \"$(getprop ro.build.system_root_image)\" == \"true\" ]; then export SYSTEM=/; else export SYSTEM=/system; " +
+        if (NhSystemApp.length() == 0) {
+            Toast.makeText(getActivity().getApplicationContext(), "NetHunter was not flashed as system app! Please remove it from Android settings.", Toast.LENGTH_LONG).show();
+        } else {
+            intentClickListener_NHSU("echo -ne \"\\033]0;Uninstalling NetHunter\\007\" && clear;if [ \"$(getprop ro.build.system_root_image)\" == \"true\" ]; then export SYSTEM=/; else export SYSTEM=/system; " +
                         "fi && mount -o rw,remount $SYSTEM && rm " + NhSystemApp + " && pm clear com.offsec.nethunter && echo \"Done! Reboot your device to complete the process. Exiting in 3secs..\" && sleep 3 && exit");
-            }
+                }
         });
         return rootView;
     }
@@ -357,13 +367,13 @@ public class SettingsFragment extends Fragment {
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
         intentClickListener_NH("echo -ne \"\\033]0;Bootanimation Setup\\007\" && clear;if [[ -f /usr/bin/convert ]];then echo \"Imagemagick is installed!\"; else " +
                 "apt-get update && apt-get install imagemagick -y;fi; if [[ -f /root/nethunter-bootanimation ]];then echo \"Nethunter-bootanimation is installed!\"; else " +
-                "git clone https://gitlab.com/yesimxev/nethunter-bootanimation /root/nethunter-bootanimation;fi; echo \"Everything is ready! Closing in 3secs..\"; sleep 3 && exit ");
+                "git clone https://gitlab.com/kekhunteros/kali-nethunter-bootanimation /root/nethunter-bootanimation;fi; echo \"Everything is ready! Closing in 3secs..\"; sleep 3 && exit ");
         sharedpreferences.edit().putBoolean("animation_setup_done", true).apply();
     }
 
     public void RunUpdate() {
         sharedpreferences = activity.getSharedPreferences("com.offsec.nethunter", Context.MODE_PRIVATE);
-        intentClickListener_NH("echo -ne \"\\033]0;Bootanimation Update\\007\" && clear;apt-get update && apt-get install imagemagick -y;if [[ -f /root/nethunter-bootanimation ]];then cd /root/nethunter-bootanimation;git pull" +
+        intentClickListener_NH("echo -ne \"\\033]0;Bootanimation Update\\007\" && clear;apt-get update && apt-get install imagemagick -y;if [[ -d /root/nethunter-bootanimation ]];then cd /root/nethunter-bootanimation;git pull" +
                 ";fi; echo \"Done! Closing in 3secs..\"; sleep 3 && exit ");
         sharedpreferences.edit().putBoolean("animation_setup_done", true).apply();
     }
