@@ -17,7 +17,7 @@ Select:
 * SDK Tools
 * SDK Platform-tools
 * SDK Build-tools
-* Android 11.0 (API 30) or newer
+* Android 10.0 (API 29) and 11.0 (API 30)
 
 Install then accept the license.  Once you have the SDK you may need to update it in the future but are good to go for now.  Now we need to go back to welcome screen and download the Nethunter application source files:
 
