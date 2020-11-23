@@ -292,8 +292,23 @@
     </array>
     <array name="f_chrootmanager_build_chroot_full_or_min">
         <item>full</item>
-        <item>min</item>
+        <item>default</item>
+        <item>kek</item>
     </array>
+
+
+    <!-- Updater stuff -->
+    <string name="wvm_toast_download_started">Download started …</string>
+    <string name="wvm_toast_download_complete">Download completed, installing …</string>
+    <string name="wvm_dialog_title_update">New Update Available!</string>
+    <string name="wvm_dialog_title_rate_us">Rate this app</string>
+    <string name="wvm_dialog_message_update">What\'s new in this version:</string>
+    <string name="wvm_dialog_message_rate_us">Please rate us!</string>
+    <string name="wvm_button_close">close</string>
+    <string name="wvm_button_remind_later">Later</string>
+    <string name="wvm_button_update">Update</string>
+    <string name="wvm_button_ok">OK</string>
+    <string name="wvm_button_not_now">Not now</string>
 
     <string name="thechroottitle">The Kali chroot</string>
     <string name="installkalichrootbutton">Install Kali Chroot</string>

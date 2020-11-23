@@ -85,6 +85,10 @@
         <item name="android:textColorLink">#476CCD</item>
         <item name="android:windowEnterAnimation">@android:anim/fade_in</item>
         <item name="android:windowExitAnimation">@android:anim/fade_out</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="backgroundColor">#1C1C1C</item>
+        <item name="buttonStyle">@style/kekbutton</item>
+
 
         <item name="android:windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
@@ -97,6 +101,9 @@
         <item name="android:textColorLink">#476CCD</item>
         <item name="android:windowEnterAnimation">@android:anim/fade_in</item>
         <item name="android:windowExitAnimation">@android:anim/fade_out</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="backgroundColor">#1C1C1C</item>
+        <item name="buttonStyle">@style/kekbutton</item>
 
         <item name="android:windowNoTitle">true</item>
         <item name="windowActionBar">false</item>

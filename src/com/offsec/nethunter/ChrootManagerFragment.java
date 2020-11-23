@@ -289,16 +289,22 @@ public class ChrootManagerFragment extends Fragment {
                 storepathEditText.setText(sharedPreferences.getString(SharePrefTag.CHROOT_DEFAULT_STORE_DOWNLOAD_SHAREPREF_TAG, NhPaths.SD_PATH + "/Download"));
                 adb1.setView(promtDownloadView);
                 adb1.setMessage("Select the options below:");
-                adb1.setPositiveButton("OK", (dialogInterface, i) -> {
+                adb1.setPositiveButton("Ok", (dialogInterface, i) -> {
                     File downloadDir = new File(storepathEditText.getText().toString());
                     if (downloadDir.isDirectory() && downloadDir.canWrite()) {
                         sharedPreferences.edit().putString(SharePrefTag.CHROOT_DEFAULT_STORE_DOWNLOAD_SHAREPREF_TAG, downloadDir.getAbsolutePath()).apply();
                         if (archSpinner.getSelectedItemPosition() == 0) {
                             ARCH = "arm64";
                         }
-                        if (minorfullSpinner.getSelectedItemPosition() == 0){
+                        if (minorfullSpinner.getSelectedItemPosition() == 0) {
                             MINORFULL = "full";
-                        } else MINORFULL = "minimal";
+                        }
+                        if (minorfullSpinner.getSelectedItemPosition() == 1) {
+                            MINORFULL = "default";
+                        }
+                        if (minorfullSpinner.getSelectedItemPosition() == 2) {
+                            MINORFULL = "kek";
+                        }
                         String targetDownloadFileName = "kalifs-" + ARCH + "-" + MINORFULL + ".tar.xz";
                         if (new File(downloadDir.getAbsoluteFile() + "/" + targetDownloadFileName).exists()){
                             AlertDialog.Builder adb3 = new AlertDialog.Builder(activity);
@@ -380,7 +386,7 @@ public class ChrootManagerFragment extends Fragment {
                         AlertDialog.Builder adb1 = new AlertDialog.Builder(activity)
                             .setTitle("Warning!")
                             .setMessage("This is your last chance!")
-                            .setPositiveButton("Just do it.", (dialogInterface1, i1) -> {
+                            .setPositiveButton("Hell yeah!!.", (dialogInterface1, i1) -> {
                                 chrootManagerAsynctask = new ChrootManagerAsynctask(ChrootManagerAsynctask.REMOVE_CHROOT);
                                 chrootManagerAsynctask.setListener(new ChrootManagerAsynctask.ChrootManagerAsyncTaskListener() {
                                     @Override
@@ -403,7 +409,7 @@ public class ChrootManagerFragment extends Fragment {
                                 });
                                 chrootManagerAsynctask.execute(resultViewerLoggerTextView);
                             })
-                            .setNegativeButton("Okay, I'm sorry.", (dialogInterface12, i12) -> {
+                            .setNegativeButton("Okay, let's cancel it.", (dialogInterface12, i12) -> {
 
                             });
                         adb1.create().show();

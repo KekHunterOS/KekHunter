@@ -27,7 +27,11 @@ public class NotificationChannelService extends IntentService {
     public static final String REMINDMOUNTCHROOT = BuildConfig.APPLICATION_ID + ".REMINDMOUNTCHROOT";
     public static final String USENETHUNTER = BuildConfig.APPLICATION_ID + ".USENETHUNTER";
     public static final String DOWNLOADING = BuildConfig.APPLICATION_ID + ".DOWNLOADING";
+    public static final String SEARCHINGUPDATES = BuildConfig.APPLICATION_ID + ".SEARCHINGUPDATES";
+    public static final String NOUPDATES = BuildConfig.APPLICATION_ID + ".NOUPDATES";
+    public static final String UPDATING = BuildConfig.APPLICATION_ID + ".UPDATING";
     public static final String INSTALLING = BuildConfig.APPLICATION_ID + ".INSTALLING";
+    public static final String NOINTERNET = BuildConfig.APPLICATION_ID + ".NOINTERNET";
     public static final String BACKINGUP = BuildConfig.APPLICATION_ID + ".BACKINGUP";
     public static final String CUSTOMCOMMAND_START = BuildConfig.APPLICATION_ID + ".CUSTOMCOMMAND_START";
     public static final String CUSTOMCOMMAND_FINISH = BuildConfig.APPLICATION_ID + ".CUSTOMCOMMAND_FINISH";
@@ -94,6 +98,50 @@ public class NotificationChannelService extends IntentService {
                                 .setStyle(new NotificationCompat.BigTextStyle().bigText("Please don't kill the app or the download will be cancelled!"))
                                 .setContentTitle("Downloading Chroot!")
                                 .setContentText("Please don't kill the app or the download will be cancelled!")
+                                .setPriority(NotificationCompat.PRIORITY_MAX)
+                                .setContentIntent(resultPendingIntent);
+                        notificationManagerCompat.notify(NOTIFY_ID, builder.build());
+                        break;
+                    case SEARCHINGUPDATES:
+                        builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
+                                .setAutoCancel(true)
+                                .setSmallIcon(R.drawable.ic_stat_ic_nh_notificaiton)
+                                .setTimeoutAfter(15000)
+                                .setContentTitle("Checking...")
+                                .setContentText("Searching for updates")
+                                .setPriority(NotificationCompat.PRIORITY_MAX)
+                                .setContentIntent(resultPendingIntent);
+                        notificationManagerCompat.notify(NOTIFY_ID, builder.build());
+                        break;
+                    case UPDATING:
+                        builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
+                                .setAutoCancel(true)
+                                .setSmallIcon(R.drawable.ic_stat_ic_nh_notificaiton)
+                                .setTimeoutAfter(15000)
+                                .setContentTitle("Updating")
+                                .setContentText("Wait for updater to downlaod the apk")
+                                .setPriority(NotificationCompat.PRIORITY_MAX)
+                                .setContentIntent(resultPendingIntent);
+                        notificationManagerCompat.notify(NOTIFY_ID, builder.build());
+                        break;
+                    case NOUPDATES:
+                        builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
+                                .setAutoCancel(true)
+                                .setSmallIcon(R.drawable.ic_stat_ic_nh_notificaiton)
+                                .setTimeoutAfter(15000)
+                                .setContentTitle("Updater")
+                                .setContentText("No updates found")
+                                .setPriority(NotificationCompat.PRIORITY_MAX)
+                                .setContentIntent(resultPendingIntent);
+                        notificationManagerCompat.notify(NOTIFY_ID, builder.build());
+                        break;
+                    case NOINTERNET:
+                        builder = new NotificationCompat.Builder(getApplicationContext(), CHANNEL_ID)
+                                .setAutoCancel(true)
+                                .setSmallIcon(R.drawable.ic_stat_ic_nh_notificaiton)
+                                .setTimeoutAfter(15000)
+                                .setContentTitle("Updater")
+                                .setContentText("No network access!!")
                                 .setPriority(NotificationCompat.PRIORITY_MAX)
                                 .setContentIntent(resultPendingIntent);
                         notificationManagerCompat.notify(NOTIFY_ID, builder.build());

@@ -1,4 +1,4 @@
 {
-	"version_code": 004,
-	"content": "Version 0.0.4 <p> Fixes/Addons </P><li>Updater uses now download manager to get apk</li><li>Fixed some theme issues</li><li>And some other under the hood modifications</li>"
+	"version_code": 006,
+	"content": "Version 0.0.6 <p> Fixes/Addons </P><li>Fixed some theme issues</li><li>And some other under the hood modifications</li>"
 }

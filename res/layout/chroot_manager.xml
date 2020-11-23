@@ -26,9 +26,10 @@
                 android:text="Click EDIT button to change your Kali Chroot Path below."/>
             <Button
                 android:id="@+id/f_chrootmanager_edit_btn"
+                android:textSize="10dp"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginEnd="8dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="6dp"
                 android:layout_weight="0.1"
                 android:text="EDIT"/>
         </LinearLayout>

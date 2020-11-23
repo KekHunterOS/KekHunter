@@ -5,7 +5,7 @@ buildscript {
         google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.0'
+        classpath 'com.android.tools.build:gradle:4.1.1'
     }
 }
 
@@ -30,14 +30,14 @@ dependencies {
     implementation 'joda-time:joda-time:2.10.6'
     implementation 'com.google.guava:guava:30.0-jre'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-    implementation project(':androidwversionmanager')
+    implementation 'org.thoughtcrime.ssl.pinning:AndroidPinning:1.0.0'
 }
 
 android {
 
-    compileSdkVersion 29
+    compileSdkVersion 30
     buildToolsVersion '29.0.3'
-
+    useLibrary 'org.apache.http.legacy'
     buildFeatures {
         dataBinding true
         // for view binding:
@@ -50,11 +50,11 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 17
-        targetSdkVersion 29
-        //noinspection HighAppVersionCode
-        versionCode 005
-        versionName "0.0.5"
+        minSdkVersion 29
+        targetSdkVersion 30
+        //noinspection AccidentalOctal,HighAppVersionCode
+        versionCode 006
+        versionName "0.0.6"
         multiDexEnabled true
     }
 
@@ -100,5 +100,10 @@ android {
 
             return true
         }
+    }
+    ndkVersion '22.0.6917172 rc1'
+    dependenciesInfo {
+        includeInApk true
+        includeInBundle true
     }
 }

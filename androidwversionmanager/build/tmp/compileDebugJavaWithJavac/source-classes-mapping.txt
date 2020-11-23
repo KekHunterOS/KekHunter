@@ -1,0 +1,17 @@
+com/winsontan520/wversionmanager/library/WVersionManager.java
+ com.winsontan520.wversionmanager.library.WVersionManager
+ com.winsontan520.wversionmanager.library.WVersionManager$1
+ com.winsontan520.wversionmanager.library.WVersionManager$AlertDialogButtonListener
+ com.winsontan520.wversionmanager.library.WVersionManager$VersionContentData
+ com.winsontan520.wversionmanager.library.WVersionManager$VersionContentLoader
+ com.winsontan520.wversionmanager.library.WVersionManager$VersionContentRequest
+com/winsontan520/wversionmanager/library/IWVersionManager.java
+ com.winsontan520.wversionmanager.library.IWVersionManager
+com/winsontan520/wversionmanager/library/OnReceiveListener.java
+ com.winsontan520.wversionmanager.library.OnReceiveListener
+com/winsontan520/wversionmanager/library/UpdateFileProvider.java
+ com.winsontan520.wversionmanager.library.UpdateFileProvider
+com/winsontan520/wversionmanager/library/BuildConfig.java
+ com.winsontan520.wversionmanager.library.BuildConfig
+com/winsontan520/wversionmanager/library/CustomTagHandler.java
+ com.winsontan520.wversionmanager.library.CustomTagHandler

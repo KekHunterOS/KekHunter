@@ -1,0 +1,20 @@
+R_DEF: Internal format may change without notice
+local
+string app_name
+string wvm_button_close
+string wvm_button_not_now
+string wvm_button_ok
+string wvm_button_remind_later
+string wvm_button_update
+string wvm_dialog_message_rate_us
+string wvm_dialog_message_update
+string wvm_dialog_title_rate_us
+string wvm_dialog_title_update
+string wvm_toast_download_complete
+string wvm_toast_download_started
+style AppBaseTheme
+style AppTheme
+style DialogStyle
+style Material
+style NegativeButtonStyle
+style PositiveButtonStyle

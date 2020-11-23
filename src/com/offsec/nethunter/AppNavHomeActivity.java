@@ -21,12 +21,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 // Updater stuff
-import com.winsontan520.wversionmanager.library.WVersionManager;
+import com.offsec.nethunter.service.NotificationChannelService;
+import com.offsec.nethunter.updater.WVersionManager;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
@@ -49,7 +49,6 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Stack;
 
-import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -75,7 +74,7 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private NavigationView navigationView;
-    private CharSequence mTitle = "NetHunter";
+    private CharSequence mTitle = "KekHunter";
     private final Stack<String> titles = new Stack<>();
     private SharedPreferences prefs;
     public static MenuItem lastSelectedMenuItem;
@@ -412,6 +411,8 @@ public class AppNavHomeActivity extends AppCompatActivity implements KaliGPSUpda
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
+        // To add notifications like no internet and no new updates is WIP, for now lets tell that its atleast searching new updates.
+        this.startService(new Intent(this, NotificationChannelService.class).setAction(NotificationChannelService.SEARCHINGUPDATES));
         versionManager.checkVersion();
         versionManager.useDownloadManager(true);
         versionManager.installAfterDownload(true);

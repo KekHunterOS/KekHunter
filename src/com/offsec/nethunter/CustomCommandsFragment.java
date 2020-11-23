@@ -79,7 +79,7 @@ public class CustomCommandsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         CustomCommandsViewModel customCommandsViewModel = ViewModelProviders.of(this).get(CustomCommandsViewModel.class);
         customCommandsViewModel.init(context);
-        customCommandsViewModel.getLiveDataCustomCommandsModelList().observe(this, customCommandsModelList -> customCommandsRecyclerViewAdapter.notifyDataSetChanged());
+        customCommandsViewModel.getLiveDataCustomCommandsModelList().observe(getViewLifecycleOwner(), customCommandsModelList -> customCommandsRecyclerViewAdapter.notifyDataSetChanged());
 
         customCommandsRecyclerViewAdapter = new CustomCommandsRecyclerViewAdapter(context, customCommandsViewModel.getLiveDataCustomCommandsModelList().getValue());
         RecyclerView recyclerView = view.findViewById(R.id.f_customcommands_recyclerview);
@@ -134,7 +134,7 @@ public class CustomCommandsFragment extends Fragment {
             case R.id.f_customcommands_menu_backupDB:
                 titleTextView.setText("Full path to where you want to save the database:");
                 storedpathEditText.setText(NhPaths.APP_SD_SQLBACKUP_PATH + "/FragmentCustomCommands");
-                AlertDialog.Builder adbBackup = new AlertDialog.Builder(activity);
+                AlertDialog.Builder adbBackup = new AlertDialog.Builder(activity,R.style.DialogStyle);
                 adbBackup.setView(promptView);
                 adbBackup.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
                 adbBackup.setPositiveButton("OK", (dialog, which) -> { });
@@ -157,7 +157,7 @@ public class CustomCommandsFragment extends Fragment {
             case R.id.f_customcommands_menu_restoreDB:
                 titleTextView.setText("Full path of the db file from where you want to restore:");
                 storedpathEditText.setText(NhPaths.APP_SD_SQLBACKUP_PATH + "/FragmentCustomCommands");
-                AlertDialog.Builder adbRestore = new AlertDialog.Builder(activity);
+                AlertDialog.Builder adbRestore = new AlertDialog.Builder(activity,R.style.DialogStyle);
                 adbRestore.setView(promptView);
                 adbRestore.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
                 adbRestore.setPositiveButton("OK", (dialog, which) -> { });
@@ -265,10 +265,12 @@ public class CustomCommandsFragment extends Fragment {
                 }
             });
 
-            AlertDialog.Builder adbAdd = new AlertDialog.Builder(activity);
+            AlertDialog.Builder adbAdd =  new AlertDialog.Builder(context,R.style.DialogStyle);
             adbAdd.setPositiveButton("OK", (dialog, which) -> { });
+            adbAdd.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
             final AlertDialog adAdd = adbAdd.create();
             adAdd.setView(promptViewAdd);
+            adAdd.getWindow().getAttributes().windowAnimations = R.style.DialogStyle;
             adAdd.setCancelable(true);
             //If you want the dialog to stay open after clicking OK, you need to do it this way...
             adAdd.setOnShowListener(dialog -> {
@@ -308,7 +310,7 @@ public class CustomCommandsFragment extends Fragment {
             recyclerViewDeleteItem.setLayoutManager(linearLayoutManagerDelete);
             recyclerViewDeleteItem.setAdapter(customCommandsRecyclerViewAdapterDeleteItems);
 
-            AlertDialog.Builder adbDelete = new AlertDialog.Builder(activity);
+            AlertDialog.Builder adbDelete = new AlertDialog.Builder(activity,R.style.DialogStyle);
             adbDelete.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
             adbDelete.setPositiveButton("Delete", (dialog, which) -> { });
             final AlertDialog adDelete = adbDelete.create();
@@ -366,7 +368,7 @@ public class CustomCommandsFragment extends Fragment {
             titlesBefore.setAdapter(arrayAdapter);
             titlesAfter.setAdapter(arrayAdapter);
 
-            AlertDialog.Builder adbMove = new AlertDialog.Builder(activity);
+            AlertDialog.Builder adbMove = new AlertDialog.Builder(activity,R.style.DialogStyle);
             adbMove.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
             adbMove.setPositiveButton("Move", (dialog, which) -> { });
             final AlertDialog adMove = adbMove.create();
