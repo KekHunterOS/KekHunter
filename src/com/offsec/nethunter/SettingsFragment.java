@@ -125,7 +125,7 @@ public class SettingsFragment extends Fragment {
             SetupDialog();
 
         //Bootanimation spinner
-        String[] animations = new String[]{"Classic", "Burning", "New Kali", "ctOS"};
+        String[] animations = new String[]{"Classic", "Burning", "New Kali", "ctOS", "Glitch"};
         Spinner animation_spinner = rootView.findViewById(R.id.animation_spinner);
         animation_spinner.setAdapter(new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_list_item_1, animations));
@@ -156,6 +156,11 @@ public class SettingsFragment extends Fragment {
                     String path = ("android.resource://" + context.getPackageName() + "/" + R.raw.boot_ctos);
                     videoview.setVideoURI(Uri.parse(path));
                     animation_dir[0] = "src_ctos";
+                    bootanimation_start();
+                } else if (selected_animation.equals("Glitch")){
+                    String path = ("android.resource://" + context.getPackageName() + "/" + R.raw.boot_glitch);
+                    videoview.setVideoURI(Uri.parse(path));
+                    animation_dir[0] = "src_glitch";
                     bootanimation_start();
                 }
             }
