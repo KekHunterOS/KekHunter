@@ -7,7 +7,7 @@ if [ ! $? -eq 0 ]; then
 fi
 
 ## Define the nethunter app package name.
-APP_PGK_NAME=com.offsec.nethunter
+APP_PGK_NAME=com.team420.kekhunter
 
 USERINIT_SCRIPT_PATH=$(readlink -f $0)
 . /data/data/$APP_PGK_NAME/files/scripts/bootkali_log

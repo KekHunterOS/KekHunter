@@ -8,6 +8,7 @@
     <item name="clearText" type="color">#ffffff</item>
 
     <item name="darkTitle" type="color">#1C1C1C</item>
+    <item name="green" type="color">#4BAE4F</item>
 
 
 </resources>

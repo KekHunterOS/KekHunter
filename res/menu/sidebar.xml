@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view"
+    android:theme="@style/Theme.Nethunter"
+    >
 
     <group>
         <item
@@ -10,10 +14,6 @@
             android:id="@+id/createchroot_item"
             android:icon="@drawable/ic_action_android"
             android:title="@string/drawertitlecreatechroot" />
-        <item
-            android:id="@+id/update_btn"
-            android:icon="@drawable/ic_system_update_black_36dp"
-            android:title="Check for updates" />
     </group>
     <group android:id="@+id/chrootDependentGroup">
         <item

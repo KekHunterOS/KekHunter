@@ -5,7 +5,7 @@
 
         <variable
             name="viewModel"
-            type="com.offsec.nethunter.MITMFViewModel" />
+            type="com.team420.kekhunter.MITMFViewModel" />
     </data>
 
     <ScrollView

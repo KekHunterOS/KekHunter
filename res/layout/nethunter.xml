@@ -13,7 +13,7 @@
         android:gravity="center"
         android:textSize="18sp"
         app:layout_constraintTop_toTopOf="parent"
-        android:text="NETHUNTER INFORMATION">
+        android:text="KEKHUNTER INFORMATION">
     </TextView>
 
     <TextView

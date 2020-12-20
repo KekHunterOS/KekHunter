@@ -184,14 +184,6 @@ if [ ! $# -eq 0 ]; then
                             fi
                         done
 
-                      KERNEL="$(uname -r)"
-                      DIR="/lib/modules/$KERNEL"
-                      if [ -d "$DIR" ]; then
-                          DIR="/system/lib/modules"
-                          else
-                          DIR="/vendor/lib/modules"
-                        fi
-
                         if [ $ISALLREADY -eq 0 ]; then
                             bklog "[+] Chroot environment has been set and started."
                             bklog "[!] You may click \"STOP KALI CHROOT\" to shutdown the chroot environment."
@@ -237,7 +229,7 @@ if [ ! $# -eq 0 ]; then
                         $BUSYBOX sync
                     elif echo $2 | grep -q ".tar.xz$"; then
                         if [ -z "$XZ" ]; then
-                            bklog "[-] Sorry, you must use /data/data/com.offsec.nethunter/files/scripts/bin/xz to get xz work here."
+                            bklog "[-] Sorry, you must use /data/data/com.team420.kekhunter/files/scripts/bin/xz to get xz work here."
                             bklog "[-] Or check if the execute permission of xz is granted."
                             bklog "[-] Or please choose to compress with .tar.gz instead."
                         else

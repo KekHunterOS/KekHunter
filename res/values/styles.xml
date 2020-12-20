@@ -23,7 +23,7 @@
         <item name="android:textSize">14dp</item>
 
         <!-- Button background colors/colours -->
-        <item name="colorBackgroundFloating">#1C1C1C</item>
+        <item name="colorBackgroundFloating">#DA201D1D</item>
 
         <!-- Button text colors/colours -->
         <item name="android:negativeButtonText">#FFFFFF</item>
@@ -55,25 +55,33 @@
 
     <!-- Overall buttons styles-->
     <style name="kekbutton" parent="@style/Widget.MaterialComponents.Button.OutlinedButton">
-        <item name="backgroundTint">#2C2C30</item>
+        <item name="backgroundTint">#E423232B</item>
         <item name="android:textColor">#FFFFFF</item>
+        <item name="actionButtonStyle">@style/Widget.MaterialComponents.FloatingActionButton</item>
 
         <item name="android:maxHeight">5dp</item>
         <item name="android:paddingLeft">5dp</item>
         <item name="android:paddingRight">5dp</item>
+        <item name="cornerRadius">12dp</item>
     </style>
 
     <!-- Alert dialog button styles go here-->
     <style name="NegativeButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textColorPrimary">#FFFFFF</item>
+        <item name="android:colorAccent">#FFFFFF</item>
+
     </style>
 
     <style name="PositiveButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textColor">#FFFFFF</item>
+        <item name="android:colorAccent">#FFFFFF</item>
     </style>
 
     <style name="NeutralButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textColor">#FFFFFF</item>
+        <item name="android:colorAccent">#FFFFFF</item>
+
     </style>
     <!-- Button styles go here-->
 
@@ -83,8 +91,11 @@
         <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
         <item name="buttonBarNeutralButtonStyle">@style/NeutralButtonStyle</item>
         <item name="android:textColorLink">#476CCD</item>
-        <item name="android:windowEnterAnimation">@android:anim/fade_in</item>
-        <item name="android:windowExitAnimation">@android:anim/fade_out</item>
+
+        <!-- Animations -->
+        <item name="android:windowEnterAnimation">@anim/fragment_fade_enter</item>
+        <item name="android:windowExitAnimation">@anim/fragment_fade_exit</item>
+
         <item name="android:textColor">#FFFFFF</item>
         <item name="backgroundColor">#1C1C1C</item>
         <item name="buttonStyle">@style/kekbutton</item>
@@ -99,8 +110,8 @@
         <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
         <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
         <item name="android:textColorLink">#476CCD</item>
-        <item name="android:windowEnterAnimation">@android:anim/fade_in</item>
-        <item name="android:windowExitAnimation">@android:anim/fade_out</item>
+        <item name="android:windowEnterAnimation">@anim/fragment_fade_enter</item>
+        <item name="android:windowExitAnimation">@anim/fragment_fade_exit</item>
         <item name="android:textColor">#FFFFFF</item>
         <item name="backgroundColor">#1C1C1C</item>
         <item name="buttonStyle">@style/kekbutton</item>

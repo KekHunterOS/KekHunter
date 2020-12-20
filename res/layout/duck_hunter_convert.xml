@@ -63,15 +63,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/load"
-                android:id="@+id/duckyLoad"
-                style="?android:attr/buttonBarButtonStyle"/>
+                android:id="@+id/duckyLoad" />
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/save"
-                android:id="@+id/duckySave"
-                style="?android:attr/buttonBarButtonStyle"/>
+                android:id="@+id/duckySave" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>
