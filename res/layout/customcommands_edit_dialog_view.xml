@@ -6,9 +6,6 @@
     android:orientation="vertical"
     android:padding="5dp">
 
-    <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -24,7 +21,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
                 android:textSize="18sp"
-                android:textColor="@color/accent_material_dark"
                 android:text="Label:"/>
 
             <EditText
@@ -41,7 +37,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
                 android:textSize="18sp"
-                android:textColor="@color/accent_material_dark"
                 android:text="Command:"/>
 
             <EditText
@@ -62,7 +57,6 @@
                     android:layout_marginStart="4dp"
                     android:layout_weight="0.4"
                     android:textSize="18sp"
-                    android:textColor="@color/accent_material_dark"
                     android:text="Send to:"/>
 
                 <Spinner
@@ -85,7 +79,6 @@
                     android:layout_marginStart="4dp"
                     android:layout_weight="0.4"
                     android:textSize="18sp"
-                    android:textColor="@color/accent_material_dark"
                     android:text="Exec mode:"/>
 
                 <Spinner
@@ -109,12 +102,10 @@
                     android:layout_height="wrap_content"
                     android:text="RunOnBoot"
                     android:textSize="18sp"
-                    android:textColor="@color/accent_material_dark"
                     android:layout_marginStart="4dp"/>
 
             </LinearLayout>
 
         </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
 
 </LinearLayout>

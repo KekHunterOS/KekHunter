@@ -45,8 +45,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Use selected target"
-            android:textColor="#ffffffff" />
+            android:text="Use selected target" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -166,16 +165,14 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="l2ping"
-            android:textColor="#ffffffff" />
+            android:text="l2ping"/>
 
         <Button
             android:id="@+id/start_rfcommscan"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="rfcomm scan"
-            android:textColor="#ffffffff" />
+            android:text="rfcomm scan" />
 
     </LinearLayout>
 
@@ -238,8 +235,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Hunt for devices"
-            android:textColor="#ffffffff" />
+            android:text="Hunt for devices"/>
 
         <View
             android:id="@+id/divider3"
@@ -260,8 +256,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Check proximity"
-            android:textColor="#ffffffff" />
+            android:text="Check proximity" />
 
         <View
             android:id="@+id/divider4"
@@ -281,8 +276,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Discover services"
-            android:textColor="#ffffffff" />
+            android:text="Discover services" />
 
         <TextView
             android:id="@+id/SDPoutput"

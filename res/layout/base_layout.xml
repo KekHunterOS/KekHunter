@@ -13,24 +13,17 @@ view using match_parent for both width and height to consume the full space avai
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/colorBackgroundBase"
         android:contentDescription="@string/app_name"
         android:scaleType="centerCrop" />
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:alpha="0.05"
-        android:contentDescription="@string/app_name"
-        app:srcCompat="@drawable/nh_cropbg"
-        android:scaleType="center" />
-
-    <com.google.android.material.navigation.NavigationView xmlns:app="http://schemas.android.com/apk/res-auto"
+    <com.google.android.material.navigation.NavigationView
         android:id="@+id/navigation_view"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         app:itemTextColor="@drawable/activated_color"
+        android:background="@color/colorBackgroundBasenav"
         app:itemIconTint="@drawable/activated_color"
         app:menu="@menu/sidebar" />
 

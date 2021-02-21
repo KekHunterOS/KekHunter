@@ -46,8 +46,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Use selected target"
-            android:textColor="#ffffffff" />
+            android:text="Use selected target" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -153,8 +152,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="5"
-                android:text="..."
-                android:textColor="#ffffffff" />
+                android:text="..."/>
 
         </LinearLayout>
 
@@ -169,22 +167,21 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="3"
-            android:text="Launch"
-            android:textColor="#ffffffff" />
+            android:text="Launch" />
 
         <Button
             android:id="@+id/stop_cw"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="3"
-            android:text="Kill"
-            android:textColor="#ffffffff" />
+            android:text="Kill" />
 
         <ImageButton
             android:id="@+id/play_audio"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_weight="4"
+            android:backgroundTint="#222222"
             android:src="@drawable/ic_action_play" />
 
         <ImageButton
@@ -192,6 +189,7 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_weight="4"
+            android:backgroundTint="#222222"
             android:src="@drawable/ic_action_stop" />
 
     </LinearLayout>

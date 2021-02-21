@@ -8,6 +8,5 @@
         android:layout_height="wrap_content"
         android:layout_gravity="top"
         android:paddingBottom="10dp"
-        android:paddingTop="10dp"
-        android:textColor="#FFFFFF" />
+        android:paddingTop="10dp" />
 </androidx.viewpager.widget.ViewPager>

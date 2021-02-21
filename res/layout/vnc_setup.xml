@@ -30,8 +30,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Setup Local Server"
-                android:textColor="#ffffffff" />
+                android:text="Setup Local Server" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -131,16 +130,14 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Start Server"
-                    android:textColor="#ffffffff" />
+                    android:text="Start Server" />
 
                 <Button
                     android:id="@+id/stop_vnc"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Stop Server"
-                    android:textColor="#ffffffff" />
+                    android:text="Stop Server" />
             </LinearLayout>
 
 
@@ -177,8 +174,9 @@
 
                 <ImageButton
                     android:id="@+id/refreshKeX"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:background="#AE1E1E1E"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:srcCompat="@drawable/ic_action_refresh" />
@@ -247,19 +245,19 @@
                 android:text="OPEN KEX CLIENT" />
 
             <Button
+                android:visibility="gone"
                 android:id="@+id/AdvancedButton"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="SHOW ADVANCED SETTINGS" />
 
-            <LinearLayout
+
                 android:id="@+id/AdvancedView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:saveEnabled="true"
-                android:visibility="gone">
+                android:saveEnabled="true">
 
                 <TextView
                     android:id="@+id/textView6"
@@ -275,16 +273,14 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Add new Kali user"
-                    android:textColor="#ffffffff" />
+                    android:text="Add new Kali user" />
 
                 <Button
                     android:id="@+id/DelUserButton"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Remove selected Kali user"
-                    android:textColor="#ffffffff" />
+                    android:text="Remove selected Kali user" />
 
                 <Switch
                     android:id="@+id/immersionSwitch"
@@ -328,8 +324,7 @@
                         android:id="@+id/ApplyResolutionButton"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Apply"
-                        android:textColor="#ffffffff" />
+                        android:text="Apply" />
 
                 </LinearLayout>
 
@@ -338,8 +333,7 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Remove selected resolution"
-                    android:textColor="#ffffffff" />
+                    android:text="Remove selected resolution" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -353,7 +347,6 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="New resolution"
-                        android:textColor="#ffffffff"
                         android:textSize="13sp" />
 
                     <Button
@@ -362,7 +355,6 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Reset"
-                        android:textColor="#ffffffff"
                         android:textSize="13sp" />
 
                 </LinearLayout>
@@ -380,7 +372,6 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Backup"
-                        android:textColor="#ffffffff"
                         android:textSize="13sp" />
 
                     <Button
@@ -389,7 +380,6 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Restore"
-                        android:textColor="#ffffffff"
                         android:textSize="13sp" />
 
                 </LinearLayout>
@@ -421,16 +411,14 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Remove selected resolution"
-                    android:textColor="#ffffffff" />
+                    android:text="Remove selected resolution" />
 
                 <Button
                     android:id="@+id/AddVncResolutionButton"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="New resolution"
-                    android:textColor="#ffffffff" />
+                    android:text="New resolution" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -444,7 +432,6 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Backup"
-                        android:textColor="#ffffffff"
                         android:textSize="13sp" />
 
                     <Button
@@ -453,14 +440,11 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Restore"
-                        android:textColor="#ffffffff"
                         android:textSize="13sp" />
 
                 </LinearLayout>
 
             </LinearLayout>
-
-        </LinearLayout>
 
     </ScrollView>
 

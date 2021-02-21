@@ -64,8 +64,9 @@
 
                 <ImageButton
                     android:id="@+id/refreshStatus"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:backgroundTint="#222222"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     app:srcCompat="@drawable/ic_action_refresh"
                     android:layout_weight="1"/>
 
@@ -267,8 +268,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Scan for devices"
-                android:textColor="#ffffffff" />
+                android:text="Scan for devices" />
 
             <ListView
                 android:id="@+id/targets"

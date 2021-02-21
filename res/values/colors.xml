@@ -1,13 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <item name="blue" type="color">#33B5E5</item>
+    <!-- Day -->
+    <color name="primaryColor">#cfd8dc</color>
+    <color name="primaryLightColor">#ffffff</color>
+    <color name="primaryDarkColor">#9ea7aa</color>
+    <color name="secondaryColor">#9e9e9e</color>
+    <color name="secondaryLightColor">#cfcfcf</color>
+    <color name="secondaryDarkColor">#707070</color>
+    <color name="primaryTextColor">#000000</color>
+    <color name="secondaryTextColor">#000000</color>
+
+    <item name="blue" type="color">#2196F3</item>
     <item name="darkorange" type="color">#FFFF8800</item>
 
-    <item name="clearTitle" type="color">#fcfcfc</item>
-    <item name="clearText" type="color">#d9d9d9</item>
+    <item name="clearTitle" type="color">#FFFEFE</item>
+    <item name="clearText" type="color">#000000</item>
 
-    <item name="darkTitle" type="color">#444</item>
+    <color name="colorBackground">#00000080</color>
 
-
+    <color name="colorBackgroundBasenav">#cfd8dc</color>
+    <color name="colorBackgroundBase">#8BB3BDC1</color>
+    <item name="darkTitle" type="color">#989797</item>
 </resources>

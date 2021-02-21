@@ -21,7 +21,6 @@
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:textSize="18sp"
-            android:textColor="@color/clearTitle"
             android:text="Arch:"/>
 
         <Spinner
@@ -29,7 +28,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="18sp"
-            android:textColor="@color/clearTitle"
             android:entries="@array/f_chrootmanager_build_chroot_arm_opts"/>
 
         <TextView
@@ -39,15 +37,13 @@
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:textSize="18sp"
-            android:textColor="@color/clearTitle"
-            android:text="Min or Full install:"/>
+            android:text="Full or minimal install:"/>
 
         <Spinner
             android:id="@+id/f_chrootmanager_minorfull_adb_spr"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="18sp"
-            android:textColor="@color/clearTitle"
             android:entries="@array/f_chrootmanager_build_chroot_full_or_min"/>
 
         <TextView
@@ -57,8 +53,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:text="Path of the folder you want to donwload to:"
-            android:textSize="18sp"
-            android:textColor="@color/clearTitle"/>
+            android:textSize="18sp"/>
 
         <EditText
             android:id="@+id/f_chrootmanager_storepath_et"
@@ -66,8 +61,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
-            android:textSize="18sp"
-            android:textColor="@color/clearTitle"/>
+            android:textSize="18sp"/>
 
     </LinearLayout>
 </LinearLayout>

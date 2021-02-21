@@ -96,7 +96,7 @@ f_dir_umount() {
     f_kill_pids
     f_restore_setup
     bklog "[!] Removing all fs mounts.."
-    FS=(dev/pts dev/shm dev proc sys system sdcard)
+    FS=(dev/pts dev/shm dev proc sys system)
     for i in "${FS[@]}"; do
         f_umount_fs "$i"
     done
@@ -110,6 +110,10 @@ f_is_mntpoint() {
     fi
 }
 
+f_umount_sdcard() {
+    $BUSYBOX umount -l $MNT/sdcard
+}
+
 
 ###################
 #### MAIN PART ####
@@ -120,6 +124,7 @@ res=$?
 case $res in
 1)
     bklog "[!] $MNT is NOT a mountpoint"
+    f_umount_sdcard
     f_dir_umount
     ;;
 *)

@@ -53,8 +53,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Use selected target"
-            android:textColor="#ffffffff" />
+            android:text="Use selected target" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -136,16 +135,14 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Apply"
-            android:textColor="#ffffffff" />
+            android:text="Apply"/>
 
         <Button
             android:id="@+id/refreshSpoof"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Check"
-            android:textColor="#ffffffff" />
+            android:text="Check" />
 
     </LinearLayout>
 

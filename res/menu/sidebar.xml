@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    android:theme="@style/Theme.KekHunter"
+    >
 
     <group>
         <item
@@ -12,6 +14,14 @@
             android:title="@string/drawertitlecreatechroot" />
     </group>
     <group android:id="@+id/chrootDependentGroup">
+        <item
+            android:id="@+id/settings_item"
+            android:icon="@drawable/ic_action_settings_applications"
+            android:title="@string/drawertitlesettings" />
+        <item
+            android:id="@+id/usbarmory_item"
+            android:icon="@drawable/ic_action_keyboard"
+            android:title="@string/drawertitleusbarmory" />
          <item
              android:id="@+id/kaliservices_item"
              android:icon="@drawable/ic_action_settings_applications"
@@ -28,10 +38,7 @@
              android:id="@+id/vnc_item"
              android:icon="@drawable/ic_action_home"
              android:title="@string/drawertitlevncmanager" />
-        <item
-            android:id="@+id/usbarmory_item"
-            android:icon="@drawable/ic_action_keyboard"
-            android:title="@string/drawertitleusbarmory" />
+
          <item
              android:id="@+id/hid_item"
              android:icon="@drawable/ic_action_keyboard"
@@ -80,9 +87,6 @@
             android:id="@+id/deauth_item"
             android:icon="@drawable/ic_action_network_wifi"
             android:title="@string/drawertitledeauth" />
-        <item
-            android:id="@+id/settings_item"
-            android:icon="@drawable/ic_action_settings_applications"
-            android:title="@string/drawertitlesettings" />
+
      </group>
 </menu>

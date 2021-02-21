@@ -198,8 +198,7 @@
                     android:id="@+id/f_usbarmory_btn_setusbinterface"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Set USB Function"
-                    style="?android:attr/buttonStyleSmall"/>
+                    android:text="Set USB Function"/>
                 <Button
                     android:id="@+id/f_usbarmory_btn_saveusbfuncswitch"
                     android:layout_width="match_parent"
@@ -228,14 +227,16 @@
                             android:layout_height="wrap_content"
                             android:textSize="18sp" />
                     </LinearLayout>
+
                     <ImageButton
                         android:id="@+id/f_usbarmory_imgbtn_reloadUSBStatus"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_weight="0.2"
                         android:adjustViewBounds="false"
+                        android:backgroundTint="#222222"
                         android:baselineAlignBottom="false"
                         android:cropToPadding="false"
-                        android:layout_weight="0.2"
                         android:src="@drawable/ic_action_refresh" />
                 </LinearLayout>
             </LinearLayout>

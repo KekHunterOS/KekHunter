@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="3dp"
         android:orientation="horizontal"
-        android:background="@color/cardview_shadow_start_color">
+        android:background="#51000000">
     </LinearLayout>
 
     <LinearLayout
@@ -23,7 +23,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="4dp"
-            android:textColor="@color/cardview_light_background"
             android:text="Loading"
             android:textSize="20sp"
             android:background="?attr/selectableItemBackground"
@@ -59,11 +58,11 @@
 
         <Button
             android:id="@+id/f_nethunter_item_run_btn"
-            android:layout_width="match_parent"
+            android:layout_width="77dp"
+            android:fontFamily="sans-serif-condensed"
             android:layout_height="wrap_content"
-            android:layout_weight="0.8"
             android:text="RUN"
-            android:layout_gravity="bottom"
-            android:textColor="@color/accent_material_dark" />
+            android:textSize="14sp" />
+
     </LinearLayout>
 </LinearLayout>

@@ -16,25 +16,6 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginStart="12dp"
-                android:gravity="bottom"
-                android:layout_weight="0.9"
-                android:text="Click EDIT button to change your Kali Chroot Path below."/>
-            <Button
-                android:id="@+id/f_chrootmanager_edit_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="0.1"
-                android:text="EDIT"/>
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal">
             <LinearLayout
@@ -51,7 +32,6 @@
                     android:layout_marginTop="8dp"
                     android:gravity="center"
                     android:text="KaliChrootPath: /data/local/nhsystem/"
-                    android:textColor="@android:color/background_light"
                     android:enabled="false"/>
                 <TextView
                     android:id="@+id/f_chrootmanager_kalifolder_tv"
@@ -60,8 +40,7 @@
                     android:layout_marginTop="8dp"
                     android:gravity="center"
                     android:text="kali-arm64"
-                    android:singleLine="true"
-                    android:textColor="@android:color/background_light"/>
+                    android:singleLine="true"/>
             </LinearLayout>
 
         </LinearLayout>
@@ -74,7 +53,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Status:"
-                android:textColor="@android:color/background_light"
                 android:layout_marginStart="12dp"
                 android:layout_marginEnd="4dp" />
 
@@ -96,8 +74,8 @@
         android:layout_marginStart="4dp"
         android:layout_marginTop="4dp"
         android:layout_marginEnd="4dp"
-        android:alpha="100"
-        android:background="@android:color/black"
+        android:alpha="0.60"
+        android:background="#EE000000"
         android:gravity="bottom"
         android:scrollbars="vertical"
         android:singleLine="false"
@@ -124,12 +102,23 @@
             android:id="@+id/f_chrootmanager_btn_linearlayout">
 
             <Button
+                android:id="@+id/f_chrootmanager_edit_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginLeft="3dp"
+                android:text="Edit path"/>
+
+            <Button
                 android:id="@+id/f_chrootmanager_mount_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:text="Start Kali Chroot"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:text="Start Chroot"
                 android:visibility="gone"/>
 
             <Button
@@ -138,7 +127,9 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toEndOf="@+id/f_chrootmanager_mount_btn"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:text="Stop Kali Chroot"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:text="Stop Chroot"
                 android:visibility="gone"/>
 
             <Button
@@ -147,7 +138,9 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toEndOf="@+id/f_chrootmanager_unmount_btn"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:text="Install Kali Chroot"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:text="Install Chroot"
                 android:visibility="gone"/>
 
             <Button
@@ -156,6 +149,8 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toEndOf="@+id/f_chrootmanager_install_btn"
                 app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
                 android:text="Add Metapackge"
                 android:visibility="gone"/>
 
@@ -165,7 +160,7 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toEndOf="@+id/f_chrootmanager_addmetapkg_btn"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:text="Backup Kali Chroot"
+                android:text="Backup Chroot"
                 android:visibility="gone"/>
 
             <Button
@@ -174,7 +169,9 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toEndOf="@+id/f_chrootmanager_backupchroot_btn"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:text="Remove Kali Chroot"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:text="Remove Chroot"
                 android:visibility="gone"/>
         </LinearLayout>
     </HorizontalScrollView>

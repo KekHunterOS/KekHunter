@@ -184,13 +184,34 @@ if [ ! $# -eq 0 ]; then
                             fi
                         done
 
+
+                      # Start of exported modules paths
                       KERNEL="$(uname -r)"
-                      DIR="/lib/modules/$KERNEL"
-                      if [ -d "$DIR" ]; then
-                          bklog "[+] kernel modules exists and linked."
+
+                      MODPATH1=/system/lib/modules
+                      MODPATH2=/vendor/lib/modules
+                      MODPATH3=/lib/modules
+                      MODPATH4=/system/lib/modules/$KERNEL
+                      MODPATH5=/vendor/lib/modules/$KERNEL
+                      MODPATH6=/lib/modules/$KERNEL
+                      # End of exported modules paths
+
+                      if [ -d "$MODPATH1" ]; then
+                          bklog "[+] kernel modules exists and found at '$MODPATH1'."
+                          elif [ -d "$MODPATH2" ]; then
+                          bklog "[+] kernel modules exists and found at '$MODPATH2'."
+                          elif [ -d "$MODPATH3" ]; then
+                          bklog "[+] kernel modules exists and found at '$MODPATH3'."
+                          elif [ -d "$MODPATH4" ]; then
+                          bklog "[+] kernel modules exists and found at '$MODPATH4'."
+                          elif [ -d "$MODPATH5" ]; then
+                          bklog "[+] kernel modules exists and found at '$MODPATH5'."
+                          elif [ -d "$MODPATH6" ]; then
+                          bklog "[+] kernel modules exists and found at '$MODPATH6'."
                           else
-                          bklog "[-] $i ${DIR} doesn't exist or isn't mounted. ."
+                          bklog "[+] No kernel modules path was found (sad)."
                       fi
+
 
                       if [ $ISALLREADY -eq 0 ]; then
                             bklog "[+] Chroot environment has been set and started."
@@ -392,25 +413,9 @@ if [ ! $# -eq 0 ]; then
             shift 1
             case $# in
                 2)
-                    # official link for chroot image -> https://images.kali.org/nethunter/
-                    # kalifs-arm64-full.tar.xz | kalifs-arm64-minimal.tar.xz
-                    # kalifs-armhf-full.tar.xz | kalifs-armhf-minimal.tar.xz
-                    local SHAFILE_URL_LINK=$1
-                    local TARGET_FILE=$2
-                    local CORRECT_SHA
-                    local COMPUTED_SHA
-                    bklog "[!] Now checking the sha512 for $TARGET_FILE.."
-                    CORRECT_SHA="$($BUSYBOX wget $SHAFILE_URL_LINK -q -O -)"
-                    bklog "$CORRECT_SHA"
-                    COMPUTED_SHA="$($BUSYBOX sha512sum $TARGET_FILE | sed 's/ .*\//  /g')"
-                    bklog "$COMPUTED_SHA"
-                    if [ "$CORRECT_SHA" = "$COMPUTED_SHA" ]; then
-                        bklog "[+] Checksum matches!"
-                        return 0
-                    else
-                        bklog "[-] Checksum mismatches! the downloaded file may be compromised already!! Please contact the nethunter devs for help."
-                        return 1
-                    fi
+                    # official link for chroot image -> www.github.com/KekHunterOS/Chroot/releases/latest/download/
+                    # kali-arm64.tar.xz | arch-arm64.tar.xz | ubuntu-arm64.tar.xz
+                    return 0
                     ;;
                 *)
                     f_chroot_usage

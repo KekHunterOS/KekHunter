@@ -42,8 +42,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:padding="4dp"
-                    android:textSize="18sp"
-                    android:textColor="@color/cardview_light_background"/>
+                    android:textSize="18sp"/>
             </LinearLayout>
 
             <LinearLayout
@@ -64,7 +63,6 @@
                     android:layout_toStartOf="@+id/f_macchanger_setHostname_btn" />
 
                 <Button
-                    style="?android:attr/buttonStyleSmall"
                     android:id="@+id/f_macchanger_setHostname_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -90,8 +88,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="1dp"
                 android:layout_marginBottom="8dp"
-                android:layout_marginTop="8dp"
-                android:background="#ffffff" />
+                android:layout_marginTop="8dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -116,13 +113,13 @@
                     android:hint="@string/currentmac"
                     android:maxLength="17"
                     android:layout_marginLeft="16dp"
-                    android:layout_marginRight="16dp"
-                    android:textColor="@color/cardview_light_background"/>
+                    android:layout_marginRight="16dp"/>
 
                 <ImageButton
                     android:id="@+id/f_macchanger_reloadMAC_imgbtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:backgroundTint="#222222"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     android:layout_marginStart="5dp"
                     android:contentDescription="@string/reloadMAC"
                     app:srcCompat="@drawable/ic_action_refresh" />
@@ -149,8 +146,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="1dp"
                 android:layout_marginBottom="8dp"
-                android:layout_marginTop="8dp"
-                android:background="#ffffff" />
+                android:layout_marginTop="8dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"

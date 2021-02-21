@@ -39,22 +39,22 @@
 
                 <TextView
                     android:id="@+id/textView1"
-                    android:layout_height="match_parent"
                     android:layout_width="match_parent"
-                    android:layout_weight="1"
+                    android:layout_height="match_parent"
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="20dp"
+                    android:layout_weight="1"
                     android:paddingTop="10dp"
                     android:text="SCREEN SIZE:"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
 
                 <TextView
                     android:id="@+id/screen_size"
-                    android:layout_height="match_parent"
                     android:layout_width="match_parent"
-                    android:layout_weight="1"
+                    android:layout_height="match_parent"
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="20dp"
+                    android:layout_weight="1"
                     android:paddingTop="10dp"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
 
@@ -69,11 +69,11 @@
 
                 <TextView
                     android:id="@+id/textView4"
-                    android:layout_height="match_parent"
                     android:layout_width="match_parent"
-                    android:layout_weight="1"
+                    android:layout_height="match_parent"
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="20dp"
+                    android:layout_weight="1"
                     android:paddingTop="15dp"
                     android:text="SELECT ANIMATION:"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
@@ -82,9 +82,9 @@
                     android:id="@+id/animation_spinner"
                     android:layout_width="fill_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="1"
                     android:layout_marginStart="5dp"
                     android:layout_marginEnd="5dp"
+                    android:layout_weight="1"
                     android:dropDownWidth="match_parent"
                     android:saveEnabled="false" />
 
@@ -98,21 +98,21 @@
 
                 <CheckBox
                     android:id="@+id/convert"
-                    android:layout_height="match_parent"
                     android:layout_width="match_parent"
-                    android:layout_weight="1"
+                    android:layout_height="match_parent"
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="20dp"
+                    android:layout_weight="1"
                     android:text="Convert"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
 
                 <CheckBox
                     android:id="@+id/preview_checkbox"
-                    android:layout_height="match_parent"
                     android:layout_width="match_parent"
-                    android:layout_weight="1"
+                    android:layout_height="match_parent"
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="20dp"
+                    android:layout_weight="1"
                     android:text="Preview"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
 
@@ -122,15 +122,14 @@
                 android:id="@+id/pre_view"
                 android:layout_width="756px"
                 android:layout_height="1344px"
+                android:layout_gravity="center"
                 android:paddingTop="10dp"
-                android:visibility="gone"
-                android:layout_gravity="center">
+                android:visibility="gone">
 
                 <VideoView
                     android:id="@+id/videoView"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    />
+                    android:layout_height="wrap_content" />
 
             </LinearLayout>
 
@@ -142,11 +141,11 @@
 
                 <TextView
                     android:id="@+id/textView5"
-                    android:layout_height="match_parent"
                     android:layout_width="match_parent"
-                    android:layout_weight="2"
+                    android:layout_height="match_parent"
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="20dp"
+                    android:layout_weight="2"
                     android:paddingTop="10dp"
                     android:text="IMAGE RESOLUTION:"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
@@ -158,8 +157,7 @@
                     android:layout_weight="1"
                     android:ems="10"
                     android:inputType="number"
-                    android:text="1080"
-                    android:textColor="#40FFFFFF" />
+                    android:text="1080" />
 
                 <EditText
                     android:id="@+id/image_height"
@@ -168,8 +166,7 @@
                     android:layout_weight="1"
                     android:ems="10"
                     android:inputType="number"
-                    android:text="1920"
-                    android:textColor="#40FFFFFF" />
+                    android:text="1920" />
 
             </LinearLayout>
 
@@ -181,11 +178,11 @@
 
                 <TextView
                     android:id="@+id/textView8"
-                    android:layout_height="match_parent"
                     android:layout_width="match_parent"
-                    android:layout_weight="2"
+                    android:layout_height="match_parent"
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="20dp"
+                    android:layout_weight="2"
                     android:paddingTop="10dp"
                     android:text="FINAL RESOLUTION:"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
@@ -218,11 +215,11 @@
 
                 <TextView
                     android:id="@+id/textView2"
-                    android:layout_height="match_parent"
                     android:layout_width="match_parent"
-                    android:layout_weight="3"
+                    android:layout_height="match_parent"
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="20dp"
+                    android:layout_weight="3"
                     android:paddingTop="10dp"
                     android:text="FRAME RATE:"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
@@ -238,8 +235,8 @@
 
                 <TextView
                     android:id="@+id/textView3"
-                    android:layout_height="match_parent"
                     android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:layout_weight="4"
                     android:paddingTop="10dp"
                     android:text="FPS"
@@ -255,11 +252,11 @@
 
                 <TextView
                     android:id="@+id/textView9"
-                    android:layout_height="match_parent"
                     android:layout_width="match_parent"
-                    android:layout_weight="3"
+                    android:layout_height="match_parent"
                     android:layout_marginStart="20dp"
                     android:layout_marginEnd="20dp"
+                    android:layout_weight="3"
                     android:paddingTop="10dp"
                     android:text="PATH:"
                     android:textAppearance="?android:attr/textAppearanceSmall" />
@@ -279,36 +276,33 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Make bootanimation"
-                android:textColor="#ffffffff" />
+                android:text="Make bootanimation" />
 
             <Button
                 android:id="@+id/set_bootanimation"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Install bootanimation"
-                android:textColor="#ffffffff" />
+                android:text="Install bootanimation" />
 
-          <View
-              android:id="@+id/divider5"
-              android:layout_width="match_parent"
-              android:layout_height="1dp"
-              android:background="?android:attr/listDivider" />
+            <View
+                android:id="@+id/divider5"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider" />
 
-          <TextView
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:text="BACKUP OR RESTORE NETHUNTER FILES"
-              android:paddingTop="10dp"
-              android:padding="4dp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="4dp"
+                android:paddingTop="10dp"
+                android:text="BACKUP OR RESTORE NETHUNTER FILES" />
 
             <Button
-              android:id="@+id/backup"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:text="Backup"
-              android:textColor="#ffffffff" />
+                android:id="@+id/backup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Backup" />
 
             <View
                 android:id="@+id/divider6"
@@ -317,35 +311,33 @@
                 android:background="?android:attr/listDivider" />
 
             <LinearLayout
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:layout_gravity="center_horizontal"
-              android:orientation="horizontal">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:orientation="horizontal">
 
-              <EditText
-                  android:id="@+id/restorefilename"
-                  android:layout_width="fill_parent"
-                  android:layout_height="wrap_content"
-                  android:layout_weight="1"
-                  android:hint="/sdcard/nh_files_20201010.tar"
-                  android:inputType="text" />
+                <EditText
+                    android:id="@+id/restorefilename"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="/sdcard/nh_files_20201010.tar"
+                    android:inputType="text" />
 
-              <Button
-                  android:id="@+id/restorefilebrowse"
-                  android:layout_width="fill_parent"
-                  android:layout_height="wrap_content"
-                  android:layout_weight="5"
-                  android:text="..."
-                  android:textColor="#ffffffff" />
+                <Button
+                    android:id="@+id/restorefilebrowse"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="5"
+                    android:text="..." />
 
-          </LinearLayout>
+            </LinearLayout>
 
             <Button
-              android:id="@+id/restore"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:text="Restore"
-              android:textColor="#ffffffff" />
+                android:id="@+id/restore"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Restore" />
 
             <View
                 android:id="@+id/divider7"
@@ -356,9 +348,32 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="REMOVE NETHUNTER SYSTEM APP"
+                android:padding="4dp"
                 android:paddingTop="10dp"
-                android:padding="4dp" />
+                android:text="KEKHUNTER ROOTFS" />
+
+            <Button
+                android:id="@+id/install_kek"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="5"
+                android:paddingBottom="10dp"
+                android:text="Install KekFS" />
+
+            <Button
+                android:id="@+id/uninstall_kek"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="5"
+                android:paddingBottom="10dp"
+                android:text="Uninstall KekFS" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="4dp"
+                android:paddingTop="10dp"
+                android:text="REMOVE KEKHUNTER SYSTEM APP" />
 
             <Button
                 android:id="@+id/uninstall_nh"
@@ -366,11 +381,10 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="5"
                 android:paddingBottom="10dp"
-                android:text="Uninstall NetHunter App"
-                android:textColor="#ffffffff" />
+                android:text="Uninstall KekHunter App" />
 
-      </LinearLayout>
+        </LinearLayout>
 
-  </ScrollView>
+    </ScrollView>
 
 </LinearLayout>

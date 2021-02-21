@@ -15,7 +15,6 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:textSize="18sp"
-        android:textColor="@color/accent_material_dark"
         android:text="Title:"/>
 
     <EditText
@@ -36,7 +35,6 @@
             android:layout_marginStart="4dp"
             android:layout_weight="0.9"
             android:textSize="18sp"
-            android:textColor="@color/accent_material_dark"
             android:text="Command for getting the output:"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -70,7 +68,6 @@
             android:layout_marginStart="4dp"
             android:layout_weight="0.9"
             android:textSize="18sp"
-            android:textColor="@color/accent_material_dark"
             android:text="Line delimiter:"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -104,7 +101,6 @@
             android:layout_height="wrap_content"
             android:text="RunOnCreate"
             android:textSize="18sp"
-            android:textColor="@color/accent_material_dark"
             android:layout_marginStart="4dp"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -124,7 +120,6 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
         android:textSize="18sp"
-        android:textColor="@color/accent_material_dark"
         android:text="Position to insert:">
     </TextView>
 

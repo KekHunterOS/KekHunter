@@ -20,15 +20,13 @@
                 android:layout_height="wrap_content"
                 android:text="@string/add_lauchner_btn_label"
 
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textColor="@android:color/white" />
+                android:textAppearance="?android:attr/textAppearanceLarge" />
 
             <EditText
                 android:id="@+id/editText_launcher_btn_label"
                 android:layout_width="match_parent"
 
-                android:layout_height="wrap_content"
-                android:textColor="@android:color/white">
+                android:layout_height="wrap_content">
 
                 <requestFocus />
             </EditText>
@@ -38,16 +36,14 @@
                 android:layout_height="wrap_content"
 
                 android:text="@string/add_lauchner_btn_command"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textColor="@android:color/white" />
+                android:textAppearance="?android:attr/textAppearanceLarge" />
 
             <EditText
                 android:id="@+id/editText_launcher_command"
                 android:layout_width="match_parent"
 
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10dp"
-                android:textColor="@android:color/white" />
+                android:layout_marginBottom="10dp" />
 
             <RelativeLayout
                 android:orientation="horizontal"
@@ -63,8 +59,7 @@
                     android:layout_alignEnd="@+id/add_lauchner_btn_execmode_text"
                     android:layout_alignParentStart="true"
                     android:text="Send to:"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:textColor="@android:color/white" />
+                    android:textAppearance="?android:attr/textAppearanceLarge" />
 
 
                 <TextView
@@ -77,8 +72,7 @@
                     android:paddingTop="5dp"
                     android:text="Exec mode: "
 
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:textColor="@android:color/white" />
+                    android:textAppearance="?android:attr/textAppearanceLarge" />
                 <Spinner
                     android:id="@+id/spinnerRun_in_shell"
                     android:layout_width="wrap_content"
@@ -114,8 +108,7 @@
                     android:layout_alignParentStart="true"
                     android:layout_alignParentBottom="true"
                     android:text="Run at boot:"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:textColor="@android:color/white" />
+                    android:textAppearance="?android:attr/textAppearanceLarge" />
 
                 <CheckBox
                     android:layout_width="wrap_content"

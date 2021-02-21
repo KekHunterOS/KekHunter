@@ -22,9 +22,10 @@
             android:id="@+id/source"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:lines="18"
+            android:lines="25"
             android:includeFontPadding="false"
             android:paddingTop="0px"
+            android:background="@color/primaryDarkColor"
             android:gravity="top"
             android:layout_marginLeft="1dip"
             android:layout_marginRight="1dip" />
@@ -34,6 +35,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/update"
+            android:backgroundTint="@color/primaryDarkColor"
             android:onClick="updateSource" />
     </LinearLayout>
 </ScrollView>

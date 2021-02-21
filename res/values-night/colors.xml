@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Night -->
+
+    <item name="blue" type="color">#373737</item>
+    <item name="darkorange" type="color">#FFFF8800</item>
+
+    <item name="clearTitle" type="color">#FFFEFE</item>
+    <item name="clearText" type="color">#d9d9d9</item>
+
+    <color name="primaryColor">#263238</color>
+    <color name="primaryLightColor">#4f5b62</color>
+    <color name="primaryDarkColor">#000a12</color>
+    <color name="primaryTextColor">#ffffff</color>
+
+    <color name="colorBackground">#00000080</color>
+
+    <color name="colorBackgroundBasenav">#1C1C1C</color>
+    <color name="colorBackgroundBase">#C41E1E1E</color>
+    <item name="darkTitle" type="color">#1C1C1C</item>
+</resources>
