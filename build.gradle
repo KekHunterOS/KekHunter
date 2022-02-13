@@ -1,98 +1,54 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
 buildscript {
+  ext.kotlin_version = '1.4.32'
+  ext.android = [
+    KOTLIN_VERSION     : '1.4.32',
+    MIN_SDK_VERSION    : 28,
+    COMPILE_SDK_VERSION: 28,
+    TARGET_SDK_VERSION : 28,
+    JUNIT_VERSION      : "4.12"
+  ]
+
+  ext.deps = [
+    "annotations"         : "androidx.annotation:annotation:1.0.0",
+    "appcompat-v7"        : "androidx.appcompat:appcompat:1.0.0",
+    "design"              : "com.android.support:design:${ext.android.ANDROID_SUPPORT_VERSION}",
+    "cardview-v7"         : "com.android.support:cardview-v7:${ext.android.ANDROID_SUPPORT_VERSION}",
+    "kotlin-stdlib"       : "org.jetbrains.kotlin:kotlin-stdlib:${ext.android.KOTLIN_VERSION}",
+    "kotlin-gradle-plugin": "org.jetbrains.kotlin:kotlin-gradle-plugin:${ext.android.KOTLIN_VERSION}",
+    "junit"               : "junit:junit:${ext.android.JUNIT_VERSION}"
+  ]
+
   repositories {
-    mavenCentral()
+    maven { url 'https://dl.google.com/dl/android/maven2/' }
+    jcenter()
     google()
   }
+
   dependencies {
     classpath 'com.android.tools.build:gradle:7.0.4'
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    classpath rootProject.ext.deps["kotlin-gradle-plugin"]
+
+    classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.2'
+    classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
+
+    // NOTE: Do not place your application dependencies here; they belong
+    // in the individual module build.gradle files
   }
 }
 
-apply plugin: 'com.android.application'
-
-repositories {
-  mavenCentral()
-  maven {
-    url "https://maven.google.com"
-  }
-  google()
-}
-
-android {
-
-  compileSdkVersion rootProject.ext.android.COMPILE_SDK_VERSION
-  buildToolsVersion '29.0.3'
-
-  buildFeatures {
-    dataBinding true
-    // for view binding:
-    // viewBinding true
-  }
-
-  compileOptions {
-    sourceCompatibility JavaVersion.VERSION_1_8
-    targetCompatibility JavaVersion.VERSION_1_8
-  }
-
-  defaultConfig {
-    minSdkVersion rootProject.ext.android.MIN_SDK_VERSION
-    targetSdkVersion rootProject.ext.android.TARGET_SDK_VERSION
-    //noinspection HighAppVersionCode
-    versionCode 2022001
-    versionName "2022.1"
-    multiDexEnabled true
-  }
-
-  sourceSets {
-    main {
-      manifest.srcFile 'AndroidManifest.xml'
-      java.srcDirs = ['src']
-      aidl.srcDirs = ['src']
-      renderscript.srcDirs = ['src']
-      res.srcDirs = ['res']
-      assets.srcDirs = ['assets']
-    }
-
-  }
-
-  buildTypes {
-
-    debug {
-      minifyEnabled false
-      buildConfigField "java.util.Date", "BUILD_TIME", "new java.util.Date(" + System.currentTimeMillis() + "L)"
-      buildConfigField "String", "BUILD_NAME", "\"" + System.getenv("USER") + "\""
-
-      return true
-    }
-    release {
-      //signingConfig signingConfigs.release
-      minifyEnabled false
-      shrinkResources false
-      proguardFiles getDefaultProguardFile('proguard-android.txt')
-      debuggable false
-      jniDebuggable false
-      zipAlignEnabled true
-      buildConfigField "java.util.Date", "BUILD_TIME", "new java.util.Date(" + System.currentTimeMillis() + "L)"
-      buildConfigField "String", "BUILD_NAME", "\"" + System.getenv("USER") + "\""
-
-      return true
-    }
+allprojects {
+  repositories {
+    jcenter()
+    maven { url 'https://dl.google.com/dl/android/maven2/' }
+    mavenCentral()
+    maven { url "https://jitpack.io" }
+    google()
   }
 }
 
-dependencies {
-  implementation 'androidx.multidex:multidex:2.0.1'
-  implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-  implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
-  implementation 'com.google.android.material:material:1.5.0-alpha02'
-  implementation 'org.thoughtcrime.ssl.pinning:AndroidPinning:1.0.0'
-  implementation 'com.google.android.gms:play-services-location:17.0.0'
-  implementation 'joda-time:joda-time:2.10.10'
-  implementation 'com.google.guava:guava:29.0-jre'
-  implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-  implementation 'androidx.appcompat:appcompat:1.2.0'
-  implementation 'androidx.appcompat:appcompat-resources:1.2.0'
-
-  implementation project(':NeoLang')
-  implementation project(':NeoTermBridge')
+task clean(type: Delete) {
+  delete rootProject.buildDir
 }
