@@ -25,7 +25,7 @@
         app:layout_constraintBottom_toTopOf="@+id/f_customcommands_btn_scrollView">
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/f_customcommands_recyclerview"
@@ -37,46 +37,48 @@
 
     <HorizontalScrollView
         android:id="@+id/f_customcommands_btn_scrollView"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:animateLayoutChanges="true"
         android:scrollbars="none"
         app:layout_constraintTop_toBottomOf="@+id/f_customcommands_scrollView"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <LinearLayout
-            android:id="@+id/f_customcommands_linearlayoutBtn"
             android:layout_width="wrap_content"
+            android:layout_gravity="center"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
             <Button
-                android:layout_marginStart="4dp"
-                android:layout_marginEnd="4dp"
                 android:id="@+id/f_customcommands_addItemButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@android:style/Holo.Light.ButtonBar"
+                android:layout_marginStart="2dp"
+                android:layout_marginBottom="2dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginEnd="2dp"
                 android:text="Add" />
 
             <Button
-                android:layout_marginStart="4dp"
-                android:layout_marginEnd="4dp"
                 android:id="@+id/f_customcommands_deleteItemButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@android:style/Holo.Light.ButtonBar"
+                android:layout_marginStart="2dp"
+                android:layout_marginBottom="2dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginEnd="2dp"
                 android:text="Delete" />
 
             <Button
-                android:layout_marginStart="4dp"
-                android:layout_marginEnd="4dp"
                 android:id="@+id/f_customcommands_moveItemButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                style="@android:style/Holo.Light.ButtonBar"
+                android:layout_marginStart="2dp"
+                android:layout_marginBottom="2dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginEnd="2dp"
                 android:text="Move" />
 
         </LinearLayout>

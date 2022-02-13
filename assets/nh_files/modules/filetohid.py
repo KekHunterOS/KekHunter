@@ -33,7 +33,7 @@ if not language:
 
 def do_file(filename, lang):
     try:
-        os.system("/system/bin/dos2unix " + filename)
+        os.system("/system/xbin/dos2unixdos2unix " + filename)
         f = open(filename, "r")
         for line in f:  # Read a line in the file
             for char in line:  # Read each character in that line

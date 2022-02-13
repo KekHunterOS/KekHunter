@@ -117,7 +117,7 @@
                     android:textAppearance="?android:attr/textAppearanceLarge"
                     android:textColor="@android:color/white" />
 
-                <CheckBox
+                <com.google.android.material.checkbox.MaterialCheckBox
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text=""

@@ -177,9 +177,8 @@
 
                 <ImageButton
                     android:id="@+id/refreshKeX"
-                    android:background="#AE1E1E1E"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:srcCompat="@drawable/ic_action_refresh" />
@@ -248,19 +247,19 @@
                 android:text="OPEN KEX CLIENT" />
 
             <Button
-                android:visibility="gone"
                 android:id="@+id/AdvancedButton"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="SHOW ADVANCED SETTINGS" />
 
-
+            <LinearLayout
                 android:id="@+id/AdvancedView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:saveEnabled="true">
+                android:saveEnabled="true"
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/textView6"
@@ -460,6 +459,8 @@
                 </LinearLayout>
 
             </LinearLayout>
+
+        </LinearLayout>
 
     </ScrollView>
 

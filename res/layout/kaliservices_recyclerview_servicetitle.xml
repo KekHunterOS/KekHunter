@@ -32,14 +32,14 @@
             android:clickable="true"
             android:focusable="true"/>
 
-        <!--Button
+        <!--<Button
             android:id="@+id/f_kaliservices_recyclerview_edit_btn"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginEnd="8dp"
             android:layout_weight="0.8"
             android:text="EDIT"
-            android:textColor="@color/accent_material_dark" /-->
+            android:textColor="@color/accent_material_dark" />-->
     </LinearLayout>
 
     <LinearLayout
@@ -54,19 +54,18 @@
             android:text="Service is NOT running."
             android:layout_weight="0.35"
             android:layout_marginStart="12dp"/>
-        <CheckBox
+        <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/f_kaliservices_recyclerview_runonchrootstart_checkbox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0.35"
-            android:text="RunOnChrootStart"/>
-        <Switch
+            android:text="Run at boot"/>
+        <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/f_kaliservices_recyclerview_switch_toggle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="4dp"
-            android:layout_weight="0.5"
-            android:textColor="@android:color/background_light" />
+            android:layout_weight="0.5"/>
     </LinearLayout>
 </LinearLayout>

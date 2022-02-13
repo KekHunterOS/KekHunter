@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <item name="blue" type="color">#373737</item>
-    <item name="darkorange" type="color">#FFFF8800</item>
-
-    <item name="clearTitle" type="color">#FFFEFE</item>
-    <item name="clearText" type="color">#d9d9d9</item>
-
-    <color name="colorPrimary">#515457</color>
-    <color name="colorPrimaryDark">#515457</color>
-    <color name="colorAccent">#515457</color>
-    <color name="colorBackground">#00000080</color>
-
-
+  <item name="blue" type="color">#373737</item>
+  <item name="clearTitle" type="color">#fcfcfc</item>
+  <item name="clearText" type="color">#d9d9d9</item>
+  <color name="textColor">#fefefe</color>
+  <color name="textColorSecondary">#ced7db</color>
+  <color name="colorPrimary">#111111</color>
+  <color name="colorPrimaryDark">#0B1E4E</color>
+  <color name="colorAccent">#183C9A</color>
+  <color name="colorBackground">#B2111111</color>
+  <color name="checkerColor">#1B48BD</color>
+  <item name="darkTitle" type="color">#3A3A3A</item>
 </resources>

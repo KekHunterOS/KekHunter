@@ -1,4 +1,0 @@
-{
-	"version_code": 006,
-	"content": "Version 0.0.6 <p> Fixes/Addons </P><li>Fixed some theme issues</li><li>And some other under the hood modifications</li>"
-}

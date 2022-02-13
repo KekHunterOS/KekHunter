@@ -1,124 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.Nethunter" parent="Theme.MaterialComponents">
-        <!-- customize the color palette -->
-        <item name="colorPrimary">#AE1E1E1E</item>
-        <item name="colorPrimaryDark">@color/material_blue_grey_950</item>
-        <item name="colorAccent">#B5B5B5</item>
+  <style name="Theme.Nethunter" parent="Theme.MaterialComponents">
+    <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
+    <item name="android:textColor">@color/textColor</item>
+    <item name="android:textColorLink">#5788FF</item>
 
-        <!-- other styles/themes -->
-        <item name="dialogTheme">@style/DialogStyle2</item>
-        <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
+    <item name="buttonStyle">@style/Button</item>
+    <item name="materialButtonStyle">@style/Button</item>
+    <item name="floatingActionButtonStyle">@style/FloatingActionButton</item>
+    <item name="materialAlertDialogTheme">@style/DialogStyle</item>
 
-        <!-- button styles -->
-        <item name="materialButtonStyle">@style/kekbutton</item>
-        <item name="buttonStyle">@style/kekbutton</item>
+    <item name="android:windowShowWallpaper">true</item>
+    <item name="android:windowBackground">@color/colorBackground</item>
+  </style>
 
-        <!-- text colors/colours -->
-        <item name="android:textColorLink">#476CCD</item>
-        <item name="android:textColor">#E5E8ED</item>
+  <style name="DrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
+    <item name="spinBars">true</item>
+    <item name="color">@android:color/white</item>
+  </style>
 
-        <!-- text size -->
-        <item name="android:textSize">14dp</item>
+  <style name="Button" parent="Widget.MaterialComponents.Button">
+    <item name="android:backgroundTint">@color/colorPrimary</item>
 
-        <!-- Button background colors/colours -->
-        <item name="colorBackgroundFloating">#DA201D1D</item>
+    <item name="android:textColor">@color/textColor</item>
+  </style>
 
-        <!-- Button text colors/colours -->
-        <item name="android:negativeButtonText">#FFFFFF</item>
+  <style name="FloatingActionButton" parent="Widget.MaterialComponents.FloatingActionButton">
+    <item name="backgroundTint">@color/colorPrimaryDark</item>
+  </style>
 
-        <!-- Button styles-->
-        <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
-        <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
-        <item name="buttonBarNeutralButtonStyle">@style/NeutralButtonStyle</item>
+  <style name="DesignTextInput" parent="Theme.Nethunter">
+    <item name="android:textColor">@color/textColor</item>
+    <item name="height">72dp</item>
+    <item name="android:inputType">textNoSuggestions</item>
+    <item name="android:windowNoTitle">true</item>
+    <item name="windowActionBar">false</item>
+    <item name="android:windowContentOverlay">@null</item>
+  </style>
 
-        <!-- Main styles-->
-        <item name="android:windowShowWallpaper">true</item>
-        <item name="android:windowBackground">@color/colorBackground</item>
+  <style name="checkbox_theme" parent="Theme.MaterialComponents">
+    <item name="buttonTint">#2449A8</item>
+  </style>
 
-    </style>
+  <style name="Alert.Button.Positive" parent="Widget.MaterialComponents.Button.TextButton">
+    <item name="backgroundTint">@color/colorPrimary</item>
+    <item name="android:textColor">@color/clearText</item>
+    <item name="android:textSize">14sp</item>
+    <item name="android:textAllCaps">false</item>
+  </style>
 
-    <style name="DrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
-        <item name="spinBars">true</item>
-        <item name="color">@android:color/white</item>
-    </style>
+  <style name="Alert.Button.Negative" parent="Widget.MaterialComponents.Button.TextButton">
+    <item name="backgroundTint">@color/colorPrimary</item>
+    <item name="android:textColor">@color/clearText</item>
+    <item name="android:textSize">14sp</item>
+    <item name="android:textAllCaps">false</item>
+  </style>
 
+  <style name="Alert.Button.Neutral" parent="Widget.MaterialComponents.Button.TextButton">
+    <item name="backgroundTint">@color/colorPrimary</item>
+    <item name="android:textColor">@color/clearText</item>
+    <item name="android:textSize">14sp</item>
+    <item name="android:textAllCaps">false</item>
+  </style>
 
-    <style name="DesignTextInput" parent="Theme.Nethunter">
-        <item name="height">72dp</item>
-        <item name="android:inputType">textNoSuggestions</item>
-    </style>
+  <style name="DialogStyle" parent="Theme.MaterialComponents.Dialog.Alert">
+    <item name="android:textColor">@color/textColor</item>
 
+    <item name="background">@color/colorPrimary</item>
 
-    <!-- Button styles go here-->
+    <item name="android:windowEnterAnimation">@android:anim/fade_in</item>
+    <item name="android:windowExitAnimation">@android:anim/fade_out</item>
 
-    <!-- Overall buttons styles-->
-    <style name="kekbutton" parent="@style/Widget.MaterialComponents.Button.OutlinedButton">
-        <item name="backgroundTint">#E423232B</item>
-        <item name="android:textColor">#FFFFFF</item>
-        <item name="actionButtonStyle">@style/Widget.MaterialComponents.FloatingActionButton</item>
-
-        <item name="android:maxHeight">5dp</item>
-        <item name="android:paddingLeft">5dp</item>
-        <item name="android:paddingRight">5dp</item>
-        <item name="cornerRadius">12dp</item>
-    </style>
-
-    <!-- Alert dialog button styles go here-->
-    <style name="NegativeButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
-        <item name="android:textColor">#FFFFFF</item>
-        <item name="android:textColorPrimary">#FFFFFF</item>
-        <item name="android:colorAccent">#FFFFFF</item>
-
-    </style>
-
-    <style name="PositiveButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
-        <item name="android:textColor">#FFFFFF</item>
-        <item name="android:colorAccent">#FFFFFF</item>
-    </style>
-
-    <style name="NeutralButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
-        <item name="android:textColor">#FFFFFF</item>
-        <item name="android:colorAccent">#FFFFFF</item>
-
-    </style>
-    <!-- Button styles go here-->
-
-    <!-- Licence dialog styles go here-->
-    <style name="DialogStyle" parent="@style/Theme.MaterialComponents.Dialog.Alert">
-        <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
-        <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
-        <item name="buttonBarNeutralButtonStyle">@style/NeutralButtonStyle</item>
-        <item name="android:textColorLink">#476CCD</item>
-
-        <!-- Animations -->
-        <item name="android:windowEnterAnimation">@anim/fragment_fade_enter</item>
-        <item name="android:windowExitAnimation">@anim/fragment_fade_exit</item>
-
-        <item name="android:textColor">#FFFFFF</item>
-        <item name="backgroundColor">#1C1C1C</item>
-        <item name="buttonStyle">@style/kekbutton</item>
-
-
-        <item name="android:windowNoTitle">true</item>
-        <item name="windowActionBar">false</item>
-        <item name="android:windowContentOverlay">@null</item>
-    </style>
-
-    <style name="DialogStyle2" parent="@style/Theme.MaterialComponents.Dialog">
-        <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
-        <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
-        <item name="android:textColorLink">#476CCD</item>
-        <item name="android:windowEnterAnimation">@anim/fragment_fade_enter</item>
-        <item name="android:windowExitAnimation">@anim/fragment_fade_exit</item>
-        <item name="android:textColor">#FFFFFF</item>
-        <item name="backgroundColor">#1C1C1C</item>
-        <item name="buttonStyle">@style/kekbutton</item>
-
-        <item name="android:windowNoTitle">true</item>
-        <item name="windowActionBar">false</item>
-        <item name="android:windowContentOverlay">@null</item>
-    </style>
+    <item name="buttonBarPositiveButtonStyle">@style/Alert.Button.Positive</item>
+    <item name="buttonBarNegativeButtonStyle">@style/Alert.Button.Neutral</item>
+    <item name="buttonBarNeutralButtonStyle">@style/Alert.Button.Neutral</item>
+  </style>
 
 </resources>

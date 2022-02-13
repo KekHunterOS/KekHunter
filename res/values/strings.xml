@@ -4,13 +4,13 @@
     <string name="app_nav_home_label">KekHunter</string>
 
     <string name="hometitle">System Information</string>
-    <string name="nethunter_description">Welcome to KekHunter this whole app is based on NetHunter by Offensive Security! This application is designed to make it easier to execute attacks and control services. The navigation menu contains links to useful commands, settings, macros, and attack configuration pages. Most configurations work out of the box but some may require some minimal tweaking.</string>
+    <string name="nethunter_description">You can ADD, DELETE, MOVE, SEARCH, BACKUP, RESTORE and RESET your custom command item. You can also long click on the item label to EDIT the item.</string>
     <string name="nethunter_current_interfaces">Network Interfaces</string>
     <string name="nethunter_external_ip">External IP</string>
     <string name="nethunter_hid_detect">HID Interfaces</string>
     <string name="nethunter_busybox_detect">Busybox Version</string>
     <string name="nethunter_kernelver_detect">Kernel Version</string>
-    <string name="nethunter_terminal_detect">KekTerm Status</string>
+    <string name="nethunter_terminal_detect">Nethunter Terminal Status</string>
     <string name="nethunter_howtouse_cmd">Put your own command string here, it will be run in Android environment to get the output displayed.</string>
     <string name="nethunter_howtouse_delimiter">Put your desired delimiter string if you want to split the output into lines, default is "\\n".</string>
     <string name="nethunter_howtouse_runoncreate">To get the output upon the fragment is created, check this option. Otherwise you have to click RUN button manually to get the output.</string>
@@ -160,7 +160,7 @@
     <string name="ps_port">Port (LPORT)</string>
     <string name="ps_payload_url">URL to payload</string>
 
-    <string name="toast_error_permissions">KekHunter App does not have permission to send to KekTerm!</string>
+    <string name="toast_error_permissions">Nethunter App does not have permission to send to Nethunter terminal!</string>
     <string name="toast_install_terminal">Error launching intent. Install Android Terminal!</string>
     <string name="descriptiontext" />
 
@@ -176,8 +176,8 @@
     <string name="reloadMAC">Reload MAC</string>
     <string name="randomMAC">Random MAC</string>
     <string name="customMAC">Custom MAC</string>
-    <string name="autorunningscripts">KekHunter: auto-running startup scripts</string>
-    <string name="toastForNoBusybox">Uh oh!  KekHunter can\'t find busybox!</string>
+    <string name="autorunningscripts">Nethunter: auto-running startup scripts</string>
+    <string name="toastForNoBusybox">Uh oh!  Nethunter can\'t find busybox!</string>
     <string name="readonly">Read-only</string>
     <string-array name="macchanger_opts">
         <item>Random MAC</item>
@@ -221,6 +221,9 @@
     <string name="bt_spoof">Spoof your BT adapters.\nWill play essential role in upcoming attacks.</string>
     <string name="bt_tools">Brute force BT device addresses, ping, and discover their services.</string>
 
+    <!-- SET -->
+    <string name="set_description">Social Engineering Toolkit email template builder by yesimxev. Please note you need to have a working Gmail or email relay configuration for SET in order to use these templates. It is recommended not to have account picture if you use Gmail.</string>
+
     <!-- Settings -->
     <string name="settings_description">Select your desired boot animation here. Please note that some older phones prefer 90% the size of original screen resolution, so it can run smoothly. For that use image resolution and final resolution together. You can also manage your nh_files folder and remove NetHunter if flashed as system app.</string>
 
@@ -229,10 +232,7 @@
     <string-array name="mitmf_interface_array">
         <item>wlan0</item>
         <item>wlan1</item>
-        <item>wlan2</item>
-        <item>wlan3</item>
         <item>eth0</item>
-        <item>eth1</item>
         <item>rndis0</item>
         <item>usb0</item>
     </string-array>
@@ -288,26 +288,12 @@
     <!-- chroot stuff -->
     <array name="f_chrootmanager_build_chroot_arm_opts">
         <item>arm64</item>
+        <item>armhf</item>
     </array>
     <array name="f_chrootmanager_build_chroot_full_or_min">
         <item>full</item>
-        <item>default</item>
-        <item>kek</item>
+        <item>min</item>
     </array>
-
-
-    <!-- Updater stuff -->
-    <string name="wvm_toast_download_started">Download started …</string>
-    <string name="wvm_toast_download_complete">Download completed, installing …</string>
-    <string name="wvm_dialog_title_update">New Update Available!</string>
-    <string name="wvm_dialog_title_rate_us">Rate this app</string>
-    <string name="wvm_dialog_message_update">What\'s new in this version:</string>
-    <string name="wvm_dialog_message_rate_us">Please rate us!</string>
-    <string name="wvm_button_close">close</string>
-    <string name="wvm_button_remind_later">Later</string>
-    <string name="wvm_button_update">Update</string>
-    <string name="wvm_button_ok">OK</string>
-    <string name="wvm_button_not_now">Not now</string>
 
     <string name="thechroottitle">The Kali chroot</string>
     <string name="installkalichrootbutton">Install Kali Chroot</string>
@@ -338,8 +324,6 @@
     <string name="extractinganddeploying">Extracting and Deploying</string>
     <string name="nhwarning">WARNING:\nNethunter installs and uses a standard Kali Linux distribution \"under the hood\".  To support this functionality, some <u>standard Android security features such as Security Enhanced Linux (SELinux) are disabled</u>.  Moreover, Kali\'s Linux processes may run with full root privileges and can therefore access system functionality well beyond the normal Android security model.  Consider therefore that this device, as a hybrid, may not be as secure as either standard Kali Linux OR standard Android, and you are advised not to install or use Nethunter on \"daily driver\" devices or devices which store or access sensitive/private data.</string>
     <string name="nhteam">DEVELOPERS:\ngitlab.com/groups/kalilinux/nethunter/-/group_members</string>
-    <string name="kekteam">CONTRIBUTORS:\n * t.me/hilledkinged \n * t.me/S133PY \n * t.me/mirivan </string>
-    <string name="telegramgroup">OUR GROUP IN TG:\n * t.me/kekhunter \n * t.me/team420nethunter</string>
     <string name="unknown">Unknown</string>
     <string name="statusText">Status:</string>
     <string name="licenseInfo">LICENSE INFO:\nNethunter is licensed under the GPLv2 (gnu.org/licenses/old-licenses/gpl-2.0.en.html) and the source code is available at gitlab.com/kalilinux/nethunter.\n Some icons are licensed from Google, Inc. under CC BY 4.0 (creativecommons.org/licenses/by/4.0). Android-VersionManager and jTar are licensed under Apache 2.0.  </string><string name="attack_launched">Attack launched!</string>
@@ -365,6 +349,7 @@
     <string name="drawertitlegps">Wardriving</string>
     <string name="drawertitledeauth">DeAuth</string>
     <string name="drawertitlesettings">Settings</string>
+    <string name="drawertitleset">SET</string>
     <string name="InstallAndUpdateButtonText"><![CDATA[Install & Update]]></string>
     <string name="metapackagesExplanation">Choose some \"metapackages\". The chroot will also be upgraded (via \"apt-get update/dist-upgrade\").\n\nSelecting metapackages you already have installed (or no packages at all) simply update/upgrades without removing anything.\n\nDepending on what metapackages you select, you may be asked to do stuff (such as set passwords for services), so pay attention.</string>
     <string name="metapackagesAdditionalInfo">Local storage requirements may be in the 20+ GB range. This installation/update will be performed in a terminal, so watch for issues. When completed, press the back button.</string>
@@ -506,8 +491,9 @@
     <string name="switch_gps_provider">Android GPS Provider</string>
     <string name="switch_gpsd">gpsd in chroot</string>
     <string name="gps_button_launch_app">Launch %s in NH Terminal</string>
-    <string name="gps_description">Converts your GPS to NMEA then provides to Kali chroot. Perfect for wardriving with Kismet or just a generic GPS server for Kali.</string>
-    <string name="gps_help">You may need to give KekHunter permissions to GPS. Go to Settings > Apps > KekHunter > Permissions.</string>
+    <string name="gps_description">Converts your GPS to NMEA then provides to Kali chroot.  Perfect for wardriving with Kismet or just a generic GPS server for Kali.</string>
+    <string name="gps_help">You may need to give Nethunter permissions to GPS. Go to Settings > Apps > Nethunter > Permissions.</string>
+    <string name="loading_wait">Loading wait…</string>
     <string name="loading_file">Loading…  FILE: %s</string>
     <string name="scanButtonText">Scan</string>
     <string name="advancedOptionsSwitchText">Advanced Options</string>

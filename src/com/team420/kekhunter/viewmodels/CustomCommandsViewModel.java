@@ -1,11 +1,9 @@
 package com.team420.kekhunter.viewmodels;
 
 import android.content.Context;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
-
 import com.team420.kekhunter.RecyclerViewData.CustomCommandsData;
 import com.team420.kekhunter.models.CustomCommandsModel;
 
@@ -17,21 +15,21 @@ import java.util.List;
     After the CustomCommandsData singleton is created, it will live until the app dies.
  */
 public class CustomCommandsViewModel extends ViewModel {
-    private MutableLiveData<List<CustomCommandsModel>> mutableLiveDataCustomCommandsModelList;
+  private MutableLiveData<List<CustomCommandsModel>> mutableLiveDataCustomCommandsModelList;
 
-    public void init(Context context){
-        if (mutableLiveDataCustomCommandsModelList != null){
-            return;
-        }
-        CustomCommandsData customCommandsData = CustomCommandsData.getInstance();
-        if (CustomCommandsData.isDataInitiated) {
-            mutableLiveDataCustomCommandsModelList = customCommandsData.getCustomCommandsModels();
-        } else {
-            mutableLiveDataCustomCommandsModelList = customCommandsData.getCustomCommandsModels(context);
-        }
+  public void init(Context context) {
+    if (mutableLiveDataCustomCommandsModelList != null) {
+      return;
     }
+    CustomCommandsData customCommandsData = CustomCommandsData.getInstance();
+    if (CustomCommandsData.isDataInitiated) {
+      mutableLiveDataCustomCommandsModelList = customCommandsData.getCustomCommandsModels();
+    } else {
+      mutableLiveDataCustomCommandsModelList = customCommandsData.getCustomCommandsModels(context);
+    }
+  }
 
-    public LiveData<List<CustomCommandsModel>> getLiveDataCustomCommandsModelList(){
-        return mutableLiveDataCustomCommandsModelList;
-    }
+  public LiveData<List<CustomCommandsModel>> getLiveDataCustomCommandsModelList() {
+    return mutableLiveDataCustomCommandsModelList;
+  }
 }

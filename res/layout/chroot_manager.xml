@@ -1,182 +1,243 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
+                                                   xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                   xmlns:tools="http://schemas.android.com/tools"
+                                                   android:orientation="vertical"
+                                                   android:layout_width="match_parent"
+                                                   android:layout_height="match_parent"
+                                                   android:id="@+id/fragment_chrootmanager">
+
+  <androidx.appcompat.widget.LinearLayoutCompat
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/fragment_chrootmanager">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    app:layout_constraintTop_toTopOf="parent"
+    android:id="@+id/f_chrootmanager_viewholder">
 
     <androidx.appcompat.widget.LinearLayoutCompat
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintTop_toTopOf="parent"
-        android:id="@+id/f_chrootmanager_viewholder">
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:background="@color/colorBackground"
+      android:layout_marginTop="4dp"
+      android:layout_marginBottom="4dp"
+      android:orientation="horizontal">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-            <LinearLayout
-                android:id="@+id/f_chrootmanager_chrootpath_linearlayout"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"
-                android:layout_weight="0.9">
-                <TextView
-                    android:id="@+id/f_chrootmanager_base_path_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginTop="8dp"
-                    android:gravity="center"
-                    android:text="KaliChrootPath: /data/local/nhsystem/"
-                    android:textColor="@android:color/background_light"
-                    android:enabled="false"/>
-                <TextView
-                    android:id="@+id/f_chrootmanager_kalifolder_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="8dp"
-                    android:gravity="center"
-                    android:text="kali-arm64"
-                    android:singleLine="true"
-                    android:textColor="@android:color/background_light"/>
-            </LinearLayout>
+      <Button
+        android:id="@+id/f_chrootmanager_edit_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_weight="0.1"
+        android:text="Change chroot"/>
 
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+      <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/f_chrootmanager_base_path_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:gravity="center"
+        android:text="[Path]: /data/local/nhsystem/"
+        android:singleLine="false"
+        android:textSize="12sp"
+        android:textColor="@android:color/background_light"
+        android:enabled="false"/>
 
-            <TextView
-                android:id="@+id/f_chrootmanager_dummy_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Status:"
-                android:textColor="@android:color/background_light"
-                android:layout_marginStart="12dp"
-                android:layout_marginEnd="4dp" />
-
-            <TextView
-                android:id="@+id/f_chrootmanager_mountresult_tv"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Loading..."
-                android:layout_marginEnd="12dp" />
-
-
-        </LinearLayout>
     </androidx.appcompat.widget.LinearLayoutCompat>
 
-    <TextView
-        android:id="@+id/f_chrootmanager_viewlogger"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="4dp"
-        android:alpha="0.60"
-        android:background="@android:color/black"
-        android:gravity="bottom"
-        android:scrollbars="vertical"
-        android:singleLine="false"
-        android:textSize="13sp"
-        app:layout_constraintBottom_toTopOf="@id/f_chrootmanager_btn_scrollView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/f_chrootmanager_viewholder" />
+    <androidx.appcompat.widget.LinearLayoutCompat
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:background="@color/colorBackground"
+      android:layout_marginTop="4dp"
+      android:layout_marginBottom="4dp"
+      android:gravity="center">
 
-    <HorizontalScrollView
-        android:id="@+id/f_chrootmanager_btn_scrollView"
+    <LinearLayout
+      android:layout_width="wrap_content"
+      android:layout_height="match_parent"
+      android:background="@color/colorPrimary"
+      android:layout_marginTop="4dp"
+      android:layout_marginBottom="4dp"
+      android:layout_marginLeft="4dp"
+      android:layout_marginRight="4dp"
+      android:orientation="horizontal">
+
+      <com.google.android.material.textview.MaterialTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:animateLayoutChanges="true"
-        android:scrollbars="none"
-        app:layout_constraintTop_toBottomOf="@+id/f_chrootmanager_viewlogger"
+        android:text="[Selected]:"
+        android:textColor="@android:color/background_light"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"/>
+
+      <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/f_chrootmanager_kalifolder_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:gravity="center"
+        android:text="kali-arm64"
+        android:singleLine="true"
+        android:textColor="@android:color/background_light"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+      android:layout_width="wrap_content"
+      android:layout_height="match_parent"
+      android:background="@color/colorPrimary"
+      android:layout_marginTop="4dp"
+      android:layout_marginBottom="4dp"
+      android:layout_marginLeft="4dp"
+      android:layout_marginRight="4dp"
+      android:orientation="horizontal">
+
+      <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/f_chrootmanager_dummy_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="[Status]:"
+        android:textColor="@android:color/background_light"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"/>
+
+      <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/f_chrootmanager_mountresult_tv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Loading..."
+        android:textColor="@android:color/background_light"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"/>
+
+    </LinearLayout>
+
+  </androidx.appcompat.widget.LinearLayoutCompat>
+
+  </androidx.appcompat.widget.LinearLayoutCompat>
+
+  <com.google.android.material.textview.MaterialTextView
+    android:id="@+id/f_chrootmanager_viewlogger"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_marginStart="4dp"
+    android:layout_marginBottom="4dp"
+    android:layout_marginTop="4dp"
+    android:layout_marginEnd="4dp"
+    android:alpha="100"
+    android:background="@android:color/black"
+    android:fadeScrollbars="true"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:gravity="bottom"
+    android:scrollbars="vertical"
+    android:singleLine="false"
+    android:textSize="12sp"
+    app:layout_constraintBottom_toTopOf="@id/f_chrootmanager_btn_scrollView"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintHorizontal_bias="1.0"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/f_chrootmanager_viewholder"/>
+
+  <HorizontalScrollView
+    android:id="@+id/f_chrootmanager_btn_scrollView"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:animateLayoutChanges="true"
+    android:scrollbars="none"
+    app:layout_constraintTop_toBottomOf="@+id/f_chrootmanager_viewlogger"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintBottom_toBottomOf="parent">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:gravity="center"
+      android:orientation="horizontal"
+      android:id="@+id/f_chrootmanager_btn_linearlayout">
+
+      <Button
+        android:id="@+id/f_chrootmanager_mount_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="Start"
+        android:layout_marginStart="2dp"
+        android:layout_marginBottom="2dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="2dp"
+        android:visibility="gone"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:id="@+id/f_chrootmanager_btn_linearlayout">
+      <Button
+        android:id="@+id/f_chrootmanager_unmount_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@+id/f_chrootmanager_mount_btn"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="Stop"
+        android:layout_marginStart="2dp"
+        android:layout_marginBottom="2dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="2dp"
+        android:visibility="gone"/>
 
-            <Button
-                android:id="@+id/f_chrootmanager_edit_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:layout_marginEnd="4dp"
-                android:layout_marginLeft="3dp"
-                android:text="Edit path"/>
+      <Button
+        android:id="@+id/f_chrootmanager_install_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@+id/f_chrootmanager_unmount_btn"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="Install"
+        android:layout_marginStart="2dp"
+        android:layout_marginBottom="2dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="2dp"
+        android:visibility="gone"/>
 
-            <Button
-                android:id="@+id/f_chrootmanager_mount_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                android:layout_marginStart="4dp"
-                android:layout_marginEnd="4dp"
-                android:text="Start Chroot"
-                android:visibility="gone"/>
+      <Button
+        android:id="@+id/f_chrootmanager_backupchroot_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@+id/f_chrootmanager_addmetapkg_btn"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="Backup"
+        android:layout_marginStart="2dp"
+        android:layout_marginBottom="2dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="2dp"
+        android:visibility="gone"/>
 
-            <Button
-                android:id="@+id/f_chrootmanager_unmount_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintStart_toEndOf="@+id/f_chrootmanager_mount_btn"
-                app:layout_constraintBottom_toBottomOf="parent"
-                android:layout_marginStart="4dp"
-                android:layout_marginEnd="4dp"
-                android:text="Stop Chroot"
-                android:visibility="gone"/>
+      <Button
+        android:id="@+id/f_chrootmanager_removechroot_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@+id/f_chrootmanager_backupchroot_btn"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="Remove"
+        android:layout_marginStart="2dp"
+        android:layout_marginBottom="2dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="2dp"
+        android:visibility="gone"/>
 
-            <Button
-                android:id="@+id/f_chrootmanager_install_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintStart_toEndOf="@+id/f_chrootmanager_unmount_btn"
-                app:layout_constraintBottom_toBottomOf="parent"
-                android:layout_marginStart="4dp"
-                android:layout_marginEnd="4dp"
-                android:text="Install Chroot"
-                android:visibility="gone"/>
+    </androidx.appcompat.widget.LinearLayoutCompat>
 
-            <Button
-                android:id="@+id/f_chrootmanager_addmetapkg_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintStart_toEndOf="@+id/f_chrootmanager_install_btn"
-                app:layout_constraintBottom_toBottomOf="parent"
-                android:layout_marginStart="4dp"
-                android:layout_marginEnd="4dp"
-                android:text="Add Metapackge"
-                android:visibility="gone"/>
-
-            <Button
-                android:id="@+id/f_chrootmanager_backupchroot_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintStart_toEndOf="@+id/f_chrootmanager_addmetapkg_btn"
-                app:layout_constraintBottom_toBottomOf="parent"
-                android:text="Backup Chroot"
-                android:visibility="gone"/>
-
-            <Button
-                android:id="@+id/f_chrootmanager_removechroot_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:layout_constraintStart_toEndOf="@+id/f_chrootmanager_backupchroot_btn"
-                app:layout_constraintBottom_toBottomOf="parent"
-                android:layout_marginStart="4dp"
-                android:layout_marginEnd="4dp"
-                android:text="Remove Chroot"
-                android:visibility="gone"/>
-        </LinearLayout>
-    </HorizontalScrollView>
+  </HorizontalScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

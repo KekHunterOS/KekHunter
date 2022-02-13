@@ -1,9 +1,7 @@
 package com.team420.kekhunter.RecyclerViewData;
 
 import android.content.Context;
-
 import androidx.lifecycle.MutableLiveData;
-
 import com.team420.kekhunter.AsyncTask.NethunterAsynctask;
 import com.team420.kekhunter.SQL.NethunterSQL;
 import com.team420.kekhunter.models.NethunterModel;
@@ -24,205 +22,205 @@ import java.util.List;
  */
 
 public class NethunterData {
-    private static NethunterData instance;
-    public static boolean isDataInitiated = false;
-    private ArrayList<NethunterModel> nethunterModelArrayList = new ArrayList<>();
-    private MutableLiveData<List<NethunterModel>> data = new MutableLiveData<>();
-    public List<NethunterModel> nethunterModelListFull;
-    private List<NethunterModel> copyOfNethunterModelListFull = new ArrayList<>();
+  private static NethunterData instance;
+  public static boolean isDataInitiated = false;
+  private ArrayList<NethunterModel> nethunterModelArrayList = new ArrayList<>();
+  private MutableLiveData<List<NethunterModel>> data = new MutableLiveData<>();
+  public List<NethunterModel> nethunterModelListFull;
+  private List<NethunterModel> copyOfNethunterModelListFull = new ArrayList<>();
 
-    public synchronized static NethunterData getInstance(){
-        if (instance == null) {
-            instance = new NethunterData();
+  public synchronized static NethunterData getInstance() {
+    if (instance == null) {
+      instance = new NethunterData();
+    }
+    return instance;
+  }
+
+  public MutableLiveData<List<NethunterModel>> getNethunterModels(Context context) {
+    if (!isDataInitiated) {
+      data.setValue(NethunterSQL.getInstance(context).bindData(nethunterModelArrayList));
+      nethunterModelListFull = new ArrayList<>(data.getValue());
+      isDataInitiated = true;
+    }
+    return data;
+  }
+
+  public MutableLiveData<List<NethunterModel>> getNethunterModels() {
+    return data;
+  }
+
+  public void refreshData() {
+    NethunterAsynctask nethunterAsynctask = new NethunterAsynctask(NethunterAsynctask.GETITEMRESULTS);
+    nethunterAsynctask.setListener(new NethunterAsynctask.NethunterAsynctaskListener() {
+      @Override
+      public void onAsyncTaskPrepare() {
+
+      }
+
+      @Override
+      public void onAsyncTaskFinished(List<NethunterModel> nethunterModelList) {
+        getNethunterModels().getValue().clear();
+        getNethunterModels().getValue().addAll(nethunterModelList);
+        getNethunterModels().postValue(getNethunterModels().getValue());
+      }
+    });
+    nethunterAsynctask.execute(getInitCopyOfNethunterModelListFull());
+  }
+
+  public void runCommandforItem(int position) {
+    NethunterAsynctask nethunterAsynctask = new NethunterAsynctask(NethunterAsynctask.RUNCMDFORITEM, position);
+    nethunterAsynctask.setListener(new NethunterAsynctask.NethunterAsynctaskListener() {
+      @Override
+      public void onAsyncTaskPrepare() {
+
+      }
+
+      @Override
+      public void onAsyncTaskFinished(List<NethunterModel> nethunterModelList) {
+        getNethunterModels().getValue().clear();
+        getNethunterModels().getValue().addAll(nethunterModelList);
+        getNethunterModels().postValue(getNethunterModels().getValue());
+      }
+    });
+    nethunterAsynctask.execute(getInitCopyOfNethunterModelListFull());
+  }
+
+  public void editData(int position, ArrayList<String> dataArrayList, NethunterSQL nethunterSQL) {
+    NethunterAsynctask nethunterAsynctask = new NethunterAsynctask(NethunterAsynctask.EDITDATA, position, dataArrayList, nethunterSQL);
+    nethunterAsynctask.setListener(new NethunterAsynctask.NethunterAsynctaskListener() {
+      @Override
+      public void onAsyncTaskPrepare() {
+
+      }
+
+      @Override
+      public void onAsyncTaskFinished(List<NethunterModel> nethunterModelList) {
+        updateNethunterModelListFull(nethunterModelList);
+        getNethunterModels().getValue().clear();
+        getNethunterModels().getValue().addAll(nethunterModelList);
+        getNethunterModels().postValue(getNethunterModels().getValue());
+      }
+    });
+    nethunterAsynctask.execute(getInitCopyOfNethunterModelListFull());
+  }
+
+  public void addData(int position, ArrayList<String> dataArrayList, NethunterSQL nethunterSQL) {
+    NethunterAsynctask nethunterAsynctask = new NethunterAsynctask(NethunterAsynctask.ADDDATA, position, dataArrayList, nethunterSQL);
+    nethunterAsynctask.setListener(new NethunterAsynctask.NethunterAsynctaskListener() {
+      @Override
+      public void onAsyncTaskPrepare() {
+
+      }
+
+      @Override
+      public void onAsyncTaskFinished(List<NethunterModel> nethunterModelList) {
+        updateNethunterModelListFull(nethunterModelList);
+        getNethunterModels().getValue().clear();
+        getNethunterModels().getValue().addAll(nethunterModelList);
+        getNethunterModels().postValue(getNethunterModels().getValue());
+      }
+    });
+    nethunterAsynctask.execute(getInitCopyOfNethunterModelListFull());
+  }
+
+  public void deleteData(ArrayList<Integer> selectedPositionsIndex, ArrayList<Integer> selectedTargetIds, NethunterSQL nethunterSQL) {
+    NethunterAsynctask nethunterAsynctask = new NethunterAsynctask(NethunterAsynctask.DELETEDATA, selectedPositionsIndex, selectedTargetIds, nethunterSQL);
+    nethunterAsynctask.setListener(new NethunterAsynctask.NethunterAsynctaskListener() {
+      @Override
+      public void onAsyncTaskPrepare() {
+
+      }
+
+      @Override
+      public void onAsyncTaskFinished(List<NethunterModel> nethunterModelList) {
+        updateNethunterModelListFull(nethunterModelList);
+        getNethunterModels().getValue().clear();
+        getNethunterModels().getValue().addAll(nethunterModelList);
+        getNethunterModels().postValue(getNethunterModels().getValue());
+      }
+    });
+    nethunterAsynctask.execute(getInitCopyOfNethunterModelListFull());
+  }
+
+  public void moveData(int originalPositionIndex, int targetPositionIndex, NethunterSQL nethunterSQL) {
+    NethunterAsynctask nethunterAsynctask = new NethunterAsynctask(NethunterAsynctask.MOVEDATA, originalPositionIndex, targetPositionIndex, nethunterSQL);
+    nethunterAsynctask.setListener(new NethunterAsynctask.NethunterAsynctaskListener() {
+      @Override
+      public void onAsyncTaskPrepare() {
+
+      }
+
+      @Override
+      public void onAsyncTaskFinished(List<NethunterModel> nethunterModelList) {
+        updateNethunterModelListFull(nethunterModelList);
+        getNethunterModels().getValue().clear();
+        getNethunterModels().getValue().addAll(nethunterModelList);
+        getNethunterModels().postValue(getNethunterModels().getValue());
+      }
+    });
+    nethunterAsynctask.execute(getInitCopyOfNethunterModelListFull());
+  }
+
+  public String backupData(NethunterSQL nethunterSQL, String storedDBpath) {
+    return nethunterSQL.backupData(storedDBpath);
+  }
+
+  public String restoreData(NethunterSQL nethunterSQL, String storedDBpath) {
+    String returnedResult = nethunterSQL.restoreData(storedDBpath);
+    if (returnedResult == null) {
+      NethunterAsynctask nethunterAsynctask = new NethunterAsynctask(NethunterAsynctask.RESTOREDATA, nethunterSQL);
+      nethunterAsynctask.setListener(new NethunterAsynctask.NethunterAsynctaskListener() {
+        @Override
+        public void onAsyncTaskPrepare() {
+
         }
-        return instance;
-    }
 
-    public MutableLiveData<List<NethunterModel>> getNethunterModels(Context context){
-        if (!isDataInitiated) {
-            data.setValue(NethunterSQL.getInstance(context).bindData(nethunterModelArrayList));
-            nethunterModelListFull = new ArrayList<>(data.getValue());
-            isDataInitiated = true;
+        @Override
+        public void onAsyncTaskFinished(List<NethunterModel> nethunterModelList) {
+          updateNethunterModelListFull(nethunterModelList);
+          getNethunterModels().getValue().clear();
+          getNethunterModels().getValue().addAll(nethunterModelList);
+          getNethunterModels().postValue(getNethunterModels().getValue());
+          refreshData();
         }
-        return data;
+      });
+      nethunterAsynctask.execute(getInitCopyOfNethunterModelListFull());
+      return null;
+    } else {
+      return returnedResult;
     }
+  }
 
-    public MutableLiveData<List<NethunterModel>> getNethunterModels(){
-        return data;
-    }
+  public void resetData(NethunterSQL nethunterSQL) {
+    nethunterSQL.resetData();
+    NethunterAsynctask nethunterAsynctask = new NethunterAsynctask(NethunterAsynctask.RESTOREDATA, nethunterSQL);
+    nethunterAsynctask.setListener(new NethunterAsynctask.NethunterAsynctaskListener() {
+      @Override
+      public void onAsyncTaskPrepare() {
 
-    public void refreshData(){
-        NethunterAsynctask nethunterAsynctask = new NethunterAsynctask(NethunterAsynctask.GETITEMRESULTS);
-        nethunterAsynctask.setListener(new NethunterAsynctask.NethunterAsynctaskListener() {
-            @Override
-            public void onAsyncTaskPrepare() {
+      }
 
-            }
+      @Override
+      public void onAsyncTaskFinished(List<NethunterModel> nethunterModelList) {
+        updateNethunterModelListFull(nethunterModelList);
+        getNethunterModels().getValue().clear();
+        getNethunterModels().getValue().addAll(nethunterModelList);
+        getNethunterModels().postValue(getNethunterModels().getValue());
+        refreshData();
+      }
+    });
+    nethunterAsynctask.execute(getInitCopyOfNethunterModelListFull());
+  }
 
-            @Override
-            public void onAsyncTaskFinished(List<NethunterModel> nethunterModelList) {
-                getNethunterModels().getValue().clear();
-                getNethunterModels().getValue().addAll(nethunterModelList);
-                getNethunterModels().postValue(getNethunterModels().getValue());
-            }
-        });
-        nethunterAsynctask.execute(getInitCopyOfNethunterModelListFull());
-    }
+  public void updateNethunterModelListFull(List<NethunterModel> copyOfNethunterModelList) {
+    nethunterModelListFull.clear();
+    nethunterModelListFull.addAll(copyOfNethunterModelList);
+  }
 
-    public void runCommandforItem(int position){
-        NethunterAsynctask nethunterAsynctask = new NethunterAsynctask(NethunterAsynctask.RUNCMDFORITEM, position);
-        nethunterAsynctask.setListener(new NethunterAsynctask.NethunterAsynctaskListener() {
-            @Override
-            public void onAsyncTaskPrepare() {
-
-            }
-
-            @Override
-            public void onAsyncTaskFinished(List<NethunterModel> nethunterModelList) {
-                getNethunterModels().getValue().clear();
-                getNethunterModels().getValue().addAll(nethunterModelList);
-                getNethunterModels().postValue(getNethunterModels().getValue());
-            }
-        });
-        nethunterAsynctask.execute(getInitCopyOfNethunterModelListFull());
-    }
-
-    public void editData(int position, ArrayList<String> dataArrayList, NethunterSQL nethunterSQL){
-        NethunterAsynctask nethunterAsynctask = new NethunterAsynctask(NethunterAsynctask.EDITDATA, position, dataArrayList, nethunterSQL);
-        nethunterAsynctask.setListener(new NethunterAsynctask.NethunterAsynctaskListener() {
-            @Override
-            public void onAsyncTaskPrepare() {
-
-            }
-
-            @Override
-            public void onAsyncTaskFinished(List<NethunterModel> nethunterModelList) {
-                updateNethunterModelListFull(nethunterModelList);
-                getNethunterModels().getValue().clear();
-                getNethunterModels().getValue().addAll(nethunterModelList);
-                getNethunterModels().postValue(getNethunterModels().getValue());
-            }
-        });
-        nethunterAsynctask.execute(getInitCopyOfNethunterModelListFull());
-    }
-
-    public void addData(int position, ArrayList<String> dataArrayList, NethunterSQL nethunterSQL){
-        NethunterAsynctask nethunterAsynctask = new NethunterAsynctask(NethunterAsynctask.ADDDATA, position, dataArrayList, nethunterSQL);
-        nethunterAsynctask.setListener(new NethunterAsynctask.NethunterAsynctaskListener() {
-            @Override
-            public void onAsyncTaskPrepare() {
-
-            }
-
-            @Override
-            public void onAsyncTaskFinished(List<NethunterModel> nethunterModelList) {
-                updateNethunterModelListFull(nethunterModelList);
-                getNethunterModels().getValue().clear();
-                getNethunterModels().getValue().addAll(nethunterModelList);
-                getNethunterModels().postValue(getNethunterModels().getValue());
-            }
-        });
-        nethunterAsynctask.execute(getInitCopyOfNethunterModelListFull());
-    }
-
-    public void deleteData(ArrayList<Integer> selectedPositionsIndex, ArrayList<Integer> selectedTargetIds, NethunterSQL nethunterSQL){
-        NethunterAsynctask nethunterAsynctask = new NethunterAsynctask(NethunterAsynctask.DELETEDATA, selectedPositionsIndex, selectedTargetIds, nethunterSQL);
-        nethunterAsynctask.setListener(new NethunterAsynctask.NethunterAsynctaskListener() {
-            @Override
-            public void onAsyncTaskPrepare() {
-
-            }
-
-            @Override
-            public void onAsyncTaskFinished(List<NethunterModel> nethunterModelList) {
-                updateNethunterModelListFull(nethunterModelList);
-                getNethunterModels().getValue().clear();
-                getNethunterModels().getValue().addAll(nethunterModelList);
-                getNethunterModels().postValue(getNethunterModels().getValue());
-            }
-        });
-        nethunterAsynctask.execute(getInitCopyOfNethunterModelListFull());
-    }
-
-    public void moveData(int originalPositionIndex, int targetPositionIndex, NethunterSQL nethunterSQL){
-        NethunterAsynctask nethunterAsynctask = new NethunterAsynctask(NethunterAsynctask.MOVEDATA, originalPositionIndex, targetPositionIndex, nethunterSQL);
-        nethunterAsynctask.setListener(new NethunterAsynctask.NethunterAsynctaskListener() {
-            @Override
-            public void onAsyncTaskPrepare() {
-
-            }
-
-            @Override
-            public void onAsyncTaskFinished(List<NethunterModel> nethunterModelList) {
-                updateNethunterModelListFull(nethunterModelList);
-                getNethunterModels().getValue().clear();
-                getNethunterModels().getValue().addAll(nethunterModelList);
-                getNethunterModels().postValue(getNethunterModels().getValue());
-            }
-        });
-        nethunterAsynctask.execute(getInitCopyOfNethunterModelListFull());
-    }
-
-    public String backupData(NethunterSQL nethunterSQL, String storedDBpath){
-        return nethunterSQL.backupData(storedDBpath);
-    }
-
-    public String restoreData(NethunterSQL nethunterSQL, String storedDBpath){
-        String returnedResult = nethunterSQL.restoreData(storedDBpath);
-        if (returnedResult == null){
-            NethunterAsynctask nethunterAsynctask = new NethunterAsynctask(NethunterAsynctask.RESTOREDATA, nethunterSQL);
-            nethunterAsynctask.setListener(new NethunterAsynctask.NethunterAsynctaskListener() {
-                @Override
-                public void onAsyncTaskPrepare() {
-
-                }
-
-                @Override
-                public void onAsyncTaskFinished(List<NethunterModel> nethunterModelList) {
-                    updateNethunterModelListFull(nethunterModelList);
-                    getNethunterModels().getValue().clear();
-                    getNethunterModels().getValue().addAll(nethunterModelList);
-                    getNethunterModels().postValue(getNethunterModels().getValue());
-                    refreshData();
-                }
-            });
-            nethunterAsynctask.execute(getInitCopyOfNethunterModelListFull());
-            return null;
-        } else {
-            return returnedResult;
-        }
-    }
-
-    public void resetData(NethunterSQL nethunterSQL){
-        nethunterSQL.resetData();
-        NethunterAsynctask nethunterAsynctask = new NethunterAsynctask(NethunterAsynctask.RESTOREDATA, nethunterSQL);
-        nethunterAsynctask.setListener(new NethunterAsynctask.NethunterAsynctaskListener() {
-            @Override
-            public void onAsyncTaskPrepare() {
-
-            }
-
-            @Override
-            public void onAsyncTaskFinished(List<NethunterModel> nethunterModelList) {
-                updateNethunterModelListFull(nethunterModelList);
-                getNethunterModels().getValue().clear();
-                getNethunterModels().getValue().addAll(nethunterModelList);
-                getNethunterModels().postValue(getNethunterModels().getValue());
-                refreshData();
-            }
-        });
-        nethunterAsynctask.execute(getInitCopyOfNethunterModelListFull());
-    }
-
-    public void updateNethunterModelListFull(List<NethunterModel> copyOfNethunterModelList){
-        nethunterModelListFull.clear();
-        nethunterModelListFull.addAll(copyOfNethunterModelList);
-    }
-
-    private List<NethunterModel> getInitCopyOfNethunterModelListFull(){
-        copyOfNethunterModelListFull.clear();
-        copyOfNethunterModelListFull.addAll(nethunterModelListFull);
-        return copyOfNethunterModelListFull;
-    }
+  private List<NethunterModel> getInitCopyOfNethunterModelListFull() {
+    copyOfNethunterModelListFull.clear();
+    copyOfNethunterModelListFull.addAll(nethunterModelListFull);
+    return copyOfNethunterModelListFull;
+  }
 
 }

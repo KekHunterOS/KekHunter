@@ -14,7 +14,8 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:paddingLeft="@dimen/base_listItem_LR"
-            android:paddingRight="@dimen/base_listItem_LR">
+            android:paddingRight="@dimen/base_listItem_LR"
+            android:paddingBottom="@dimen/base_listItem_TB">
 
             <TextView
                 android:layout_width="match_parent"
@@ -179,6 +180,43 @@
                 android:layout_gravity="center_horizontal"
                 android:orientation="horizontal">
 
+                <View
+                    android:layout_height="match_parent"
+                    android:layout_width="60dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="10dp"
+                    android:paddingTop="10dp"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+
+                <Button
+                    android:id="@+id/imageresminus"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_weight="1"
+                    android:text="-"
+                    android:textColor="#40FFFFFF" />
+
+                <Button
+                    android:id="@+id/imageresplus"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="5dp"
+                    android:text="+"
+                    android:textColor="#40FFFFFF" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:orientation="horizontal">
+
                 <TextView
                     android:id="@+id/textView8"
                     android:layout_height="match_parent"
@@ -207,6 +245,40 @@
                     android:ems="10"
                     android:inputType="number"
                     android:text="1920" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:orientation="horizontal" >
+
+                <View
+                    android:layout_height="match_parent"
+                    android:layout_width="60dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="10dp"
+                    android:paddingTop="10dp"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                <Button
+                    android:id="@+id/finalresminus"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_weight="1"
+                    android:text="-" />
+
+                <Button
+                    android:id="@+id/finalresplus"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="5dp"
+                    android:text="+" />
 
             </LinearLayout>
 
@@ -290,25 +362,25 @@
                 android:text="Install bootanimation"
                 android:textColor="#ffffffff" />
 
-            <View
-                android:id="@+id/divider5"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="?android:attr/listDivider" />
+          <View
+              android:id="@+id/divider5"
+              android:layout_width="match_parent"
+              android:layout_height="1dp"
+              android:background="?android:attr/listDivider" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="BACKUP OR RESTORE NETHUNTER FILES"
-                android:paddingTop="10dp"
-                android:padding="4dp" />
+          <TextView
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:text="BACKUP OR RESTORE NETHUNTER FILES"
+              android:paddingTop="10dp"
+              android:padding="4dp" />
 
             <Button
-                android:id="@+id/backup"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Backup"
-                android:textColor="#ffffffff" />
+              android:id="@+id/backup"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:text="Backup"
+              android:textColor="#ffffffff" />
 
             <View
                 android:id="@+id/divider6"
@@ -317,35 +389,35 @@
                 android:background="?android:attr/listDivider" />
 
             <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:orientation="horizontal">
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_gravity="center_horizontal"
+              android:orientation="horizontal">
 
-                <EditText
-                    android:id="@+id/restorefilename"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="/sdcard/nh_files_20201010.tar"
-                    android:inputType="text" />
+              <EditText
+                  android:id="@+id/restorefilename"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_weight="1"
+                  android:hint="/sdcard/nh_files_20201010.tar"
+                  android:inputType="text" />
 
-                <Button
-                    android:id="@+id/restorefilebrowse"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="5"
-                    android:text="..."
-                    android:textColor="#ffffffff" />
+              <Button
+                  android:id="@+id/restorefilebrowse"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_weight="5"
+                  android:text="..."
+                  android:textColor="#ffffffff" />
 
-            </LinearLayout>
+          </LinearLayout>
 
             <Button
-                android:id="@+id/restore"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Restore"
-                android:textColor="#ffffffff" />
+              android:id="@+id/restore"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:text="Restore"
+              android:textColor="#ffffffff" />
 
             <View
                 android:id="@+id/divider7"
@@ -369,8 +441,84 @@
                 android:text="Uninstall NetHunter App"
                 android:textColor="#ffffffff" />
 
+            <View
+                android:id="@+id/divider9"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="CURRENT BUSYBOX VERSION"
+                android:paddingTop="10dp"
+                android:padding="4dp"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:id="@+id/busybox_version"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Loading.."
+                android:paddingTop="10dp"
+                android:padding="4dp"
+                android:layout_weight="3"/>
+
         </LinearLayout>
 
-    </ScrollView>
+            <View
+                android:id="@+id/divider8"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="NEW VERSION"
+                    android:padding="4dp"/>
+
+            <Spinner
+                android:id="@+id/bb_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
+                android:dropDownWidth="match_parent"
+                android:saveEnabled="false" />
+
+            <Button
+                android:id="@+id/select_bb"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:text="Apply"
+                android:textColor="#ffffffff" />
+
+        </LinearLayout>
+
+            <Button
+                android:id="@+id/system_bb"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:text="Use as default system busybox"
+                android:textColor="#ffffffff" />
+
+      </LinearLayout>
+
+  </ScrollView>
 
 </LinearLayout>

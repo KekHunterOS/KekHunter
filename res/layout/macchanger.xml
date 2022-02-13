@@ -120,9 +120,8 @@
 
                 <ImageButton
                     android:id="@+id/f_macchanger_reloadMAC_imgbtn"
-                    android:background="#AE1E1E1E"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
                     android:contentDescription="@string/reloadMAC"
                     app:srcCompat="@drawable/ic_action_refresh" />
@@ -245,19 +244,28 @@
                         android:maxLength="2" />
                 </LinearLayout>
 
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
                 <Button
                     android:id="@+id/f_macchanger_regenerate_mac_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="GENERATE"
-                    android:visibility="gone"/>
+                    android:visibility="gone"
+                    android:layout_weight="1" />
 
                 <Button
                     android:id="@+id/f_macchanger_clear_mac_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="CLEAR"
-                    android:visibility="gone" />
+                    android:visibility="gone"
+                    android:layout_weight="1" />
 
             </LinearLayout>
 

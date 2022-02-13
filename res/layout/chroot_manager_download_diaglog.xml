@@ -40,7 +40,7 @@
             android:layout_marginEnd="8dp"
             android:textSize="18sp"
             android:textColor="@color/clearTitle"
-            android:text="Full or minimal install:"/>
+            android:text="Min or Full install:"/>
 
         <Spinner
             android:id="@+id/f_chrootmanager_minorfull_adb_spr"

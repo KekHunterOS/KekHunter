@@ -76,7 +76,6 @@
             android:gravity="center_vertical" />
     </RelativeLayout>
     <Button
-        style="@style/Widget.AppCompat.Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="LOAD DB (1st run only)"

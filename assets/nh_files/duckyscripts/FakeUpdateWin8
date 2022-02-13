@@ -1,4 +1,0 @@
-GUI r
-DELAY 500
-STRING iexplore -k https://fakeupdate.net/win8/
-ENTER

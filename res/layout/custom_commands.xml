@@ -9,11 +9,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <Button
-            android:id="@+id/addCommand"
+            style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="Add Command"
+            android:id="@+id/addCommand"
             android:layout_alignParentTop="true"
-            android:text="Add Command" />
+            android:layout_alignParentStart="false" />
+
         <SearchView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
